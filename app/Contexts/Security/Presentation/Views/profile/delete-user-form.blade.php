@@ -8,9 +8,10 @@
         </p>
     </header>
 
-    <x-form.danger-button wire:click.prevent="confirmDeletion">
+    {{-- Mapeado al botón danger unificado de Shared --}}
+    <x-shared::form.danger-button wire:click.prevent="confirmDeletion">
         {{ __('Eliminar Cuenta') }}
-    </x-form.danger-button> 
+    </x-shared::form.danger-button> 
 
     {{-- Renderizado condicional del modal manejado por Livewire --}}
     @if($confirmingUserDeletion)
@@ -26,25 +27,32 @@
 
                 <form wire:submit.prevent="deleteAccount" class="mt-6">
                     <div>
-                        <x-form.input-label for="password" value="{{ __('Password') }}" class="sr-only" />
-                        <x-form.text-input
+                        <x-shared::form.input-label for="password" value="{{ __('Password') }}" class="sr-only" />
+                        
+                        <x-shared::form.text-input
                             type="password"
                             id="password"
                             placeholder="Ingresa la contraseña actual"
                             wire:model="password"
+                            class="w-full"
                             required 
                         />
-                        @error('password') <span class="text-sm text-red-650 mt-2 block">{{ $message }}</span> @enderror
+                        
+                        {{-- Corregido text-red-650 a text-red-600 para Tailwind nativo --}}
+                        @error('password') 
+                            <span class="text-sm text-red-600 mt-2 block font-medium">{{ $message }}</span> 
+                        @enderror
                     </div>
 
                     <div class="mt-6 flex justify-end gap-3">
-                        <x-form.secondary-button type="button" wire:click="cancelDeletion">
+                        {{-- Mapeado a los controles de Shared --}}
+                        <x-shared::form.secondary-button type="button" wire:click="cancelDeletion">
                             {{ __('Cancelar') }}
-                        </x-form.secondary-button>
+                        </x-shared::form.secondary-button>
 
-                        <x-form.danger-button type="submit" class="ms-3">
+                        <x-shared::form.danger-button type="submit" class="ms-3">
                             {{ __('Eliminar Cuenta') }}
-                        </x-form.danger-button>
+                        </x-shared::form.danger-button>
                     </div>
                 </form>
                 

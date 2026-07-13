@@ -18,30 +18,33 @@
 
         <form wire:submit="sendResetLink">
             <div class="space-y-5">
+                {{-- Correo Electrónico --}}
                 <div>
-                    <x-form.input-label for="email" :value="__('Email:')" required />
-                    <x-form.text-input 
+                    <x-shared::form.input-label for="email" :value="__('Email:')" required />
+                    <x-shared::form.text-input 
                         type="email" 
                         wire:model="email" 
                         id="email" 
                         placeholder="Escribe el email registrado" 
+                        class="w-full lowercase"
                         required 
                         autofocus 
                     />    
-                    <x-form.input-error :messages="$errors->get('email')" class="mt-2" />
+                    <x-shared::form.input-error :messages="$errors->get('email')" class="mt-2" />
                 </div>
 
+                {{-- Controles y Acciones --}}
                 <div class="flex items-center justify-between pt-2">
                     <a href="{{ route('login') }}" class="text-xs font-bold text-gray-400 hover:text-indigo-600 transition-colors uppercase tracking-wider">
                         <i class="fa-solid fa-arrow-left mr-1"></i> Volver al Login
                     </a>
 
-                    <x-form.button-primary type="submit" wire:loading.attr="disabled" class="shadow-lg shadow-indigo-500/10">
+                    <x-shared::form.button-primary type="submit" wire:loading.attr="disabled" class="shadow-lg shadow-indigo-500/10">
                         <span wire:loading.remove><i class="fa-solid fa-paper-plane mr-1.5"></i> Enviar Enlace</span>
                         <span wire:loading class="flex items-center gap-2">
                             <i class="fa-solid fa-circle-notch animate-spin text-xs"></i> Despachando token...
                         </span>
-                    </x-form.button-primary>
+                    </x-shared::form.button-primary>
                 </div>
             </div>
         </form>
