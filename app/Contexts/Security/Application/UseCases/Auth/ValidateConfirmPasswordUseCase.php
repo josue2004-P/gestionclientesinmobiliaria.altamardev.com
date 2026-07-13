@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Contexts\Security\Application\UseCases;
+namespace App\Contexts\Security\Application\UseCases\Auth;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;

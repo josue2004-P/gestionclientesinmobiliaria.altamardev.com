@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Contexts\Public\Infrastructure\Livewire\Components;
+namespace App\Contexts\Public\Presentation\Livewire\Components;
 
 use Livewire\Component;
 use App\Contexts\Public\Application\UseCases\Contact\SubmitContactMessageUseCase;

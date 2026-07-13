@@ -1,6 +1,5 @@
 <?php
 
-namespace App\Contexts\Public\Domain\Repositories;
 namespace App\Contexts\Public\Application\UseCases\Contact;
 
 use App\Contexts\Public\Domain\Repositories\ContactMessageRepositoryInterface;
