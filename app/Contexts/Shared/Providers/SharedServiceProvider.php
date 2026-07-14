@@ -21,6 +21,11 @@ use App\Contexts\Shared\Presentation\Livewire\TiposVivienda\IndexTiposVivienda;
 use App\Contexts\Shared\Presentation\Livewire\TiposVivienda\CreateTipoVivienda;
 use App\Contexts\Shared\Presentation\Livewire\TiposVivienda\EditTipoVivienda;
 
+// AMENIDADES
+use App\Contexts\Shared\Presentation\Livewire\Amenidades\IndexAmenidades;
+use App\Contexts\Shared\Presentation\Livewire\Amenidades\CreateAmenidad;
+use App\Contexts\Shared\Presentation\Livewire\Amenidades\EditAmenidad;
+
 class SharedServiceProvider extends ServiceProvider
 {
     public function register(): void
@@ -50,6 +55,11 @@ class SharedServiceProvider extends ServiceProvider
         Livewire::component('shared::tipos-vivienda.create-tipo-vivienda', CreateTipoVivienda::class);
         Livewire::component('shared::tipos-vivienda.edit-tipo-vivienda', EditTipoVivienda::class);
 
+        // AMENIDADES
+        Livewire::component('shared::amenidades.index-amenidades', IndexAmenidades::class);
+        Livewire::component('shared::amenidades.create-amenidad', CreateAmenidad::class);
+        Livewire::component('shared::amenidades.edit-amenidad', EditAmenidad::class);
+
         $this->app->bind(
             \App\Contexts\Shared\Domain\Repositories\AsentamientoRepositoryInterface::class,
             \App\Contexts\Shared\Infrastructure\Repositories\EloquentAsentamientoRepository::class
@@ -63,6 +73,11 @@ class SharedServiceProvider extends ServiceProvider
         $this->app->bind(
             \App\Contexts\Shared\Domain\Repositories\TipoViviendaRepositoryInterface::class,
             \App\Contexts\Shared\Infrastructure\Repositories\EloquentTipoViviendaRepository::class
+        );
+
+        $this->app->bind(
+            \App\Contexts\Shared\Domain\Repositories\AmenidadRepositoryInterface::class,
+            \App\Contexts\Shared\Infrastructure\Repositories\EloquentAmenidadRepository::class
         );
     }
 }

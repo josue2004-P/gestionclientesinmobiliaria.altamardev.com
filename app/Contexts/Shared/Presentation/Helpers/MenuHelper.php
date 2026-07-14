@@ -20,6 +20,7 @@ class MenuHelper
                     ['name' => 'Asentamientos', 'path' => '/asentamientos', 'permiso' => 'asentamientos'],
                     ['name' => 'Tipos de Crédito', 'path' => '/tipos-credito', 'permiso' => 'tipos_credito'],
                     ['name' => 'Tipos de Vivienda', 'path' => '/tipos-vivienda', 'permiso' => 'tipos_vivienda'],
+                    ['name' => 'Amenidades', 'path' => '/amenidades', 'permiso' => 'amenidades'],
                 ],
             ],
             [
