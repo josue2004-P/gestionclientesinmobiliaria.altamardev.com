@@ -43,6 +43,11 @@ use App\Contexts\Shared\Presentation\Livewire\Amenidades\IndexAmenidades;
 use App\Contexts\Shared\Presentation\Livewire\Amenidades\CreateAmenidad;
 use App\Contexts\Shared\Presentation\Livewire\Amenidades\EditAmenidad;
 
+// --- IMPORTACIONES MÓDULO 5: VIVIENDAS ---
+use App\Contexts\Viviendas\Presentation\Livewire\IndexViviendas;
+use App\Contexts\Viviendas\Presentation\Livewire\CreateVivienda;
+use App\Contexts\Viviendas\Presentation\Livewire\EditVivienda;
+
 Route::get('/', WelcomePage::class)->name('home');
 Route::get('/contacto', ContactPage::class)->name('contactar');
 
@@ -81,9 +86,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('tipos-vivienda/crear', CreateTipoVivienda::class)->name('tipos-vivienda.create');
     Route::get('tipos-vivienda/{id}/editar', EditTipoVivienda::class)->name('tipos-vivienda.edit');
 
+    // --- MÓDULO 4: CATÁLOGO DE AMENIDADES ---
     Route::get('amenidades', IndexAmenidades::class)->name('amenidades.index');
     Route::get('amenidades/crear', CreateAmenidad::class)->name('amenidades.create');
     Route::get('amenidades/{id}/editar', EditAmenidad::class)->name('amenidades.edit');
+
+    // --- MÓDULO 5: CATÁLOGO DE VIVIENDAS ---
+
+    Route::get('viviendas', IndexViviendas::class)->name('viviendas.index');
+    Route::get('viviendas/crear', CreateVivienda::class)->name('viviendas.create');
+    Route::get('viviendas/{id}/editar', EditVivienda::class)->name('viviendas.edit');
 
 });
 

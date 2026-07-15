@@ -24,6 +24,14 @@ class MenuHelper
                 ],
             ],
             [
+                'name' => 'Viviendas',
+                'icon' => 'viviendas-icon', 
+                'permiso' => 'viviendas',
+                'subItems' => [
+                    ['name' => 'Inventario', 'path' => '/viviendas', 'permiso' => 'viviendas'],
+                ],
+            ],
+            [
                 'name' => 'Usuarios',
                 'icon' => 'users',
                 'permiso' => 'usuarios', 
@@ -33,7 +41,6 @@ class MenuHelper
                     ['name' => 'Permisos', 'path' => '/permisos', 'permiso' => 'permisos'],
                 ],
             ],
-       
         ];
     }
 
@@ -78,10 +85,6 @@ class MenuHelper
                 'title' => 'Menu',
                 'items' => self::getMainNavItems()
             ],
-            // [
-            //     'title' => 'Others',
-            //     'items' => self::getOthersItems()
-            // ]
         ];
     }
 
@@ -93,24 +96,12 @@ class MenuHelper
     public static function getIconSvg($iconName)
     {
         $icons = [
-            'dashboard' => '<i class="text-xl fa-solid fa-gauge-high"></i>',
-
-            'book-medical' => '<i class="text-xl fa-solid fa-book-medical"></i>',
-
-            'users' => '<i class="text-xl fa-solid fa-user"></i>',
-
-            'analysis' => '<i class=" text-xl fa-solid fa-flask"></i>',
-
-            'dna' => '<i class="text-xl fa-solid fa-dna"></i>',
-
-            'doctor' => '<i class="text-xl fa-solid fa-user-doctor"></i>',
-
-            'gear' => '<i class="text-xl fa-solid fa-gear"></i>',
-
-            'catalog' => '<i class=" text-xl  fa-solid fa-square-poll-horizontal"></i>',
-
-            'catalog-icon' => '<i class="text-xl fa-solid fa-earth-americas"></i>',
-
+            'dashboard'    => '<i class="text-xl fa-solid fa-gauge-high"></i>',
+            'users'        => '<i class="text-xl fa-solid fa-user"></i>',
+            'gear'         => '<i class="text-xl fa-solid fa-gear"></i>',
+            'catalog'      => '<i class="text-xl fa-solid fa-square-poll-horizontal"></i>',
+            'catalog-icon'   => '<i class="text-xl fa-solid fa-earth-americas"></i>',
+            'viviendas-icon' => '<i class="text-xl fa-solid fa-house-chimney"></i>',
         ];
 
         return $icons[$iconName] ?? '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/></svg>';
