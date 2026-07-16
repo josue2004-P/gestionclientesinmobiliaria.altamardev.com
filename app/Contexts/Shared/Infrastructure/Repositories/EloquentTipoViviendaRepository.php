@@ -9,6 +9,21 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class EloquentTipoViviendaRepository implements TipoViviendaRepositoryInterface
 {
+    public function all(): array
+    {
+        $models = TipoViviendaEloquentModel::select('id', 'nombre', 'descripcion')
+            ->orderBy('nombre', 'asc')
+            ->get();
+
+        return $models->map(function ($model) {
+            return new TipoVivienda(
+                $model->id,
+                $model->nombre,
+                $model->descripcion 
+            );
+        })->toArray();
+    }
+    
     public function create(TipoVivienda $tipoVivienda): void
     {
         TipoViviendaEloquentModel::create($tipoVivienda->toArray());

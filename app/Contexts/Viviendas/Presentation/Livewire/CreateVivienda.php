@@ -5,25 +5,23 @@ namespace App\Contexts\Viviendas\Presentation\Livewire;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+
 use App\Contexts\Viviendas\Application\UseCases\SaveViviendaUseCase;
 use App\Contexts\Viviendas\Application\UseCases\SaveViviendaContactosUseCase;
 use App\Contexts\Viviendas\Application\UseCases\SaveViviendaDocumentosUseCase;
 use App\Contexts\Viviendas\Application\UseCases\SaveViviendaFotosUseCase;
 
-use App\Contexts\Shared\Infrastructure\LaravelModels\AsentamientoEloquentModel;
-use App\Contexts\Shared\Infrastructure\LaravelModels\TipoViviendaEloquentModel;
-use App\Contexts\Shared\Infrastructure\LaravelModels\TipoCreditoEloquentModel;
-use App\Contexts\Shared\Infrastructure\LaravelModels\AmenidadEloquentModel;
+use App\Contexts\Shared\Application\UseCases\Asentamientos\GetAsentamientosForSelectUseCase;
+use App\Contexts\Shared\Application\UseCases\TiposVivienda\GetTiposViviendaForSelectUseCase;
+use App\Contexts\Shared\Application\UseCases\TiposCredito\GetTiposCreditoForSelectUseCase;
+use App\Contexts\Shared\Application\UseCases\Amenidades\GetAmenidadesForSelectUseCase;
 
 class CreateVivienda extends Component
 {
     use WithFileUploads;
 
-    public $asentamientos = [];
-    public $tiposVivienda = [];
-    public $creditosDisponibles = [];
-    public $amenidadesDisponibles = [];
-
+    // Form data fields
     public $fraccionamiento = '';
     public $asentamiento_id = '';
     public $tipo_vivienda_id = '';
@@ -36,7 +34,6 @@ class CreateVivienda extends Component
     public $amenidades_ids = [];
 
     public array $contactos = [];
-
     public array $documentos = [];
     public $temporalFile; 
     public $temporalTipo = '';
@@ -69,11 +66,6 @@ class CreateVivienda extends Component
     {
         if (!checkPermiso('viviendas.is_create')) abort(403);
         
-        $this->asentamientos = AsentamientoEloquentModel::select('id', 'codigo_postal', 'nombre_asentamiento')->get();
-        $this->tiposVivienda = TipoViviendaEloquentModel::select('id', 'nombre')->get();
-        $this->creditosDisponibles = TipoCreditoEloquentModel::where('aplica_vivienda', true)->select('id', 'nombre')->get();
-        $this->amenidadesDisponibles = AmenidadEloquentModel::select('id', 'nombre')->get();
-
         $this->addContacto();
     }
 
@@ -158,7 +150,7 @@ class CreateVivienda extends Component
     public function removeFoto($index)
     {
         if (isset($this->fotos[$index]['url'])) {
-            \Illuminate\Support\Facades\Storage::disk('local')->delete($this->fotos[$index]['url']);
+            Storage::disk('local')->delete($this->fotos[$index]['url']);
         }
 
         $fuePrincipal = $this->fotos[$index]['es_principal'];
@@ -178,31 +170,50 @@ class CreateVivienda extends Component
     ) {
         $this->validate();
 
-        $viviendaId = $useCase->execute([
-            'fraccionamiento'  => $this->fraccionamiento,
-            'asentamiento_id'  => $this->asentamiento_id,
-            'tipo_vivienda_id' => $this->tipo_vivienda_id,
-            'precio_lista'     => $this->precio_lista,
-            'recamaras'        => $this->recamaras,
-            'direccion'        => $this->direccion,
-            'llaves'           => (bool)$this->llaves,
-            'estatus_vivienda' => $this->estatus_vivienda,
-            'creditos_ids'     => $this->creditos_ids,
-            'amenidades_ids'   => $this->amenidades_ids,
-        ]);
+        try {
+            DB::beginTransaction();
 
-        $contactosUseCase->execute($viviendaId, $this->contactos);
-        $documentosUseCase->execute($viviendaId, $this->documentos);
-        $fotosUseCase->execute($viviendaId, $this->fotos);
+            $viviendaId = $useCase->execute([
+                'fraccionamiento'  => $this->fraccionamiento,
+                'asentamiento_id'  => $this->asentamiento_id,
+                'tipo_vivienda_id' => $this->tipo_vivienda_id,
+                'precio_lista'     => $this->precio_lista,
+                'recamaras'        => $this->recamaras,
+                'direccion'        => $this->direccion,
+                'llaves'           => (bool)$this->llaves,
+                'estatus_vivienda' => $this->estatus_vivienda,
+                'creditos_ids'     => $this->creditos_ids,
+                'amenidades_ids'   => $this->amenidades_ids,
+            ]);
 
-        session()->flash('success', 'Ficha técnica de la propiedad generada correctamente.');
-        return redirect()->route('viviendas.index');
+            $contactosUseCase->execute($viviendaId, $this->contactos);
+            $documentosUseCase->execute($viviendaId, $this->documentos);
+            $fotosUseCase->execute($viviendaId, $this->fotos);
+
+            DB::commit();
+
+            session()->flash('success', 'Ficha técnica de la propiedad generada correctamente.');
+            return redirect()->route('viviendas.index');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $this->addError('fraccionamiento', 'Error en el proceso de guardado: ' . $e->getMessage());
+        }
     }
 
-    public function render()
-    {
-        return view('viviendas::create')
-            ->layout('shared::layouts.app')
-            ->title('Registrar Inmueble');
+    public function render(
+        GetAsentamientosForSelectUseCase $asentamientosUseCase,
+        GetTiposViviendaForSelectUseCase $tiposUseCase,
+        GetTiposCreditoForSelectUseCase $creditosUseCase,
+        GetAmenidadesForSelectUseCase $amenidadesUseCase
+    ) {
+        return view('viviendas::create', [
+            'asentamientos'         => $asentamientosUseCase->execute(),
+            'tiposVivienda'         => $tiposUseCase->execute(),
+            'creditosDisponibles'   => $creditosUseCase->execute('vivienda'), // Contexto vivienda estricto
+            'amenidadesDisponibles' => $amenidadesUseCase->execute()
+        ])
+        ->layout('shared::layouts.app')
+        ->title('Registrar Inmueble');
     }
 }

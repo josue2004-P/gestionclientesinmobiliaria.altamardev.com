@@ -9,6 +9,18 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class EloquentAmenidadRepository implements AmenidadRepositoryInterface
 {
+    public function all(): array
+    {
+        $models = AmenidadEloquentModel::select('id', 'nombre')->orderBy('nombre', 'asc')->get();
+
+        return $models->map(function ($model) {
+            return new Amenidad(
+                $model->id,
+                $model->nombre
+            );
+        })->toArray();
+    }
+    
     public function create(Amenidad $amenidad): void
     {
         AmenidadEloquentModel::create($amenidad->toArray());
