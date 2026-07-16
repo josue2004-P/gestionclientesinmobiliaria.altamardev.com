@@ -54,6 +54,7 @@ use App\Contexts\Viviendas\Presentation\Controllers\ViviendaFotoController;
 use App\Contexts\Clientes\Presentation\Livewire\IndexClientes;
 use App\Contexts\Clientes\Presentation\Livewire\CreateCliente;
 use App\Contexts\Clientes\Presentation\Livewire\EditCliente;
+use App\Contexts\Clientes\Presentation\Http\Controllers\VerClienteDocumentoController;
 
 Route::get('/', WelcomePage::class)->name('home');
 Route::get('/contacto', ContactPage::class)->name('contactar');
@@ -113,6 +114,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('clientes', IndexClientes::class)->name('clientes.index');
     Route::get('clientes/crear', CreateCliente::class)->name('clientes.create');
     Route::get('clientes/{id}/editar', EditCliente::class)->name('clientes.edit');
+    Route::get('/clientes/expediente/ver-documento', VerClienteDocumentoController::class)
+        ->name('clientes.documentos.ver');
 });
 
 Route::get('/dashboard', DashboardPage::class)

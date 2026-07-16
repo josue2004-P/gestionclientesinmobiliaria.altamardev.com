@@ -99,6 +99,9 @@ class EditCliente extends Component
             ];
         })->toArray();
 
+        if (empty($this->telefonos)) {
+            $this->addTelefono();
+        }
         if (empty($this->referencias)) {
             $this->addReferencia();
         }
