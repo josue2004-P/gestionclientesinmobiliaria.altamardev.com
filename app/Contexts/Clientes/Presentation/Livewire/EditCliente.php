@@ -2,14 +2,20 @@
 
 namespace App\Contexts\Clientes\Presentation\Livewire;
 
+use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use App\Contexts\Clientes\Application\UseCases\GetClienteByIdUseCase;
-use App\Contexts\Clientes\Application\UseCases\UpdateClienteUseCase;
+use App\Contexts\Clientes\Application\UseCases\SaveClienteUseCase;
+use App\Contexts\Clientes\Application\UseCases\SaveClienteTelefonosUseCase;
+use App\Contexts\Clientes\Application\UseCases\SaveClienteReferenciasUseCase;
+use App\Contexts\Clientes\Application\UseCases\SaveClienteDocumentosUseCase;
 use App\Contexts\Shared\Application\UseCases\Asentamientos\GetAsentamientosForSelectUseCase;
 use App\Contexts\Shared\Application\UseCases\TiposCredito\GetTiposCreditoForSelectUseCase;
 
 class EditCliente extends Component
 {
+    use WithFileUploads;
     // ID del registro a editar
     public int $clienteId;
 
@@ -33,6 +39,21 @@ class EditCliente extends Component
 
     public array $zonas_ids = [];
     public array $telefonos = [];
+    public array $referencias = [];
+
+    public array $documentos = [];
+    public $temporalFile;
+    public string $temporalTipo = '';
+
+    // Catálogo interno para desplegar etiquetas limpias
+    public array $tiposDisponibles = [
+        'INE' => 'Identificación Oficial (INE / Pasaporte)',
+        'CURP' => 'Clave Única de Registro de Población (CURP)',
+        'RFC' => 'Constancia de Situación Fiscal (RFC)',
+        'Acta_Nacimiento' => 'Acta de Nacimiento Certificada',
+        'Comprobante_Domicilio' => 'Comprobante de Domicilio Reciente',
+        'Estado_Cuenta' => 'Estado de Cuenta Bancario (CLABE)'
+    ];
 
     public function mount(int $id, GetClienteByIdUseCase $getClienteUseCase)
     {
@@ -66,6 +87,24 @@ class EditCliente extends Component
 
         $this->zonas_ids = $cliente->getZonasInteres() ?? [];
         $this->telefonos = collect($cliente->getTelefonos())->map(fn($t) =>$t->toArray())->toArray();
+        $this->referencias = collect($cliente->getReferencias())->map(fn($r) => $r->toArray())->toArray();
+        $this->documentos = collect($cliente->getDocumentos())->map(function($d) {
+            return [
+                'id'              => $d->getId(),
+                'url'             => $d->getUrl(),
+                'nombre_original' => $d->getNombreOriginal(),
+                'tipo_documento'  => $d->getTipoDocumento(),
+                'peso_bytes'      => $d->getPesoBytes(),
+                'verificado'      => (bool)$d->isVerificado(),
+            ];
+        })->toArray();
+
+        if (empty($this->referencias)) {
+            $this->addReferencia();
+        }
+        if (empty($this->documentos)) {
+            $this->documentos = [];
+        }
     }
 
     protected function rules(): array
@@ -94,6 +133,11 @@ class EditCliente extends Component
             'telefonos.*.id'            => 'nullable|integer',
             'telefonos.*.telefono'      => 'required|string|min:8|max:20',
             'telefonos.*.tipo_telefono' => 'required|string|max:50',
+            'referencias' => 'nullable|array',
+            'referencias.*.id' => 'nullable|integer',
+            'referencias.*.nombre' => 'required|string|max:255',
+            'referencias.*.celular' => 'nullable|string|max:20',
+            'referencias.*.parentesco' => 'nullable|string|max:100',
         ];
     }
 
@@ -112,31 +156,89 @@ class EditCliente extends Component
         $this->telefonos = array_values($this->telefonos);
     }
 
-    public function update(UpdateClienteUseCase $updateClienteUseCase)
+    public function addReferencia(): void
     {
-        $validatedData = $this->validate();
+        $this->referencias[] = [
+            'id' => null,
+            'nombre' => '',
+            'celular' => '',
+            'parentesco' => '',
+            'asentamiento_id' => null,
+            'calle_numero' => ''
+        ];
+    }
 
-        $validatedData['zonas_interes'] = $this->zonas_ids;
-        $validatedData['telefonos']     = $this->telefonos;
+    public function removeReferencia(int $index): void
+    {
+        unset($this->referencias[$index]);
+        $this->referencias = array_values($this->referencias);
+    }
 
-        try {
-            $updateClienteUseCase->execute($this->clienteId, $validatedData);
+    public function addDocumento()
+    {
+        $this->validate([
+            'temporalFile' => 'required|file|max:10240', // 10MB Máx
+            'temporalTipo' => 'required|string',
+        ]);
 
-            $this->dispatch('swal-init', [
-                'icon' => 'success',
-                'title' => '¡Actualizado!',
-                'text' => 'El expediente del cliente se actualizó correctamente.'
-            ]);
+        $path = $this->temporalFile->store('clientes/documentos', 'local');
 
-            return redirect()->route('clientes.index');
+        $this->documentos[] = [
+            'id'              => null,
+            'url'             => $path,
+            'nombre_original' => $this->temporalFile->getClientOriginalName(),
+            'tipo_documento'  => $this->temporalTipo,
+            'peso_bytes'      => $this->temporalFile->getSize(),
+            'verificado'      => false,
+        ];
 
-        } catch (\Exception $e) {
-            $this->dispatch('swal-init', [
-                'icon' => 'error',
-                'title' => 'Error',
-                'text' => 'Fallo al actualizar: ' . $e->getMessage()
-            ]);
+        $this->reset(['temporalFile', 'temporalTipo']);
+    }
+
+    public function removeDocumento($index)
+    {
+        if (isset($this->documentos[$index]['url'])) {
+            Storage::disk('local')->delete($this->documentos[$index]['url']);
         }
+        unset($this->documentos[$index]);
+        $this->documentos = array_values($this->documentos);
+    }
+
+    public function save(
+        SaveClienteUseCase $useCase, 
+        SaveClienteTelefonosUseCase $telefonosUseCase,
+        SaveClienteReferenciasUseCase $referenciasUseCase,
+        SaveClienteDocumentosUseCase $documentosUseCase 
+    ) {
+        $this->validate();
+
+        $idGenerado = $useCase->execute([
+            'id'                   => $this->clienteId,
+            'nombre'               => $this->nombre,
+            'apellido_paterno'     => $this->apellido_paterno,
+            'apellido_materno'     => $this->apellido_materno,
+            'fecha_nacimiento'     => $this->fecha_nacimiento,
+            'rfc'                  => $this->rfc,
+            'curp'                 => $this->curp,
+            'asentamiento_id'      => $this->asentamiento_id,
+            'calle_numero'         => $this->calle_numero,
+            'nss'                  => $this->nss,
+            'correo_infonavit'     => $this->correo_infonavit,
+            'contrasena_infonavit' => $this->contrasena_infonavit,
+            'tipo_credito_id'      => $this->tipo_credito_id,
+            'precalificacion'      => $this->precalificacion,
+            'avaluo_solicitado'    => $this->avaluo_solicitado,
+            'estado_civil'         => $this->estado_civil,
+            'regimen_casamiento'   => $this->regimen_casamiento,
+            'zonas_ids'            => $this->zonas_ids,
+        ]);
+
+        $telefonosUseCase->execute($idGenerado, $this->telefonos);
+        $referenciasUseCase->execute($idGenerado, $this->referencias);
+        $documentosUseCase->execute($idGenerado, $this->documentos);
+
+        session()->flash('success', 'Expediente del cliente actualizado correctamente.');
+        return redirect()->route('clientes.index');
     }
 
     public function render(

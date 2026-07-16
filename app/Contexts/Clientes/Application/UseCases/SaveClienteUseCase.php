@@ -13,14 +13,14 @@ class SaveClienteUseCase
         private ClienteRepositoryInterface $repository
     ) {}
 
-    public function execute(array $data): Cliente
+    public function execute(array $data): int // 🟢 Corregido a int
     {
         $telefonosDominio = [];
         if (!empty($data['telefonos']) && is_array($data['telefonos'])) {
             foreach ($data['telefonos'] as $tel) {
                 $telefonosDominio[] = new ClienteTelefono(
-                    id: null,
-                    clienteId: null,
+                    id: $tel['id'] ?? null,
+                    clienteId: $data['id'] ?? null,
                     telefono: $tel['telefono'],
                     tipoTelefono: $tel['tipo_telefono'] ?? 'Celular'
                 );
@@ -28,7 +28,7 @@ class SaveClienteUseCase
         }
         
         $cliente = new Cliente(
-            id: null,
+            id: $data['id'] ?? null,
             nombre: $data['nombre'],
             apellidoPaterno: $data['apellido_paterno'],
             apellidoMaterno: $data['apellido_materno'],
@@ -48,7 +48,7 @@ class SaveClienteUseCase
             telefonos: $telefonosDominio,
             referencias: [],
             documentos: [],
-            zonasInteres: $data['zonas_interes'] ?? []
+            zonasInteres: $data['zonas_ids'] ?? [] 
         );
 
         return $this->repository->save($cliente);
