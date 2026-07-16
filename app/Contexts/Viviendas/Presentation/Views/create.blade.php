@@ -110,9 +110,14 @@
                     <div class="md:col-span-3">
                         <x-shared::form.input-label for="direccion" :value="__('Dirección Completa (Calle, Número, Interno)')" required/>
                         <div class="mt-1.5">
-                            <textarea id="direccion" wire:model="direccion" placeholder="Ingresa la calle, número exterior y número de lote exacto..." class="w-full text-sm font-medium border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 rounded-none h-24 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                            <x-shared::form.textarea-input 
+                                id="direccion" 
+                                wire:model="direccion" 
+                                placeholder="Ingresa la calle, número exterior y número de lote exacto..." 
+                                :messages="$errors->get('direccion')"
+                                class="w-full text-sm font-medium h-24 rounded-none" 
+                            />
                         </div>
-                        <x-shared::form.input-error :messages="$errors->get('direccion')" class="mt-2" />
                     </div>
 
                     {{-- Switches Cruzados M:N --}}

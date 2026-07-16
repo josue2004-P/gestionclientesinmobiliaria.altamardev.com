@@ -29,30 +29,40 @@
                         <x-shared::form.input-error :messages="$errors->get('fraccionamiento')" class="mt-2" />
                     </div>
 
-                    {{-- Asentamiento Geográfico Compartido --}}
+                    {{-- 🟢 Asentamiento Geográfico Compartido (Searchable Select vía Slot) --}}
                     <div>
                         <x-shared::form.input-label for="asentamiento_id" :value="__('Ubicación Postal / Asentamiento')" required class="text-gray-700 dark:text-gray-300"/>
                         <div class="mt-1.5">
-                            <select id="asentamiento_id" wire:model="asentamiento_id" class="w-full text-xs font-bold uppercase tracking-wide border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 rounded-none h-11 focus:ring-indigo-500 focus:border-indigo-500">
-                                <option value="">-- Seleccionar --</option>
+                            <x-shared::form.searchable-select 
+                                id="asentamiento_id" 
+                                wire:model="asentamiento_id" 
+                                placeholder="Buscar por C.P. o Colonia..."
+                            >
+                                <option value="">-- SELECCIONAR --</option>
                                 @foreach($asentamientos as $as)
-                                    <option value="{{ $as->id }}">CP {{ $as->codigo_postal }} - {{ $as->nombre_asentamiento }}</option>
+                                    @php $asData = $as->toArray(); @endphp
+                                    <option value="{{ $asData['id'] }}">CP {{ $asData['codigo_postal'] }} - {{ $asData['nombre_asentamiento'] }}</option>
                                 @endforeach
-                            </select>
+                            </x-shared::form.searchable-select>
                         </div>
                         <x-shared::form.input-error :messages="$errors->get('asentamiento_id')" class="mt-2" />
                     </div>
 
-                    {{-- Tipo Vivienda --}}
+                    {{-- 🟢 Tipo Vivienda (Searchable Select vía Slot) --}}
                     <div>
                         <x-shared::form.input-label for="tipo_vivienda_id" :value="__('Modelo / Tipo de Vivienda')" required class="text-gray-700 dark:text-gray-300"/>
                         <div class="mt-1.5">
-                            <select id="tipo_vivienda_id" wire:model="tipo_vivienda_id" class="w-full text-xs font-bold uppercase tracking-wide border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 rounded-none h-11 focus:ring-indigo-500 focus:border-indigo-500">
-                                <option value="">-- Seleccionar --</option>
+                            <x-shared::form.searchable-select 
+                                id="tipo_vivienda_id" 
+                                wire:model="tipo_vivienda_id" 
+                                placeholder="Seleccionar Modelo..."
+                            >
+                                <option value="">-- SELECCIONAR --</option>
                                 @foreach($tiposVivienda as $tipo)
-                                    <option value="{{ $tipo->id }}">{{ $tipo->nombre }}</option>
+                                    @php $tipoData = $tipo->toArray(); @endphp
+                                    <option value="{{ $tipoData['id'] }}">{{ $tipoData['nombre'] }}</option>
                                 @endforeach
-                            </select>
+                            </x-shared::form.searchable-select>
                         </div>
                         <x-shared::form.input-error :messages="$errors->get('tipo_vivienda_id')" class="mt-2" />
                     </div>
@@ -75,40 +85,52 @@
                         <x-shared::form.input-error :messages="$errors->get('recamaras')" class="mt-2" />
                     </div>
 
-                    {{-- Estatus --}}
+                    {{-- 🟢 Estatus Operativo (Input Select compartido) --}}
                     <div>
                         <x-shared::form.input-label for="estatus_vivienda" :value="__('Estatus Operativo')" required class="text-gray-700 dark:text-gray-300"/>
                         <div class="mt-1.5">
-                            <select id="estatus_vivienda" wire:model="estatus_vivienda" class="w-full text-xs font-bold uppercase tracking-wide border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 rounded-none h-11 focus:ring-indigo-500 focus:border-indigo-500">
+                            <x-shared::form.input-select 
+                                id="estatus_vivienda" 
+                                wire:model="estatus_vivienda"
+                                :messages="$errors->get('estatus_vivienda')"
+                                class="uppercase tracking-wide font-bold"
+                            >
                                 <option value="Disponible">Disponible</option>
                                 <option value="Apartada">Apartada</option>
                                 <option value="Vendida">Vendida</option>
                                 <option value="Rentada">Rentada</option>
                                 <option value="Mantenimiento">Mantenimiento</option>
                                 <option value="Suspendida">Suspendida</option>
-                            </select>
+                            </x-shared::form.input-select>
                         </div>
+                        <x-shared::form.input-error :messages="$errors->get('estatus_vivienda')" class="mt-2" />
                     </div>
 
                     {{-- Dirección Detallada --}}
                     <div class="md:col-span-3">
-                        <x-shared::form.input-label for="direccion" :value="__('Dirección Completa (Calle, Número, Interno)')" required class="text-gray-700 dark:text-gray-300"/>
+                        <x-shared::form.input-label for="direccion" :value="__('Dirección Completa (Calle, Número, Interno)')" required/>
                         <div class="mt-1.5">
-                            <textarea id="direccion" wire:model="direccion" class="w-full text-sm font-medium border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 rounded-none h-24 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                            <x-shared::form.textarea-input 
+                                id="direccion" 
+                                wire:model="direccion" 
+                                placeholder="Ingresa la calle, número exterior y número de lote exacto..." 
+                                :messages="$errors->get('direccion')"
+                                class="w-full text-sm font-medium h-24 rounded-none" 
+                            />
                         </div>
-                        <x-shared::form.input-error :messages="$errors->get('direccion')" class="mt-2" />
                     </div>
 
-                    {{-- Switches Cruzados M:N --}}
+                    {{-- Switches Cruzados M:N (Desestructurados de forma segura con toArray) --}}
                     <div class="md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-gray-100 dark:border-gray-900">
                         {{-- Créditos Admitidos --}}
                         <div>
                             <span class="block text-xs font-bold uppercase tracking-wide text-gray-700 dark:text-gray-300 mb-2">Créditos Financieros Permitidos</span>
                             <div class="space-y-2 max-h-40 overflow-y-auto p-3 border border-gray-150 dark:border-gray-900 rounded-none bg-gray-50/50 dark:bg-gray-950/20">
                                 @foreach($creditosDisponibles as $cr)
+                                    @php $crData = $cr->toArray(); @endphp
                                     <label class="flex items-center gap-3 text-xs font-medium text-gray-700 dark:text-gray-400 cursor-pointer">
-                                        <input type="checkbox" value="{{ $cr->id }}" wire:model="creditos_ids" class="h-4 w-4 rounded-none border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:border-gray-800 dark:bg-gray-900">
-                                        <span>{{ $cr->nombre }}</span>
+                                        <input type="checkbox" value="{{ $crData['id'] }}" wire:model="creditos_ids" class="h-4 w-4 rounded-none border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:border-gray-800 dark:bg-gray-900">
+                                        <span>{{ $crData['nombre'] }}</span>
                                     </label>
                                 @endforeach
                             </div>
@@ -119,9 +141,10 @@
                             <span class="block text-xs font-bold uppercase tracking-wide text-gray-700 dark:text-gray-300 mb-2">Amenidades e Infraestructura Interna</span>
                             <div class="space-y-2 max-h-40 overflow-y-auto p-3 border border-gray-150 dark:border-gray-900 rounded-none bg-gray-50/50 dark:bg-gray-950/20">
                                 @foreach($amenidadesDisponibles as $am)
+                                    @php $amData = $am->toArray(); @endphp
                                     <label class="flex items-center gap-3 text-xs font-medium text-gray-700 dark:text-gray-400 cursor-pointer">
-                                        <input type="checkbox" value="{{ $am->id }}" wire:model="amenidades_ids" class="h-4 w-4 rounded-none border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:border-gray-800 dark:bg-gray-900">
-                                        <span>{{ $am->nombre }}</span>
+                                        <input type="checkbox" value="{{ $amData['id'] }}" wire:model="amenidades_ids" class="h-4 w-4 rounded-none border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:border-gray-800 dark:bg-gray-900">
+                                        <span>{{ $amData['nombre'] }}</span>
                                     </label>
                                 @endforeach
                             </div>
@@ -155,26 +178,37 @@
                             @foreach($contactos as $index => $contacto)
                                 <div class="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 border border-gray-200 dark:border-gray-800 bg-gray-50/30 dark:bg-gray-900/10 relative rounded-none" wire:key="contacto-row-{{ $index }}">
                                     <input type="hidden" wire:model="contactos.{{ $index }}.id">
+                                    
+                                    {{-- Nombre Completo --}}
                                     <div class="md:col-span-3">
                                         <label class="block text-[10px] font-bold text-gray-400 dark:text-gray-550 uppercase tracking-wider mb-1">Nombre Completo</label>
-                                        <input type="text" wire:model="contactos.{{ $index }}.nombre" placeholder="ej: Juan Pérez" class="w-full text-xs font-bold border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 rounded-none h-9 focus:ring-indigo-500 focus:border-indigo-500">
+                                        <x-shared::form.text-input type="text" wire:model="contactos.{{ $index }}.nombre" placeholder="ej: Juan Pérez" class="w-full text-xs font-bold h-9 rounded-none" />
                                     </div>
+                                    
+                                    {{-- Relación / Vínculo --}}
                                     <div class="md:col-span-2">
                                         <label class="block text-[10px] font-bold text-gray-400 dark:text-gray-550 uppercase tracking-wider mb-1">Relación / Vínculo</label>
-                                        <input type="text" wire:model="contactos.{{ $index }}.relacion" placeholder="ej: Propietario, Vecino" class="w-full text-xs font-medium border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 rounded-none h-9 focus:ring-indigo-500 focus:border-indigo-500">
+                                        <x-shared::form.text-input type="text" wire:model="contactos.{{ $index }}.relacion" placeholder="ej: Propietario, Vecino" class="w-full text-xs font-medium h-9 rounded-none" />
                                     </div>
+                                    
+                                    {{-- Teléfono --}}
                                     <div class="md:col-span-2">
                                         <label class="block text-[10px] font-bold text-gray-400 dark:text-gray-550 uppercase tracking-wider mb-1">Teléfono</label>
-                                        <input type="text" wire:model="contactos.{{ $index }}.telefono" placeholder="10 dígitos" class="w-full text-xs font-mono font-bold border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 rounded-none h-9 focus:ring-indigo-500 focus:border-indigo-500">
+                                        <x-shared::form.text-input type="text" wire:model="contactos.{{ $index }}.telefono" placeholder="10 dígitos" class="w-full text-xs font-mono font-bold h-9 rounded-none" />
                                     </div>
+                                    
+                                    {{-- Correo Electrónico --}}
                                     <div class="md:col-span-2">
                                         <label class="block text-[10px] font-bold text-gray-400 dark:text-gray-550 uppercase tracking-wider mb-1">Correo Electrónico</label>
-                                        <input type="email" wire:model="contactos.{{ $index }}.correo" placeholder="ejemplo@mail.com" class="w-full text-xs font-medium border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 rounded-none h-9 focus:ring-indigo-500 focus:border-indigo-500">
+                                        <x-shared::form.text-input type="email" wire:model="contactos.{{ $index }}.correo" placeholder="ejemplo@mail.com" class="w-full text-xs font-medium h-9 rounded-none" />
                                     </div>
+                                    
+                                    {{-- Notas Cortas --}}
                                     <div class="md:col-span-2">
                                         <label class="block text-[10px] font-bold text-gray-400 dark:text-gray-550 uppercase tracking-wider mb-1">Notas Cortas</label>
-                                        <input type="text" wire:model="contactos.{{ $index }}.notes" placeholder="ej: Horarios de atención" class="w-full text-xs font-medium border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 rounded-none h-9 focus:ring-indigo-500 focus:border-indigo-500">
+                                        <x-shared::form.text-input type="text" wire:model="contactos.{{ $index }}.notes" placeholder="ej: Horarios de atención" class="w-full text-xs font-medium h-9 rounded-none" />
                                     </div>
+
                                     <div class="md:col-span-1 flex items-end justify-center pb-0.5">
                                         <button type="button" wire:click="removeContacto({{ $index }})" class="h-9 w-full border border-red-200 dark:border-red-900/30 bg-red-50/50 hover:bg-red-100 text-red-600 dark:bg-red-950/20 dark:text-red-400 dark:hover:bg-red-950/50 transition-colors flex items-center justify-center rounded-none shadow-xs">
                                             <i class="fa-solid fa-trash-can text-xs"></i>
@@ -194,18 +228,25 @@
 
                         <div class="p-4 border border-gray-200 dark:border-gray-800 bg-gray-50/20 dark:bg-gray-900/5 mb-4 rounded-none">
                             <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+                                
+                                {{-- Clasificación del Documento (Input Select compartido con placeholder nativo) --}}
                                 <div class="md:col-span-4">
                                     <label class="block text-[10px] font-bold text-gray-400 dark:text-gray-550 uppercase tracking-wider mb-1">Clasificación del Documento</label>
-                                    <select wire:model="temporalTipo" class="w-full text-xs font-bold border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 rounded-none h-9 focus:ring-indigo-500 focus:border-indigo-500">
-                                        <option value="">-- Clasificar archivo --</option>
+                                    <x-shared::form.input-select 
+                                        wire:model="temporalTipo" 
+                                        placeholder="-- Clasificar archivo --"
+                                        :messages="$errors->get('temporalTipo')"
+                                        class="text-xs font-bold rounded-none"
+                                    >
                                         @foreach($tiposDisponibles as $key => $value)
                                             <option value="{{ $key }}">{{ $value }}</option>
                                         @endforeach
-                                    </select>
+                                    </x-shared::form.input-select>
                                 </div>
+
                                 <div class="md:col-span-6">
                                     <label class="block text-[10px] font-bold text-gray-400 dark:text-gray-550 uppercase tracking-wider mb-1">Seleccionar Archivo Físico</label>
-                                    <input type="file" wire:model="temporalFile" id="temporalFile" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-none file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 dark:file:bg-gray-900 dark:file:text-gray-300 hover:file:bg-indigo-100 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 h-9 flex items-center">
+                                    <input type="file" wire:model="temporalFile" id="temporalFile" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-none file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 dark:file:bg-gray-900 dark:file:text-gray-300 hover:file:bg-indigo-100 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 h-9 flex items-center rounded-none">
                                 </div>
                                 <div class="md:col-span-2">
                                     <button type="button" wire:click="addDocumento" class="w-full inline-flex items-center justify-center h-9 text-xs font-bold uppercase text-white bg-indigo-600 hover:bg-indigo-700 rounded-none transition-colors shadow-xs">
@@ -279,7 +320,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
                                 <div class="md:col-span-10">
                                     <label class="block text-[10px] font-bold text-gray-400 dark:text-gray-550 uppercase tracking-wider mb-1">Seleccionar Imágenes (JPG, PNG)</label>
-                                    <input type="file" wire:model="temporalFotoFile" id="temporalFotoFile" accept="image/*" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-none file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 dark:file:bg-gray-900 dark:file:text-gray-300 hover:file:bg-indigo-100 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 h-9 flex items-center">
+                                    <input type="file" wire:model="temporalFotoFile" id="temporalFotoFile" accept="image/*" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-none file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 dark:file:bg-gray-900 dark:file:text-gray-300 hover:file:bg-indigo-100 border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 h-9 flex items-center rounded-none">
                                 </div>
                                 <div class="md:col-span-2">
                                     <button type="button" wire:click="addFoto" class="w-full inline-flex items-center justify-center h-9 text-xs font-bold uppercase text-white bg-indigo-600 hover:bg-indigo-700 rounded-none transition-colors shadow-xs">
@@ -300,7 +341,6 @@
                                         <input type="hidden" wire:model="fotos.{{ $index }}.id">
                                         
                                         <div class="aspect-video w-full bg-gray-50 dark:bg-gray-900 flex items-center justify-center overflow-hidden border border-gray-100 dark:border-gray-900">
-                                            {{-- CORRECCIÓN: Si ya existe en BD usa la ruta del controlador, si es nueva usa preview de Livewire --}}
                                             @if(!empty($f['id']))
                                                 <img src="{{ route('viviendas.fotos.show', $f['id']) }}" class="w-full h-full object-cover">
                                             @else
@@ -334,9 +374,9 @@
                         <a href="{{ route('viviendas.index') }}" class="inline-flex items-center text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-red-550 transition-colors">
                             <i class="fa-solid fa-xmark mr-2 text-sm"></i> Cancelar
                         </a>
-                        <x-shared::form.button-primary type="submit" class="shadow-lg px-5 h-11 text-xs" wire:loading.attr="disabled">
-                            <i class="fa-solid fa-circle-check mr-2" wire:loading.remove></i>
-                            <i class="fa-solid fa-circle-notch animate-spin mr-2" wire:loading></i> 
+                        <x-shared::form.button-primary type="submit" class="shadow-lg px-5 h-11 text-xs" wire:loading.attr="disabled" wire:target="save">
+                            <i class="fa-solid fa-circle-check mr-2" wire:loading.remove wire:target="save"></i>
+                            <i class="fa-solid fa-circle-notch animate-spin mr-2" wire:loading wire:target="save"></i> 
                             <span>Guardar Cambios</span>
                         </x-shared::form.button-primary>
                     </div>
