@@ -53,15 +53,10 @@
 
                             <div>
                                 <x-shared::form.input-label for="fecha_nacimiento" :value="__('Fecha de Nacimiento')"/>
-                                    <div class="mt-1.5">
-                                        <x-shared::form.date-picker 
-                                            id="fecha_nacimiento" 
-                                            wire:model="fecha_nacimiento" 
-                                            placeholder="Selecciona tu fecha"
-                                            :messages="$errors->get('fecha_nacimiento')"
-                                        />
-                                    </div>
-                                    <x-shared::form.input-error :messages="$errors->get('fecha_nacimiento')" class="mt-2" />
+                                <div class="mt-1.5">
+                                    <x-shared::form.date-picker id="fecha_nacimiento" wire:model="fecha_nacimiento" placeholder="Selecciona la fecha" :messages="$errors->get('fecha_nacimiento')" />
+                                </div>
+                                <x-shared::form.input-error :messages="$errors->get('fecha_nacimiento')" class="mt-2" />
                             </div>
 
                             <div>
@@ -88,7 +83,7 @@
                         </div>
                     </div>
 
-                    {{-- SECCIÓN: IDENTIFICACIONES Y CAPACIDAD FINANCIERA --}}
+                    {{-- SECCIÓN: IDENTIFICACIONES Y CRÉDITO --}}
                     <div class="pt-6 border-t border-gray-100 dark:border-gray-900">
                         <h3 class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-4">
                             <i class="fa-solid fa-credit-card mr-2"></i>Identificaciones y Capacidad Financiera
@@ -203,11 +198,25 @@
                                 <x-shared::form.input-error :messages="$errors->get('asentamiento_id')" class="mt-2" />
                             </div>
                         </div>
-                    </div>
 
+                        {{-- SUBMÓDULO INTERACTIVO M:N DE ZONAS DE INTERÉS (EDICIÓN) --}}
+                        <div class="mt-6 pt-6 border-t border-dashed border-gray-150 dark:border-gray-900">
+                            <x-shared::form.multi-select-tags 
+                                id="zonas_ids"
+                                wire:model="zonas_ids"
+                                label="Zonas geográficas de interés / Preferencias de compra"
+                                placeholder="Escriba para buscar y agregar asentamientos..."
+                                :messages="$errors->get('zonas_ids')"
+                                :options="collect($asentamientos)->map(fn($a) => [
+                                    'id' => $a->getId(),
+                                    'label' => $a->getNombreAsentamiento() . ' (C.P. ' . $a->getCodigoPostal() . ')'
+                                ])->toArray()"
+                            />
+                        </div>
+
+                    </div>
                 </div>
 
-                {{-- FOOTER --}}
                 <x-slot:footer>
                     <div class="flex items-center justify-between">
                         <a href="{{ route('clientes.index') }}" class="inline-flex items-center text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-red-550 transition-colors">

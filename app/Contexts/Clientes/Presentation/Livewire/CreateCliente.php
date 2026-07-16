@@ -27,6 +27,8 @@ class CreateCliente extends Component
     public ?string $estado_civil = null;
     public ?string $regimen_casamiento = null;
 
+    public array $zonas_ids = [];
+
     public function mount()
     {
         if (!checkPermiso('clientes.is_update')) {
@@ -53,12 +55,16 @@ class CreateCliente extends Component
             'avaluo_solicitado' => 'required|in:Sí,No',
             'estado_civil' => 'nullable|in:Soltero,Casado,Divorciado,Viudo,Union_Libre',
             'regimen_casamiento' => 'nullable|string|max:100',
+            'zonas_ids' => 'nullable|array',
+            'zonas_ids.*' => 'integer|exists:asentamientos,id',
         ];
     }
 
     public function store(SaveClienteUseCase $saveClienteUseCase)
     {
         $validatedData = $this->validate();
+
+        $validatedData['zonas_interes'] = $this->zonas_ids;
 
         try {
             // Invocamos al caso de uso de Dominio pasándole los datos limpios

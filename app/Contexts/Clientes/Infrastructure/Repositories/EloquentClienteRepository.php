@@ -23,7 +23,7 @@ class EloquentClienteRepository implements ClienteRepositoryInterface
 
     public function findById(int $id): ?Cliente
     {
-        $modelo = ClienteEloquentModel::find($id);
+        $modelo = ClienteEloquentModel::with('zonasInteres')->find($id);
         
         if (!$modelo) {
             return null;
@@ -46,6 +46,8 @@ class EloquentClienteRepository implements ClienteRepositoryInterface
         $modelo = ClienteEloquentModel::findOrFail($id);
         $modelo = $this->fillModel($modelo, $cliente);
         $modelo->save();
+
+        $modelo->zonasInteres()->sync($cliente->getZonasInteres());
 
         return $this->toEntity($modelo);
     }
@@ -83,7 +85,11 @@ class EloquentClienteRepository implements ClienteRepositoryInterface
             precalificacion: (float) $modelo->precalificacion,
             avaluoSolicitado: $modelo->avaluo_solicitado,
             estadoCivil: $modelo->estado_civil,
-            regimenCasamiento: $modelo->regimen_casamiento
+            regimenCasamiento: $modelo->regimen_casamiento,
+            telefonos: [], 
+            referencias: [],
+            documentos: [],
+            zonasInteres: $modelo->zonasInteres->pluck('id')->toArray()
         );
     }
 

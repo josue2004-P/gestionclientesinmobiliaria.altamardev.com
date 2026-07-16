@@ -31,7 +31,8 @@ class SaveClienteUseCase
             precalificacion: (float) ($data['precalificacion'] ?? 0),
             avaluoSolicitado: $data['avaluo_solicitado'] ?? 'No',
             estadoCivil: $data['estado_civil'] ?? null,
-            regimenCasamiento: $data['regimen_casamiento'] ?? null
+            regimenCasamiento: $data['regimen_casamiento'] ?? null,
+            zonasInteres: $data['zonas_interes'] ?? []
         );
 
         return $this->repository->save($cliente);

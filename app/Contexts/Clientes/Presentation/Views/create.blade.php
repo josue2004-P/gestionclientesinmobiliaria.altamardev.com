@@ -27,7 +27,6 @@
                         </h3>
                         
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {{-- Nombre --}}
                             <div>
                                 <x-shared::form.input-label for="nombre" :value="__('Nombre(s)')" required/>
                                 <div class="mt-1.5">
@@ -36,7 +35,6 @@
                                 <x-shared::form.input-error :messages="$errors->get('nombre')" class="mt-2" />
                             </div>
 
-                            {{-- Apellido Paterno --}}
                             <div>
                                 <x-shared::form.input-label for="apellido_paterno" :value="__('Apellido Paterno')" required/>
                                 <div class="mt-1.5">
@@ -45,7 +43,6 @@
                                 <x-shared::form.input-error :messages="$errors->get('apellido_paterno')" class="mt-2" />
                             </div>
 
-                            {{-- Apellido Materno --}}
                             <div>
                                 <x-shared::form.input-label for="apellido_materno" :value="__('Apellido Materno')" required/>
                                 <div class="mt-1.5">
@@ -54,30 +51,18 @@
                                 <x-shared::form.input-error :messages="$errors->get('apellido_materno')" class="mt-2" />
                             </div>
 
-                            {{-- Fecha de Nacimiento --}}
                             <div>
                                 <x-shared::form.input-label for="fecha_nacimiento" :value="__('Fecha de Nacimiento')"/>
                                 <div class="mt-1.5">
-                                    <x-shared::form.date-picker 
-                                        id="fecha_nacimiento" 
-                                        wire:model="fecha_nacimiento" 
-                                        placeholder="Selecciona tu fecha"
-                                        :messages="$errors->get('fecha_nacimiento')"
-                                    />
+                                    <x-shared::form.date-picker id="fecha_nacimiento" wire:model="fecha_nacimiento" placeholder="Selecciona la fecha" :messages="$errors->get('fecha_nacimiento')" />
                                 </div>
                                 <x-shared::form.input-error :messages="$errors->get('fecha_nacimiento')" class="mt-2" />
                             </div>
 
-                            {{-- Estado Civil --}}
                             <div>
                                 <x-shared::form.input-label for="estado_civil" :value="__('Estado Civil')"/>
                                 <div class="mt-1.5">
-                                    <x-shared::form.input-select 
-                                        id="estado_civil" 
-                                        wire:model.live="estado_civil"
-                                        placeholder="-- SELECCIONAR --"
-                                        :messages="$errors->get('estado_civil')"
-                                    >
+                                    <x-shared::form.input-select id="estado_civil" wire:model.live="estado_civil" placeholder="-- SELECCIONAR --" :messages="$errors->get('estado_civil')">
                                         <option value="Soltero">Soltero/a</option>
                                         <option value="Casado">Casado/a</option>
                                         <option value="Divorciado">Divorciado/a</option>
@@ -88,7 +73,6 @@
                                 <x-shared::form.input-error :messages="$errors->get('estado_civil')" class="mt-2" />
                             </div>
 
-                            {{-- Régimen Patrimonial --}}
                             <div>
                                 <x-shared::form.input-label for="regimen_casamiento" :value="__('Régimen Patrimonial')"/>
                                 <div class="mt-1.5">
@@ -99,14 +83,13 @@
                         </div>
                     </div>
 
-                    {{-- SECCIÓN: IDENTIFICACIONES Y CAPACIDAD FINANCIERA --}}
+                    {{-- SECCIÓN: IDENTIFICACIONES Y CRÉDITO --}}
                     <div class="pt-6 border-t border-gray-100 dark:border-gray-900">
                         <h3 class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-4">
                             <i class="fa-solid fa-credit-card mr-2"></i>Identificaciones y Capacidad Financiera
                         </h3>
                         
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {{-- CURP --}}
                             <div>
                                 <x-shared::form.input-label for="curp" :value="__('CURP')"/>
                                 <div class="mt-1.5">
@@ -115,7 +98,6 @@
                                 <x-shared::form.input-error :messages="$errors->get('curp')" class="mt-2" />
                             </div>
 
-                            {{-- RFC --}}
                             <div>
                                 <x-shared::form.input-label for="rfc" :value="__('RFC')"/>
                                 <div class="mt-1.5">
@@ -124,7 +106,6 @@
                                 <x-shared::form.input-error :messages="$errors->get('rfc')" class="mt-2" />
                             </div>
 
-                            {{-- NSS --}}
                             <div>
                                 <x-shared::form.input-label for="nss" :value="__('NSS (Seguro Social)')"/>
                                 <div class="mt-1.5">
@@ -135,7 +116,6 @@
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
-                            {{-- Correo Infonavit --}}
                             <div class="md:col-span-2">
                                 <x-shared::form.input-label for="correo_infonavit" :value="__('Correo Cuenta Infonavit')"/>
                                 <div class="mt-1.5">
@@ -144,7 +124,6 @@
                                 <x-shared::form.input-error :messages="$errors->get('correo_infonavit')" class="mt-2" />
                             </div>
 
-                            {{-- Contraseña Infonavit --}}
                             <div>
                                 <x-shared::form.input-label for="contrasena_infonavit" :value="__('Contraseña Infonavit')"/>
                                 <div class="mt-1.5">
@@ -153,7 +132,6 @@
                                 <x-shared::form.input-error :messages="$errors->get('contrasena_infonavit')" class="mt-2" />
                             </div>
 
-                            {{-- Precalificación --}}
                             <div>
                                 <x-shared::form.input-label for="precalificacion" :value="__('Monto Precalificación ($)')"/>
                                 <div class="mt-1.5">
@@ -164,16 +142,10 @@
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                            {{-- ¿Avalúo Solicitado? --}}
                             <div>
                                 <x-shared::form.input-label for="avaluo_solicitado" :value="__('¿Avalúo Solicitado?')"/>
                                 <div class="mt-1.5">
-                                    <x-shared::form.input-select 
-                                        id="avaluo_solicitado" 
-                                        wire:model="avaluo_solicitado"
-                                        placeholder="-- SELECCIONAR --"
-                                        :messages="$errors->get('avaluo_solicitado')"
-                                    >
+                                    <x-shared::form.input-select id="avaluo_solicitado" wire:model="avaluo_solicitado" :messages="$errors->get('avaluo_solicitado')">
                                         <option value="No">No</option>
                                         <option value="Sí">Sí</option>
                                     </x-shared::form.input-select>
@@ -181,15 +153,10 @@
                                 <x-shared::form.input-error :messages="$errors->get('avaluo_solicitado')" class="mt-2" />
                             </div>
 
-                            {{-- Tipo Crédito (Searchable Select Component) --}}
                             <div>
                                 <x-shared::form.input-label for="tipo_credito_id" :value="__('Tipo de Crédito Tentativo')"/>
                                 <div class="mt-1.5">
-                                    <x-shared::form.searchable-select 
-                                        wire:model="tipo_credito_id" 
-                                        placeholder="-- BUSCAR O SELECCIONAR CRÉDITO --"
-                                        :messages="$errors->get('tipo_credito_id')"
-                                    >
+                                    <x-shared::form.searchable-select wire:model="tipo_credito_id" placeholder="-- BUSCAR O SELECCIONAR CRÉDITO --" :messages="$errors->get('tipo_credito_id')">
                                         <option value="">-- No Asignado --</option>
                                         @foreach($tiposCredito as $tipo)
                                             <option value="{{ $tipo->getId() }}">{{ $tipo->getNombre() }}</option>
@@ -208,7 +175,6 @@
                         </h3>
                         
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {{-- Calle y Número --}}
                             <div class="md:col-span-2">
                                 <x-shared::form.input-label for="calle_numero" :value="__('Calle y Número')"/>
                                 <div class="mt-1.5">
@@ -217,15 +183,10 @@
                                 <x-shared::form.input-error :messages="$errors->get('calle_numero')" class="mt-2" />
                             </div>
 
-                            {{-- Asentamiento (Searchable Select Component) --}}
                             <div>
                                 <x-shared::form.input-label for="asentamiento_id" :value="__('Asentamiento / Zona')"/>
                                 <div class="mt-1.5">
-                                    <x-shared::form.searchable-select 
-                                        wire:model="asentamiento_id" 
-                                        placeholder="-- BUSCAR O SELECCIONAR ZONA --"
-                                        :messages="$errors->get('asentamiento_id')"
-                                    >
+                                    <x-shared::form.searchable-select wire:model="asentamiento_id" placeholder="-- BUSCAR O SELECCIONAR ZONA --" :messages="$errors->get('asentamiento_id')">
                                         <option value="">-- Seleccionar Asentamiento --</option>
                                         @foreach($asentamientos as $asentamiento)
                                             <option value="{{ $asentamiento->getId() }}">
@@ -237,11 +198,25 @@
                                 <x-shared::form.input-error :messages="$errors->get('asentamiento_id')" class="mt-2" />
                             </div>
                         </div>
-                    </div>
 
+                        {{-- SUBMÓDULO INTERACTIVO M:N DE ZONAS DE INTERÉS (COMPONENTE ENCAPSULADO) --}}
+                        <div class="mt-6 pt-6 border-t border-dashed border-gray-150 dark:border-gray-900">
+                            <x-shared::form.multi-select-tags 
+                                id="zonas_ids"
+                                wire:model="zonas_ids"
+                                label="Zonas geográficas de interés / Preferencias de compra"
+                                placeholder="Escriba para buscar y agregar asentamientos..."
+                                :messages="$errors->get('zonas_ids')"
+                                :options="collect($asentamientos)->map(fn($a) => [
+                                    'id' => $a->getId(),
+                                    'label' => $a->getNombreAsentamiento() . ' (C.P. ' . $a->getCodigoPostal() . ')'
+                                ])->toArray()"
+                            />
+                        </div>
+
+                    </div>
                 </div>
 
-                {{-- FOOTER CON ACCIONES ESTILIZADAS --}}
                 <x-slot:footer>
                     <div class="flex items-center justify-between">
                         <a href="{{ route('clientes.index') }}" class="inline-flex items-center text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-red-550 transition-colors">

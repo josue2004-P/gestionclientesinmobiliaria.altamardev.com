@@ -31,6 +31,8 @@ class EditCliente extends Component
     public ?string $estado_civil = null;
     public ?string $regimen_casamiento = null;
 
+    public array $zonas_ids = [];
+
     public function mount(int $id, GetClienteByIdUseCase $getClienteUseCase)
     {
         if (!checkPermiso('clientes.is_update')) {
@@ -43,7 +45,6 @@ class EditCliente extends Component
             abort(404, 'Cliente no encontrado.');
         }
 
-        // Poblamos las propiedades del componente con la Entidad de Dominio
         $this->clienteId = $cliente->getId();
         $this->nombre = $cliente->getNombre();
         $this->apellido_paterno = $cliente->getApellidoPaterno();
@@ -61,6 +62,8 @@ class EditCliente extends Component
         $this->avaluo_solicitado = $cliente->getAvalaoSolicitado();
         $this->estado_civil = $cliente->getEstadoCivil();
         $this->regimen_casamiento = $cliente->getRegimenCasamiento();
+
+        $this->zonas_ids = $cliente->getZonasInteres() ?? [];
     }
 
     protected function rules(): array
@@ -70,7 +73,6 @@ class EditCliente extends Component
             'apellido_paterno' => 'required|string|max:255',
             'apellido_materno' => 'required|string|max:255',
             'fecha_nacimiento' => 'nullable|date',
-            // Ignoramos el ID actual en la validación única para evitar colisiones
             'rfc' => 'nullable|string|max:13|unique:clientes,rfc,' . $this->clienteId,
             'curp' => 'nullable|string|max:18|unique:clientes,curp,' . $this->clienteId,
             'asentamiento_id' => 'nullable|integer',
@@ -83,6 +85,8 @@ class EditCliente extends Component
             'avaluo_solicitado' => 'required|in:Sí,No',
             'estado_civil' => 'nullable|in:Soltero,Casado,Divorciado,Viudo,Union_Libre',
             'regimen_casamiento' => 'nullable|string|max:100',
+            'zonas_ids' => 'nullable|array',
+            'zonas_ids.*' => 'integer|exists:asentamientos,id',
         ];
     }
 
@@ -90,8 +94,9 @@ class EditCliente extends Component
     {
         $validatedData = $this->validate();
 
+        $validatedData['zonas_interes'] = $this->zonas_ids;
+
         try {
-            // Ejecutamos el caso de uso mandando el ID y los campos modificados
             $updateClienteUseCase->execute($this->clienteId, $validatedData);
 
             $this->dispatch('swal-init', [
