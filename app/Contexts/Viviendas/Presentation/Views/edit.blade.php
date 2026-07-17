@@ -29,26 +29,28 @@
                         <x-shared::form.input-error :messages="$errors->get('fraccionamiento')" class="mt-2" />
                     </div>
 
-                    {{-- 🟢 Asentamiento Geográfico Compartido (Searchable Select vía Slot) --}}
                     <div>
                         <x-shared::form.input-label for="asentamiento_id" :value="__('Ubicación Postal / Asentamiento')" required class="text-gray-700 dark:text-gray-300"/>
                         <div class="mt-1.5">
                             <x-shared::form.searchable-select 
                                 id="asentamiento_id" 
                                 wire:model="asentamiento_id" 
+                                liveSearch="searchAsentamiento"
                                 placeholder="Buscar por C.P. o Colonia..."
                             >
-                                <option value="">-- SELECCIONAR --</option>
-                                @foreach($asentamientos as $as)
-                                    @php $asData = $as->toArray(); @endphp
-                                    <option value="{{ $asData['id'] }}">CP {{ $asData['codigo_postal'] }} - {{ $asData['nombre_asentamiento'] }}</option>
-                                @endforeach
+                                @if(count($asentamientos) === 0)
+                                    <option value="">-- NO SE ENCONTRARON RESULTADOS --</option>
+                                @else
+                                    <option value="">-- SELECCIONAR --</option>
+                                    @foreach($asentamientos as $as)
+                                        <option value="{{ $as->getId() }}">CP {{ $as->getCodigoPostal() }} - {{ $as->getNombreAsentamiento() }}</option>
+                                    @endforeach
+                                @endif
                             </x-shared::form.searchable-select>
                         </div>
                         <x-shared::form.input-error :messages="$errors->get('asentamiento_id')" class="mt-2" />
                     </div>
 
-                    {{-- 🟢 Tipo Vivienda (Searchable Select vía Slot) --}}
                     <div>
                         <x-shared::form.input-label for="tipo_vivienda_id" :value="__('Modelo / Tipo de Vivienda')" required class="text-gray-700 dark:text-gray-300"/>
                         <div class="mt-1.5">
@@ -59,8 +61,7 @@
                             >
                                 <option value="">-- SELECCIONAR --</option>
                                 @foreach($tiposVivienda as $tipo)
-                                    @php $tipoData = $tipo->toArray(); @endphp
-                                    <option value="{{ $tipoData['id'] }}">{{ $tipoData['nombre'] }}</option>
+                                    <option value="{{ $tipo->id }}">{{ $tipo->nombre }}</option>
                                 @endforeach
                             </x-shared::form.searchable-select>
                         </div>

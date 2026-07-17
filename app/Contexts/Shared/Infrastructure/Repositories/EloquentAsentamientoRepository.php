@@ -6,25 +6,158 @@ use App\Contexts\Shared\Domain\Entities\Asentamiento;
 use App\Contexts\Shared\Domain\Repositories\AsentamientoRepositoryInterface;
 use App\Contexts\Shared\Infrastructure\LaravelModels\AsentamientoEloquentModel;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
 
 class EloquentAsentamientoRepository implements AsentamientoRepositoryInterface
 {
+    private string $cacheKey = 'catalogo_asentamientos_entities_ram';
 
     public function all(): array
     {
-        $models = AsentamientoEloquentModel::orderBy('nombre_asentamiento', 'asc')->get();
+        $rawArray = Cache::get($this->cacheKey);
+        $necesitaRecargar = false;
+
+        if (is_array($rawArray)) {
+            foreach ($rawArray as $item) {
+                if (!is_array($item)) {
+                    $necesitaRecargar = true;
+                    break;
+                }
+            }
+        } else {
+            $necesitaRecargar = true;
+        }
+
+        if ($necesitaRecargar) {
+            $rawArray = AsentamientoEloquentModel::orderBy('nombre_asentamiento', 'asc')
+                ->select(['id', 'codigo_postal', 'estado', 'municipio', 'tipo_asentamiento', 'nombre_asentamiento', 'ciudad'])
+                ->get()
+                ->toArray();
+
+            Cache::forever($this->cacheKey, $rawArray);
+        }
+
+        return array_map(function ($data) {
+            return new Asentamiento(
+                isset($data['id']) ? (int)$data['id'] : null,
+                (string)($data['codigo_postal'] ?? ''),
+                (string)($data['estado'] ?? 'Sin Estado'),
+                (string)($data['municipio'] ?? 'Sin Municipio'), 
+                (string)($data['tipo_asentamiento'] ?? 'Colonia'),
+                (string)($data['nombre_asentamiento'] ?? 'Sin Nombre'),
+                !empty($data['ciudad']) ? (string)$data['ciudad'] : null 
+            );
+        }, $rawArray);
+    }
+
+    public function searchForSelect(?string $search, ?int $selectedId, ?string $estado = null, ?string $municipio = null, ?string $ciudad = null, int $limit = 15): array
+    {
+        $query = AsentamientoEloquentModel::query();
+
+        if (!empty($estado)) {
+            $query->where('estado', $estado);
+        }
+        if (!empty($municipio)) {
+            $query->where('municipio', $municipio);
+        }
+        if (!empty($ciudad)) {
+            $query->where('ciudad', $ciudad);
+        }
+
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('codigo_postal', 'like', $search . '%')
+                ->orWhere('nombre_asentamiento', 'like', '%' . $search . '%');
+            });
+        } elseif (!empty($selectedId)) {
+            $query->where('id', $selectedId);
+        } else {
+            if (empty($estado) && empty($municipio) && empty($ciudad)) {
+                return [];
+            }
+        }
+
+        $models = $query->orderBy('nombre_asentamiento', 'asc')->limit($limit)->get();
+
+        if (!empty($selectedId) && !$models->contains('id', $selectedId)) {
+            $selectedModel = AsentamientoEloquentModel::find($selectedId);
+            if ($selectedModel) {
+                $models->push($selectedModel);
+            }
+        }
 
         return $models->map(function ($model) {
             return new Asentamiento(
                 $model->id,
                 $model->codigo_postal,
-                $model->estado,
-                $model->municipio,
-                $model->tipo_asentamiento,
-                $model->nombre_asentamiento,
+                $model->estado ?? 'Sin Estado',
+                $model->municipio ?? 'Sin Municipio',
+                $model->tipo_asentamiento ?? 'Colonia',
+                $model->nombre_asentamiento ?? 'Sin Nombre',
                 $model->ciudad
             );
         })->toArray();
+    }
+
+    public function getUniqueEstados(): array
+    {
+        return AsentamientoEloquentModel::query()
+            ->whereNotNull('estado')
+            ->where('estado', '!=', '')
+            ->distinct()
+            ->orderBy('estado', 'asc')
+            ->pluck('estado')
+            ->toArray();
+    }
+
+    public function getUniqueMunicipios(?string $estado = null): array
+    {
+        return AsentamientoEloquentModel::query()
+            ->whereNotNull('municipio')
+            ->where('municipio', '!=', '')
+            ->when($estado, function ($q) use ($estado) {
+                $q->where('estado', $estado);
+            })
+            ->distinct()
+            ->orderBy('municipio', 'asc')
+            ->pluck('municipio')
+            ->toArray();
+    }
+
+    public function getUniqueCiudades(?string $estado = null, ?string $municipio = null): array
+    {
+        return AsentamientoEloquentModel::query()
+            ->whereNotNull('ciudad')
+            ->where('ciudad', '!=', '')
+            ->when($estado, function ($q) use ($estado) {
+                $q->where('estado', $estado);
+            })
+            ->when($municipio, function ($q) use ($municipio) {
+                $q->where('municipio', $municipio);
+            })
+            ->distinct()
+            ->orderBy('ciudad', 'asc')
+            ->pluck('ciudad')
+            ->toArray();
+    }
+
+    public function create(Asentamiento $asentamiento): void
+    {
+        AsentamientoEloquentModel::create($asentamiento->toArray());
+        Cache::forget($this->cacheKey);
+    }
+
+    public function bulkInsert(array $asentamientos): void
+    {
+        AsentamientoEloquentModel::insert($asentamientos);
+        Cache::forget($this->cacheKey);
+    }
+
+    public function delete(int $id): void
+    {
+        $model = AsentamientoEloquentModel::findOrFail($id);
+        $model->delete();
+        Cache::forget($this->cacheKey);
     }
 
     public function findDuplicate(string $codigoPostal, string $nombreAsentamiento, string $tipoAsentamiento): ?Asentamiento
@@ -64,16 +197,6 @@ class EloquentAsentamientoRepository implements AsentamientoRepositoryInterface
                 $model->ciudad
             );
         })->toArray();
-    }
-
-    public function create(Asentamiento $asentamiento): void
-    {
-        AsentamientoEloquentModel::create($asentamiento->toArray());
-    }
-
-    public function bulkInsert(array $asentamientos): void
-    {
-        AsentamientoEloquentModel::insert($asentamientos);
     }
 
     public function paginateWithSearch(?string $search, int $perPage): LengthAwarePaginator

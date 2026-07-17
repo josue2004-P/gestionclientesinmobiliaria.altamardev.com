@@ -15,7 +15,10 @@ class Vivienda
         private bool $llaves,
         private string $estatusVivienda,
         private array $creditosIds = [],
-        private array $amenidadesIds = []
+        private array $amenidadesIds = [],
+        private array $contactos = [],
+        private array $documentos = [],
+        private array $fotos = []
     ) {}
 
     // Getters
@@ -30,6 +33,9 @@ class Vivienda
     public function getEstatusVivienda(): string { return $this->estatusVivienda; }
     public function getCreditosIds(): array { return $this->creditosIds; }
     public function getAmenidadesIds(): array { return $this->amenidadesIds; }
+    public function getContactos(): array { return $this->contactos; }
+    public function getDocumentos(): array { return $this->documentos; }
+    public function getFotos(): array { return $this->fotos; }
 
     public function toArray(): array
     {

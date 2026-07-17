@@ -10,8 +10,8 @@ class GetAsentamientosForSelectUseCase
         private AsentamientoRepositoryInterface $asentamientoRepository
     ) {}
 
-    public function execute(): array
+    public function execute(?string $search = null, ?int $selectedId = null, ?string $estado = null, ?string $municipio = null, ?string $ciudad = null): array
     {
-        return $this->asentamientoRepository->all();
+        return $this->asentamientoRepository->searchForSelect($search, $selectedId, $estado, $municipio, $ciudad);
     }
 }

@@ -4,26 +4,32 @@ namespace App\Contexts\Viviendas\Presentation\Livewire;
 
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+
+use App\Contexts\Viviendas\Application\UseCases\FindViviendaByIdUseCase;
 use App\Contexts\Viviendas\Application\UseCases\SaveViviendaUseCase;
 use App\Contexts\Viviendas\Application\UseCases\SaveViviendaContactosUseCase;
 use App\Contexts\Viviendas\Application\UseCases\SaveViviendaDocumentosUseCase;
 use App\Contexts\Viviendas\Application\UseCases\SaveViviendaFotosUseCase;
 
-use App\Contexts\Viviendas\Infrastructure\LaravelModels\ViviendaEloquentModel;
-use App\Contexts\Shared\Infrastructure\LaravelModels\AsentamientoEloquentModel;
-use App\Contexts\Shared\Infrastructure\LaravelModels\TipoViviendaEloquentModel;
-use App\Contexts\Shared\Infrastructure\LaravelModels\TipoCreditoEloquentModel;
-use App\Contexts\Shared\Infrastructure\LaravelModels\AmenidadEloquentModel;
+use App\Contexts\Shared\Application\UseCases\Asentamientos\GetAsentamientosForSelectUseCase;
+use App\Contexts\Shared\Application\UseCases\Asentamientos\GetUniqueEstadosUseCase;
+use App\Contexts\Shared\Application\UseCases\Asentamientos\GetUniqueMunicipiosUseCase;
+use App\Contexts\Shared\Application\UseCases\Asentamientos\GetUniqueCiudadesUseCase;
+use App\Contexts\Shared\Application\UseCases\TiposVivienda\GetTiposViviendaForSelectUseCase;
+use App\Contexts\Shared\Application\UseCases\TiposCredito\GetTiposCreditoForSelectUseCase;
+use App\Contexts\Shared\Application\UseCases\Amenidades\GetAmenidadesForSelectUseCase;
 
 class EditVivienda extends Component
 {
     use WithFileUploads;
 
-    public $asentamientos = [];
-    public $tiposVivienda = [];
-    public $creditosDisponibles = [];
-    public $amenidadesDisponibles = [];
+    public $searchAsentamiento = '';
+
+    public $selectedEstado = '';
+    public $selectedMunicipio = '';
+    public $selectedCiudad = '';
 
     public $viviendaId;
     public $fraccionamiento = '';
@@ -67,66 +73,61 @@ class EditVivienda extends Component
         'amenidades_ids'   => 'nullable|array',
     ];
 
-    public function mount($id)
+    public function mount($id, FindViviendaByIdUseCase $findViviendaUseCase, GetAsentamientosForSelectUseCase $asentamientoUseCase)
     {
         if (!checkPermiso('viviendas.is_update')) abort(403);
 
-        $this->asentamientos = AsentamientoEloquentModel::select('id', 'codigo_postal', 'nombre_asentamiento')->get();
-        $this->tiposVivienda = TipoViviendaEloquentModel::select('id', 'nombre')->get();
-        $this->creditosDisponibles = TipoCreditoEloquentModel::where('aplica_vivienda', true)->select('id', 'nombre')->get();
-        $this->amenidadesDisponibles = AmenidadEloquentModel::select('id', 'nombre')->get();
+        $vivienda = $findViviendaUseCase->execute((int)$id);
+        if (!$vivienda) abort(404, 'Vivienda no localizada.');
 
-        $model = ViviendaEloquentModel::with(['creditos', 'amenidades','contactos', 'documentos', 'fotos'])->findOrFail($id);
-        $this->viviendaId = $model->id;
-        $this->fraccionamiento = $model->fraccionamiento;
-        $this->asentamiento_id = $model->asentamiento_id;
-        $this->tipo_vivienda_id = $model->tipo_vivienda_id;
-        $this->precio_lista = $model->precio_lista;
-        $this->recamaras = $model->recamaras;
-        $this->direccion = $model->direccion;
-        $this->llaves = (bool)$model->llaves;
-        $this->estatus_vivienda = $model->estatus_vivienda;
+        $this->viviendaId = $vivienda->getId();
+        $this->fraccionamiento = $vivienda->getFraccionamiento();
+        $this->asentamiento_id = $vivienda->getAsentamientoId();
+        $this->tipo_vivienda_id = $vivienda->getTipoViviendaId();
+        $this->precio_lista = $vivienda->getPrecioLista();
+        $this->recamaras = $vivienda->getRecamaras();
+        $this->direccion = $vivienda->getDireccion();
+        $this->llaves = $vivienda->getLlaves();
+        $this->estatus_vivienda = $vivienda->getEstatusVivienda();
         
-        $this->creditos_ids = $model->creditos->pluck('id')->map(fn($id) => (string)$id)->toArray();
-        $this->amenidades_ids = $model->amenidades->pluck('id')->map(fn($id) => (string)$id)->toArray();
+        $this->creditos_ids = array_map(fn($id) => (string)$id, $vivienda->getCreditosIds());
+        $this->amenidades_ids = array_map(fn($id) => (string)$id, $vivienda->getAmenidadesIds());
 
-        $this->contactos = $model->contactos->map(function($c) {
-            return [
-                'id'       => $c->id, 
-                'nombre'   => $c->nombre,
-                'relacion' => $c->relacion,
-                'telefono' => $c->telefono,
-                'correo'   => $c->correo,
-                'notes'    => $c->notes,
-            ];
-        })->toArray();
+        $this->contactos = $vivienda->getContactos();
+        $this->documentos = $vivienda->getDocumentos();
+        $this->fotos = $vivienda->getFotos();
 
-        $this->documentos = $model->documentos->map(function($d) {
-            return [
-                'id'              => $d->id, 
-                'url'             => $d->url,
-                'nombre_original' => $d->nombre_original,
-                'tipo_documento'  => $d->tipo_documento,
-                'peso_bytes'      => $d->peso_bytes,
-                'verificado'      => (bool)$d->verificado,
-            ];
-        })->toArray();
-
-        $this->fotos = $model->fotos->sortBy('orden')->map(function($f) {
-            return [
-                'id'              => $f->id,
-                'url'             => $f->url,
-                'nombre_original' => $f->nombre_original,
-                'orden'           => $f->orden,
-                'es_principal'    => (bool)$f->es_principal,
-                'preview'         => null
-            ];
-        })->toArray();
+        if ($this->asentamiento_id) {
+            $initialLocation = $asentamientoUseCase->execute(null, (int)$this->asentamiento_id);
+            if (!empty($initialLocation)) {
+                $asentamientoData = $initialLocation[0];
+                $this->selectedEstado = $asentamientoData->getEstado();
+                $this->selectedMunicipio = $asentamientoData->getMunicipio();
+                $this->selectedCiudad = $asentamientoData->getCiudad();
+            }
+        }
 
         if (empty($this->contactos)) {
             $this->addContacto();
         }
-        
+    }
+
+    public function updatedSelectedEstado()
+    {
+        $this->selectedMunicipio = '';
+        $this->selectedCiudad = '';
+        $this->asentamiento_id = '';
+    }
+
+    public function updatedSelectedMunicipio()
+    {
+        $this->selectedCiudad = '';
+        $this->asentamiento_id = '';
+    }
+
+    public function updatedSelectedCiudad()
+    {
+        $this->asentamiento_id = '';
     }
 
     public function addContacto()
@@ -178,7 +179,7 @@ class EditVivienda extends Component
         $this->documentos = array_values($this->documentos);
     }
 
-        public function addFoto()
+    public function addFoto()
     {
         $this->validate([
             'temporalFotoFile' => 'required|image|max:5120',
@@ -230,32 +231,55 @@ class EditVivienda extends Component
     ) {
         $this->validate();
 
-        $useCase->execute([
-            'id'               => $this->viviendaId,
-            'fraccionamiento'  => $this->fraccionamiento,
-            'asentamiento_id'  => $this->asentamiento_id,
-            'tipo_vivienda_id' => $this->tipo_vivienda_id,
-            'precio_lista'     => $this->precio_lista,
-            'recamaras'        => $this->recamaras,
-            'direccion'        => $this->direccion,
-            'llaves'           => (bool)$this->llaves,
-            'estatus_vivienda' => $this->estatus_vivienda,
-            'creditos_ids'     => $this->creditos_ids,
-            'amenidades_ids'   => $this->amenidades_ids,
-        ]);
+        DB::transaction(function() use ($useCase, $contactosUseCase, $documentosUseCase, $fotosUseCase) {
+            $useCase->execute([
+                'id'               => $this->viviendaId,
+                'fraccionamiento'  => $this->fraccionamiento,
+                'asentamiento_id'  => $this->asentamiento_id,
+                'tipo_vivienda_id' => $this->tipo_vivienda_id,
+                'precio_lista'     => $this->precio_lista,
+                'recamaras'        => $this->recamaras,
+                'direccion'        => $this->direccion,
+                'llaves'           => (bool)$this->llaves,
+                'estatus_vivienda' => $this->estatus_vivienda,
+                'creditos_ids'     => $this->creditos_ids,
+                'amenidades_ids'   => $this->amenidades_ids,
+            ]);
 
-        $contactosUseCase->execute($this->viviendaId, $this->contactos);
-        $documentosUseCase->execute($this->viviendaId, $this->documentos);
-        $fotosUseCase->execute($this->viviendaId, $this->fotos);
+            $contactosUseCase->execute($this->viviendaId, $this->contactos);
+            $documentosUseCase->execute($this->viviendaId, $this->documentos);
+            $fotosUseCase->execute($this->viviendaId, $this->fotos);
+        });
 
         session()->flash('success', 'Ficha de la propiedad actualizada correctamente.');
         return redirect()->route('viviendas.index');
     }
-
-    public function render()
-    {
-        return view('viviendas::edit')
-            ->layout('shared::layouts.app')
-            ->title('Modificar Inmueble');
+    
+    public function render(
+        GetAsentamientosForSelectUseCase $asentamientosUseCase,
+        GetUniqueEstadosUseCase $estadosUseCase,
+        GetUniqueMunicipiosUseCase $municipiosUseCase,
+        GetUniqueCiudadesUseCase $ciudadesUseCase,
+        GetTiposViviendaForSelectUseCase $tiposUseCase,
+        GetTiposCreditoForSelectUseCase $creditosUseCase,
+        GetAmenidadesForSelectUseCase $amenidadesUseCase
+    ) {
+        return view('viviendas::create', [
+            'estados'               => $estadosUseCase->execute(),
+            'municipios'            => $municipiosUseCase->execute($this->selectedEstado),
+            'ciudades'              => $ciudadesUseCase->execute($this->selectedEstado, $this->selectedMunicipio),
+            'asentamientos'         => $asentamientosUseCase->execute(
+                                            $this->searchAsentamiento, 
+                                            (int)$this->asentamiento_id,
+                                            $this->selectedEstado,
+                                            $this->selectedMunicipio,
+                                            $this->selectedCiudad
+                                       ),
+            'tiposVivienda'         => $tiposUseCase->execute(),
+            'creditosDisponibles'   => $creditosUseCase->execute('vivienda'), 
+            'amenidadesDisponibles' => $amenidadesUseCase->execute()
+        ])
+        ->layout('shared::layouts.app')
+        ->title('Modificar Ficha de Inmueble');
     }
 }

@@ -1,11 +1,11 @@
 @props([
     'placeholder' => '-- SELECCIONAR --',
     'messages' => [],
-    'disabled' => false
+    'disabled' => false,
+    'liveSearch' => null 
 ])
 
 <div 
-    {{-- Usamos x-init para observar cambios en el atributo disabled del DOM --}}
     x-data="{
         open: false,
         disabled: false, 
@@ -14,20 +14,30 @@
         options: [],
         
         init() {
-            {{-- Sincronizar estado inicial --}}
             this.disabled = $el.hasAttribute('disabled') || {{ $disabled ? 'true' : 'false' }};
             
+            // 📥 Carga inicial de opciones
+            this.parseOptions();
+
+            // ⚡ 1. Observador del Slot: Si Livewire cambia las opciones del select, Alpine las recarga al vuelo
+            const slotObserver = new MutationObserver(() => {
+                this.parseOptions();
+            });
+            slotObserver.observe(this.$refs.selectSlot, { childList: true, subtree: true });
+
+            // 🛠️ Observador del estado disabled
+            const disabledObserver = new MutationObserver(() => {
+                this.disabled = $el.hasAttribute('disabled');
+            });
+            disabledObserver.observe($el, { attributes: true, attributeFilter: ['disabled'] });
+        },
+
+        parseOptions() {
             this.options = Array.from(this.$refs.selectSlot.options)
                 .map(opt => ({
                     value: opt.value,
                     label: opt.text
                 })).filter(opt => opt.value !== '');
-
-            {{-- Observar cambios en el atributo 'disabled' que haga Livewire --}}
-            const observer = new MutationObserver(() => {
-                this.disabled = $el.hasAttribute('disabled');
-            });
-            observer.observe($el, { attributes: true, attributeFilter: ['disabled'] });
         },
 
         toggle() {
@@ -35,31 +45,36 @@
             this.open = !this.open;
         },
 
-        {{-- ... resto de tus funciones (selectedLabel, select, etc) se mantienen igual ... --}}
         get selectedLabel() {
             const selected = this.options.find(opt => opt.value == this.value);
             return selected ? selected.label : '{{ $placeholder }}';
         },
+
         get filteredOptions() {
             return this.options.filter(opt => 
                 opt.label.toLowerCase().includes(this.search.toLowerCase())
             );
         },
+
         select(val) {
             this.value = val;
             this.open = false;
-            this.search = '';
+            
+            // Si es búsqueda local limpiamos, si es remota mantenemos el término para evitar parpadeos
+            if (!{{ $liveSearch ? 'true' : 'false' }}) {
+                this.search = '';
+            }
         }
     }"
-    {{-- Importante: El atributo disabled debe estar en el elemento raíz para que el observer lo vea --}}
     {{ $attributes->merge(['class' => 'relative w-full']) }}
     :class="disabled ? 'opacity-60 cursor-not-allowed' : ''"
 >
-    {{-- El resto del HTML queda igual, pero asegúrate de usar toggle() --}}
+    {{-- SELECT OCULTO QUE ESCUCHA A LIVEWIRE --}}
     <select x-ref="selectSlot" class="hidden">
         {{ $slot }}
     </select>
 
+    {{-- Gatillo del Dropdown --}}
     <div 
         @click="toggle()"
         @click.away="open = false"
@@ -81,10 +96,11 @@
         x-transition:enter-end="opacity-100 scale-100"
         class="absolute z-[999] mt-1 w-full bg-white dark:bg-[#001f3f] shadow-lg max-h-60 rounded border border-slate-300 dark:border-slate-700  flex flex-col"
     >
-        {{-- Buscador --}}
+        {{-- Buscador Único --}}
         <div class="p-2 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-[#001f3f]">
             <input 
                 x-model="search"
+                @if($liveSearch) wire:model.live.debounce.350ms="{{ $liveSearch }}" @endif {{-- ⚡ Enlace dinámico al backend --}}
                 type="text"
                 class="h-8 w-full rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-[#001f3f] px-3 text-[12px] focus:outline-none dark:text-white font-mono uppercase"
                 placeholder="BUSCAR..."

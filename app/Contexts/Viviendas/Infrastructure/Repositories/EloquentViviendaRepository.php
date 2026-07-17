@@ -119,8 +119,10 @@ class EloquentViviendaRepository implements ViviendaRepositoryInterface
 
     public function findById(int $id): ?Vivienda
     {
-        $model = ViviendaEloquentModel::with(['creditos', 'amenidades'])->find($id);
-        if (!$model) return null;
+        $model = ViviendaEloquentModel::with(['creditos', 'amenidades', 'contactos', 'documentos', 'fotos'])->find($id);
+        if (!$model) {
+            return null;
+        }
 
         return new Vivienda(
             $model->id,
@@ -133,7 +135,17 @@ class EloquentViviendaRepository implements ViviendaRepositoryInterface
             $model->llaves,
             $model->estatus_vivienda,
             $model->creditos->pluck('id')->toArray(),
-            $model->amenidades->pluck('id')->toArray()
+            $model->amenidades->pluck('id')->toArray(),
+            // Transformamos colecciones Eloquent en matrices primitivas asociativas limpias
+            $model->contactos->map(fn($c) => [
+                'id' => $c->id, 'nombre' => $c->nombre, 'relacion' => $c->relacion, 'telefono' => $c->telefono, 'correo' => $c->correo, 'notes' => $c->notes
+            ])->toArray(),
+            $model->documentos->map(fn($d) => [
+                'id' => $d->id, 'url' => $d->url, 'nombre_original' => $d->nombre_original, 'tipo_documento' => $d->tipo_documento, 'peso_bytes' => $d->peso_bytes, 'verificado' => (bool)$d->verificado
+            ])->toArray(),
+            $model->fotos->sortBy('orden')->map(fn($f) => [
+                'id' => $f->id, 'url' => $f->url, 'nombre_original' => $f->nombre_original, 'orden' => $f->orden, 'es_principal' => (bool)$f->es_principal, 'preview' => null
+            ])->toArray()
         );
     }
 

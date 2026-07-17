@@ -9,7 +9,7 @@ use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use App\Contexts\Shared\Application\UseCases\Asentamientos\GetAsentamientosPaginatedUseCase;
 use App\Contexts\Shared\Application\UseCases\Asentamientos\DeleteAsentamientoUseCase;
-use App\Contexts\Shared\Application\UseCases\Asentamientos\CreateAsentamientoUseCase;
+use App\Contexts\Shared\Application\UseCases\Asentamientos\BulkInsertAsentamientosUseCase;
 
 class IndexAsentamientos extends Component
 {
@@ -55,13 +55,13 @@ class IndexAsentamientos extends Component
             'icon'               => 'question',
             'id'                 => null, 
             'function'           => 'execute-import',
-            'confirmButtonText'  => 'Sí, procesar catálogo', // 👈 Personalizado
-            'confirmButtonColor' => '#4f46e5',                // 👈 Índigo premium
+            'confirmButtonText'  => 'Sí, procesar catálogo',
+            'confirmButtonColor' => '#4f46e5',              
         ]);
     }
 
     #[On('execute-import')]
-    public function executeImport(CreateAsentamientoUseCase $createUseCase)
+    public function executeImport(BulkInsertAsentamientosUseCase $bulkUseCase) 
     {
         if (!checkPermiso('asentamientos.is_update')) {
             $this->dispatch('swal-init', [
@@ -91,31 +91,28 @@ class IndexAsentamientos extends Component
                 throw new \Exception('No se encontraron filas procesables en el documento.');
             }
 
-            \DB::beginTransaction();
+            $loteAsentamientos = [];
 
-                foreach ($filas as $fila) {
-                    if (empty($fila[0]) || empty($fila[5])) {
-                        continue; 
-                    }
-
-                    $codigoPostal      = trim((string)$fila[0]);
-                    $estado            = trim(htmlspecialchars_decode((string)$fila[1], ENT_QUOTES));
-                    $municipio         = trim(htmlspecialchars_decode((string)$fila[2], ENT_QUOTES));
-                    $ciudad            = !empty($fila[3]) ? trim(htmlspecialchars_decode((string)$fila[3], ENT_QUOTES)) : null;
-                    $tipoAsentamiento  = trim(htmlspecialchars_decode((string)$fila[4], ENT_QUOTES));
-                    $nombreAsentamiento = trim(htmlspecialchars_decode((string)$fila[5], ENT_QUOTES));
-
-                    $createUseCase->execute([
-                        'codigo_postal'       => $codigoPostal,
-                        'estado'              => $estado,
-                        'municipio'           => $municipio,
-                        'ciudad'              => $ciudad,
-                        'tipo_asentamiento'   => $tipoAsentamiento,
-                        'nombre_asentamiento' => $nombreAsentamiento,
-                    ]);
+            foreach ($filas as $fila) {
+                if (empty($fila[0]) || empty($fila[5])) {
+                    continue; 
                 }
 
-            \DB::commit();
+                $loteAsentamientos[] = [
+                    'codigo_postal'       => trim((string)$fila[0]),
+                    'estado'              => trim(htmlspecialchars_decode((string)$fila[1], ENT_QUOTES)),
+                    'municipio'           => trim(htmlspecialchars_decode((string)$fila[2], ENT_QUOTES)),
+                    'ciudad'              => !empty($fila[3]) ? trim(htmlspecialchars_decode((string)$fila[3], ENT_QUOTES)) : null,
+                    'tipo_asentamiento'   => trim(htmlspecialchars_decode((string)$fila[4], ENT_QUOTES)),
+                    'nombre_asentamiento' => trim(htmlspecialchars_decode((string)$fila[5], ENT_QUOTES)),
+                ];
+            }
+
+            if (count($loteAsentamientos) > 0) {
+                \DB::transaction(function () use ($bulkUseCase, $loteAsentamientos) {
+                    $bulkUseCase->execute($loteAsentamientos);
+                });
+            }
 
             $this->reset('excelFile');
             $this->resetPage(); 
@@ -127,8 +124,6 @@ class IndexAsentamientos extends Component
             ]);
 
         } catch (\Exception $e) {
-            \DB::rollBack();
-            
             $this->reset('excelFile');
             $this->addError('excelFile', 'Error al procesar la importación: ' . $e->getMessage());
         }
