@@ -17,6 +17,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
+          timeout: 20m
           script: |
             echo "Conexión exitosa al servidor"
 
@@ -31,15 +32,28 @@ jobs:
             docker compose up -d --build
             
             echo "⏳ Esperando unos segundos a que la base de datos esté lista..."
-            sleep 5
+            FORMA_LISTO=0
+            for i in {1..60}; do
+              if docker compose exec -T app_inmobiliaria php artisan --version > /dev/null 2>&1; then
+                echo "⚡ ¡Contenedor listo y Artisan disponible!"
+                FORMA_LISTO=1
+                break
+              fi
+              echo "⏳ Aún construyendo o instalando... (Intento $i/60 - esperando 10s)"
+              sleep 10
+            done
+
+            if [ $FORMA_LISTO -eq 0 ]; then
+              echo "❌ Error: El contenedor tardó demasiado en iniciar."
+              exit 1
+            fi
 
             echo "🗄️ Ejecutando migraciones de Laravel..."
             docker compose exec -T app_inmobiliaria php artisan migrate --force
 
             echo "🧹 Optimizando la aplicación (Caché)..."
-            
+
             docker compose exec -T app_inmobiliaria php artisan config:cache
             docker compose exec -T app_inmobiliaria php artisan route:cache
-            docker compose exec -T app_inmobiliaria php artisan view:cache
 
             echo "✅ ¡Despliegue completado con éxito en $HOSTNAME!"
