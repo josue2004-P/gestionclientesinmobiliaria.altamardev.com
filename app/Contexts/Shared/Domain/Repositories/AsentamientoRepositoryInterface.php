@@ -8,7 +8,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 interface AsentamientoRepositoryInterface
 {
     public function all(): array;
-    public function searchForSelect(?string $search, ?int $selectedId, ?string $estado = null, ?string $municipio = null, ?string $ciudad = null, int $limit = 15): array;
+    public function searchForSelect(?string $search, ?int $selectedId, ?string $estado = null, ?string $municipio = null, ?string $ciudad = null): array;
     
     public function getUniqueEstados(): array;
     public function getUniqueMunicipios(?string $estado = null): array;

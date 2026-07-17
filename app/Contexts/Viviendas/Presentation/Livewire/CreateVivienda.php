@@ -13,6 +13,9 @@ use App\Contexts\Viviendas\Application\UseCases\SaveViviendaDocumentosUseCase;
 use App\Contexts\Viviendas\Application\UseCases\SaveViviendaFotosUseCase;
 
 use App\Contexts\Shared\Application\UseCases\Asentamientos\GetAsentamientosForSelectUseCase;
+use App\Contexts\Shared\Application\UseCases\Asentamientos\GetUniqueEstadosUseCase;
+use App\Contexts\Shared\Application\UseCases\Asentamientos\GetUniqueMunicipiosUseCase;
+use App\Contexts\Shared\Application\UseCases\Asentamientos\GetUniqueCiudadesUseCase;
 use App\Contexts\Shared\Application\UseCases\TiposVivienda\GetTiposViviendaForSelectUseCase;
 use App\Contexts\Shared\Application\UseCases\TiposCredito\GetTiposCreditoForSelectUseCase;
 use App\Contexts\Shared\Application\UseCases\Amenidades\GetAmenidadesForSelectUseCase;
@@ -21,7 +24,11 @@ class CreateVivienda extends Component
 {
     use WithFileUploads;
 
-    // Form data fields
+    public $searchAsentamiento = '';
+    public $selectedEstado = '';
+    public $selectedMunicipio = '';
+    public $selectedCiudad = '';
+
     public $fraccionamiento = '';
     public $asentamiento_id = '';
     public $tipo_vivienda_id = '';
@@ -67,6 +74,24 @@ class CreateVivienda extends Component
         if (!checkPermiso('viviendas.is_create')) abort(403);
         
         $this->addContacto();
+    }
+
+    public function updatedSelectedEstado()
+    {
+        $this->selectedMunicipio = '';
+        $this->selectedCiudad = '';
+        $this->asentamiento_id = '';
+    }
+
+    public function updatedSelectedMunicipio()
+    {
+        $this->selectedCiudad = '';
+        $this->asentamiento_id = '';
+    }
+
+    public function updatedSelectedCiudad()
+    {
+        $this->asentamiento_id = '';
     }
 
     public function addContacto()
@@ -203,14 +228,26 @@ class CreateVivienda extends Component
 
     public function render(
         GetAsentamientosForSelectUseCase $asentamientosUseCase,
+        GetUniqueEstadosUseCase $estadosUseCase,
+        GetUniqueMunicipiosUseCase $municipiosUseCase,
+        GetUniqueCiudadesUseCase $ciudadesUseCase,
         GetTiposViviendaForSelectUseCase $tiposUseCase,
         GetTiposCreditoForSelectUseCase $creditosUseCase,
         GetAmenidadesForSelectUseCase $amenidadesUseCase
     ) {
         return view('viviendas::create', [
-            'asentamientos'         => $asentamientosUseCase->execute(),
+            'estados'               => $estadosUseCase->execute(),
+            'municipios'            => $municipiosUseCase->execute($this->selectedEstado),
+            'ciudades'              => $ciudadesUseCase->execute($this->selectedEstado, $this->selectedMunicipio),
+            'asentamientos'         => $asentamientosUseCase->execute(
+                                            $this->searchAsentamiento, 
+                                            (int)$this->asentamiento_id,
+                                            $this->selectedEstado,
+                                            $this->selectedMunicipio,
+                                            $this->selectedCiudad
+                                       ),
             'tiposVivienda'         => $tiposUseCase->execute(),
-            'creditosDisponibles'   => $creditosUseCase->execute('vivienda'), // Contexto vivienda estricto
+            'creditosDisponibles'   => $creditosUseCase->execute('vivienda'), 
             'amenidadesDisponibles' => $amenidadesUseCase->execute()
         ])
         ->layout('shared::layouts.app')

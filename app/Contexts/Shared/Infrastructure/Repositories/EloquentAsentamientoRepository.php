@@ -50,7 +50,7 @@ class EloquentAsentamientoRepository implements AsentamientoRepositoryInterface
         }, $rawArray);
     }
 
-    public function searchForSelect(?string $search, ?int $selectedId, ?string $estado = null, ?string $municipio = null, ?string $ciudad = null, int $limit = 15): array
+    public function searchForSelect(?string $search, ?int $selectedId, ?string $estado = null, ?string $municipio = null, ?string $ciudad = null): array
     {
         $query = AsentamientoEloquentModel::query();
 
@@ -67,7 +67,7 @@ class EloquentAsentamientoRepository implements AsentamientoRepositoryInterface
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('codigo_postal', 'like', $search . '%')
-                ->orWhere('nombre_asentamiento', 'like', '%' . $search . '%');
+                  ->orWhere('nombre_asentamiento', 'like', '%' . $search . '%');
             });
         } elseif (!empty($selectedId)) {
             $query->where('id', $selectedId);
@@ -77,9 +77,9 @@ class EloquentAsentamientoRepository implements AsentamientoRepositoryInterface
             }
         }
 
-        $models = $query->orderBy('nombre_asentamiento', 'asc')->limit($limit)->get();
+        $models = $query->orderBy('nombre_asentamiento', 'asc')->get();
 
-        if (!empty($selectedId) && !$models->contains('id', $selectedId)) {
+        if (!empty($search) && !empty($selectedId) && !$models->contains('id', $selectedId)) {
             $selectedModel = AsentamientoEloquentModel::find($selectedId);
             if ($selectedModel) {
                 $models->push($selectedModel);

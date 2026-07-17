@@ -87,7 +87,7 @@ class EditVivienda extends Component
         $this->precio_lista = $vivienda->getPrecioLista();
         $this->recamaras = $vivienda->getRecamaras();
         $this->direccion = $vivienda->getDireccion();
-        $this->llaves = $vivienda->getLlaves();
+        $this->llaves = $vivienda->hasLlaves();
         $this->estatus_vivienda = $vivienda->getEstatusVivienda();
         
         $this->creditos_ids = array_map(fn($id) => (string)$id, $vivienda->getCreditosIds());
@@ -264,7 +264,7 @@ class EditVivienda extends Component
         GetTiposCreditoForSelectUseCase $creditosUseCase,
         GetAmenidadesForSelectUseCase $amenidadesUseCase
     ) {
-        return view('viviendas::create', [
+        return view('viviendas::edit', [
             'estados'               => $estadosUseCase->execute(),
             'municipios'            => $municipiosUseCase->execute($this->selectedEstado),
             'ciudades'              => $ciudadesUseCase->execute($this->selectedEstado, $this->selectedMunicipio),
