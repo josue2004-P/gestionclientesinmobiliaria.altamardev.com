@@ -20,14 +20,26 @@ jobs:
           script: |
             echo "Conexión exitosa al servidor"
 
-            # cd ${{ secrets.WORK_DIR }}
-            # echo "📥 Actualizando repositorio..."
-            # git fetch origin ${{ secrets.MAIN_BRANCH }}
-            # git checkout ${{ secrets.MAIN_BRANCH }}
-            # git pull origin ${{ secrets.MAIN_BRANCH }}
+            cd ${{ secrets.WORK_DIR }}
+            echo "📥 Actualizando repositorio..."
+            git fetch origin ${{ secrets.MAIN_BRANCH }}
+            git checkout ${{ secrets.MAIN_BRANCH }}
+            git pull origin ${{ secrets.MAIN_BRANCH }}
 
-            # composer i
-            # npm i
-            # npm run build
+            echo "🚀 Construyendo y levantando contenedores..."
 
-            echo "✅ Despliegue completado en $HOSTNAME"
+            docker compose up -d --build
+            
+            echo "⏳ Esperando unos segundos a que la base de datos esté lista..."
+            sleep 5
+
+            echo "🗄️ Ejecutando migraciones de Laravel..."
+            docker compose exec -T app_inmobiliaria php artisan migrate --force
+
+            echo "🧹 Optimizando la aplicación (Caché)..."
+            
+            docker compose exec -T app_inmobiliaria php artisan config:cache
+            docker compose exec -T app_inmobiliaria php artisan route:cache
+            docker compose exec -T app_inmobiliaria php artisan view:cache
+
+            echo "✅ ¡Despliegue completado con éxito en $HOSTNAME!"
