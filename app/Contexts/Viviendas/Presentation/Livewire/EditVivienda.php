@@ -197,26 +197,52 @@ class EditVivienda extends Component
         $this->contactos = array_values($this->contactos);
     }
 
-    public function addDocumento()
-    {
+public function addDocumento()
+{
+    try {
+        // 🔍 Forzamos validación y atrapamos si falla
         $this->validate([
             'temporalFile' => 'required|file|max:10240',
             'temporalTipo' => 'required|string',
         ]);
+        
+        // 🔍 Si pasa, inspeccionamos el archivo antes de guardarlo
+        // dd($this->temporalFile);
 
         $path = $this->temporalFile->store('viviendas/documentos', 'local');
 
-        $this->documentos[] = [
-            'id'              => null,
-            'url'             => $path,
-            'nombre_original' => $this->temporalFile->getClientOriginalName(),
-            'tipo_documento'  => $this->temporalTipo,
-            'peso_bytes'      => $this->temporalFile->getSize(),
-            'verificado'      => false,
-        ];
-
-        $this->reset(['temporalFile', 'temporalTipo']);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        // 💥 Si el error es por reglas de validación (Tamaño, tipo, etc.)
+        dd([
+            'Fase' => 'Validación de Documento Fallida',
+            'Errores' => $e->errors(),
+            'Datos Recibidos' => [
+                'temporalTipo' => $this->temporalTipo,
+                'temporalFile' => $this->temporalFile
+            ]
+        ]);
+    } catch (\Exception $e) {
+        // 💥 Si el error es de disco, permisos, Docker o PHP general
+        dd([
+            'Fase' => 'Excepción Crítica en Servidor (Documento)',
+            'Mensaje' => $e->getMessage(),
+            'Archivo' => $e->getFile(),
+            'Línea' => $e->getLine(),
+            'Trace' => $e->getTraceAsString()
+        ]);
     }
+
+    $this->documentos[] = [
+        'id'              => null,
+        'url'             => $path,
+        'nombre_original' => $this->temporalFile->getClientOriginalName(),
+        'tipo_documento'  => $this->temporalTipo,
+        'peso_bytes'      => $this->temporalFile->getSize(),
+        'verificado'      => false,
+    ];
+
+    $this->reset(['temporalFile', 'temporalTipo']);
+}
 
     public function removeDocumento($index)
     {
@@ -228,27 +254,52 @@ class EditVivienda extends Component
         $this->documentos = array_values($this->documentos);
     }
 
-    public function addFoto()
-    {
+public function addFoto()
+{
+    try {
+        // 🔍 Forzamos validación y atrapamos si falla
         $this->validate([
             'temporalFotoFile' => 'required|image|max:5120',
         ]);
+        
+        // 🔍 Si pasa, inspeccionamos las propiedades del archivo temporal
+        // dd($this->temporalFotoFile);
 
         $path = $this->temporalFotoFile->store('viviendas/fotos', 'local');
 
-        $esPrincipal = count($this->fotos) === 0;
-
-        $this->fotos[] = [
-            'id'              => null,
-            'url'             => $path,
-            'nombre_original' => $this->temporalFotoFile->getClientOriginalName(),
-            'orden'           => count($this->fotos),
-            'es_principal'    => $esPrincipal,
-            'preview'         => $this->temporalFotoFile->temporaryUrl()
-        ];
-
-        $this->reset('temporalFotoFile');
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        // 💥 Si el error es por reglas de validación de la imagen
+        dd([
+            'Fase' => 'Validación de Foto Fallida',
+            'Errores' => $e->errors(),
+            'Datos Recibidos' => [
+                'temporalFotoFile' => $this->temporalFotoFile
+            ]
+        ]);
+    } catch (\Exception $e) {
+        // 💥 Si el error es de disco, permisos o manipulación de imagen
+        dd([
+            'Fase' => 'Excepción Crítica en Servidor (Foto)',
+            'Mensaje' => $e->getMessage(),
+            'Archivo' => $e->getFile(),
+            'Línea' => $e->getLine(),
+            'Trace' => $e->getTraceAsString()
+        ]);
     }
+
+    $esPrincipal = count($this->fotos) === 0;
+
+    $this->fotos[] = [
+        'id'              => null,
+        'url'             => $path,
+        'nombre_original' => $this->temporalFotoFile->getClientOriginalName(),
+        'orden'           => count($this->fotos),
+        'es_principal'    => $esPrincipal,
+        'preview'         => $this->temporalFotoFile->temporaryUrl()
+    ];
+
+    $this->reset('temporalFotoFile');
+}
 
     public function setFotoPrincipal($index)
     {
