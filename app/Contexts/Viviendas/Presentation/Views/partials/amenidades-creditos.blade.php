@@ -3,7 +3,7 @@
     <div>
         <span class="block text-xs font-bold uppercase tracking-wide text-gray-700 dark:text-gray-300 mb-2">Créditos Financieros Permitidos</span>
         <div class="space-y-2 max-h-40 overflow-y-auto p-3 border border-gray-150 dark:border-gray-900 rounded-none bg-gray-50/50 dark:bg-gray-950/20">
-            @foreach($creditosDisponibles as $cr)
+            @foreach($this->creditosDisponibles as $cr) 
                 @php $crData = $cr->toArray(); @endphp
                 <label class="flex items-center gap-3 text-xs font-medium text-gray-700 dark:text-gray-400 cursor-pointer">
                     <input type="checkbox" value="{{ $crData['id'] }}" wire:model="creditos_ids" class="h-4 w-4 rounded-none border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:border-gray-800 dark:bg-gray-900">
@@ -17,7 +17,7 @@
     <div>
         <span class="block text-xs font-bold uppercase tracking-wide text-gray-700 dark:text-gray-300 mb-2">Amenidades e Infraestructura Interna</span>
         <div class="space-y-2 max-h-40 overflow-y-auto p-3 border border-gray-150 dark:border-gray-900 rounded-none bg-gray-50/50 dark:bg-gray-950/20">
-            @foreach($amenidadesDisponibles as $am)
+            @foreach($this->amenidadesDisponibles as $am) 
                 @php $amData = $am->toArray(); @endphp
                 <label class="flex items-center gap-3 text-xs font-medium text-gray-700 dark:text-gray-400 cursor-pointer">
                     <input type="checkbox" value="{{ $amData['id'] }}" wire:model="amenidades_ids" class="h-4 w-4 rounded-none border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:border-gray-800 dark:bg-gray-900">

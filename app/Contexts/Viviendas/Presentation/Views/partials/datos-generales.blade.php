@@ -13,7 +13,7 @@
     <div class="mt-1.5">
         <x-shared::form.searchable-select id="tipo_vivienda_id" wire:model="tipo_vivienda_id" placeholder="Seleccionar Modelo...">
             <option value="">-- SELECCIONAR --</option>
-            @foreach($tiposVivienda as $tipo)
+            @foreach($this->tiposVivienda as $tipo)
                 <option value="{{ $tipo->getId() }}">{{ $tipo->getNombre() }}</option>
             @endforeach
         </x-shared::form.searchable-select>

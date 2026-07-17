@@ -101,44 +101,52 @@ class EloquentAsentamientoRepository implements AsentamientoRepositoryInterface
 
     public function getUniqueEstados(): array
     {
-        return AsentamientoEloquentModel::query()
-            ->whereNotNull('estado')
-            ->where('estado', '!=', '')
-            ->distinct()
-            ->orderBy('estado', 'asc')
-            ->pluck('estado')
-            ->toArray();
+        return Cache::rememberForever('geo_estados_unicos', function () {
+            return AsentamientoEloquentModel::query()
+                ->whereNotNull('estado')
+                ->where('estado', '!=', '')
+                ->distinct()
+                ->orderBy('estado', 'asc')
+                ->pluck('estado')
+                ->toArray();
+        });
     }
 
     public function getUniqueMunicipios(?string $estado = null): array
     {
-        return AsentamientoEloquentModel::query()
-            ->whereNotNull('municipio')
-            ->where('municipio', '!=', '')
-            ->when($estado, function ($q) use ($estado) {
-                $q->where('estado', $estado);
-            })
-            ->distinct()
-            ->orderBy('municipio', 'asc')
-            ->pluck('municipio')
-            ->toArray();
+        if (empty($estado)) return [];
+
+        $cacheKey = 'geo_municipios_de_' . md5($estado);
+        
+        return Cache::remember($cacheKey, now()->addDays(7), function () use ($estado) {
+            return AsentamientoEloquentModel::query()
+                ->whereNotNull('municipio')
+                ->where('municipio', '!=', '')
+                ->where('estado', $estado)
+                ->distinct()
+                ->orderBy('municipio', 'asc')
+                ->pluck('municipio')
+                ->toArray();
+        });
     }
 
     public function getUniqueCiudades(?string $estado = null, ?string $municipio = null): array
     {
-        return AsentamientoEloquentModel::query()
-            ->whereNotNull('ciudad')
-            ->where('ciudad', '!=', '')
-            ->when($estado, function ($q) use ($estado) {
-                $q->where('estado', $estado);
-            })
-            ->when($municipio, function ($q) use ($municipio) {
-                $q->where('municipio', $municipio);
-            })
-            ->distinct()
-            ->orderBy('ciudad', 'asc')
-            ->pluck('ciudad')
-            ->toArray();
+        if (empty($estado) || empty($municipio)) return [];
+
+        $cacheKey = 'geo_ciudades_de_' . md5($estado . '_' . $municipio);
+
+        return Cache::remember($cacheKey, now()->addDays(7), function () use ($estado, $municipio) {
+            return AsentamientoEloquentModel::query()
+                ->whereNotNull('ciudad')
+                ->where('ciudad', '!=', '')
+                ->where('estado', $estado)
+                ->where('municipio', $municipio)
+                ->distinct()
+                ->orderBy('ciudad', 'asc')
+                ->pluck('ciudad')
+                ->toArray();
+        });
     }
 
     public function create(Asentamiento $asentamiento): void

@@ -4,7 +4,7 @@
     <div class="mt-1.5">
         <x-shared::form.input-select id="selectedEstado" wire:model.live="selectedEstado">
             <option value="">-- SELECCIONAR ESTADO --</option>
-            @foreach($estados as $edo)
+            @foreach($this->estados as $edo)
                 <option value="{{ $edo }}">{{ $edo }}</option>
             @endforeach
         </x-shared::form.input-select>
@@ -18,7 +18,7 @@
     <div class="mt-1.5">
         <x-shared::form.input-select id="selectedMunicipio" wire:model.live="selectedMunicipio" :disabled="empty($selectedEstado)">
             <option value="">-- SELECCIONAR MUNICIPIO --</option>
-            @foreach($municipios as $mun)
+            @foreach($this->municipios as $mun) 
                 <option value="{{ $mun }}">{{ $mun }}</option>
             @endforeach
         </x-shared::form.input-select>
@@ -32,7 +32,7 @@
     <div class="mt-1.5">
         <x-shared::form.input-select id="selectedCiudad" wire:model.live="selectedCiudad" :disabled="empty($selectedMunicipio)">
             <option value="">-- SELECCIONAR CIUDAD --</option>
-            @foreach($ciudades as $ciu)
+            @foreach($this->ciudades as $ciu) 
                 <option value="{{ $ciu }}">{{ $ciu }}</option>
             @endforeach
         </x-shared::form.input-select>
@@ -45,11 +45,11 @@
     <x-shared::form.input-label for="asentamiento_id" :value="__('Ubicación Postal / Asentamiento')" required class="text-gray-700 dark:text-gray-300"/>
     <div class="mt-1.5">
         <x-shared::form.searchable-select id="asentamiento_id" wire:model="asentamiento_id" liveSearch="searchAsentamiento" placeholder="Buscar por C.P. o Colonia...">
-            @if(count($asentamientos) === 0)
+            @if(count($this->asentamientos) === 0)
                 <option value="">-- NO SE ENCONTRARON RESULTADOS --</option>
             @else
                 <option value="">-- SELECCIONAR --</option>
-                @foreach($asentamientos as $as)
+                @foreach($this->asentamientos as $as) 
                     <option value="{{ $as->getId() }}">CP {{ $as->getCodigoPostal() }} - {{ $as->getNombreAsentamiento() }}</option>
                 @endforeach
             @endif

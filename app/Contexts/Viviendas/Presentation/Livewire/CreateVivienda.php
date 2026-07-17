@@ -4,6 +4,7 @@ namespace App\Contexts\Viviendas\Presentation\Livewire;
 
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Livewire\Attributes\Computed;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 
@@ -68,6 +69,54 @@ class CreateVivienda extends Component
         'creditos_ids'     => 'nullable|array',
         'amenidades_ids'   => 'nullable|array',
     ];
+
+    #[Computed]
+    public function estados()
+    {
+        return app(GetUniqueEstadosUseCase::class)->execute();
+    }
+
+    #[Computed]
+    public function municipios()
+    {
+        return app(GetUniqueMunicipiosUseCase::class)->execute($this->selectedEstado);
+    }
+
+    #[Computed]
+    public function ciudades()
+    {
+        return app(GetUniqueCiudadesUseCase::class)->execute($this->selectedEstado, $this->selectedMunicipio);
+    }
+
+    #[Computed]
+    public function asentamientos()
+    {
+        return app(GetAsentamientosForSelectUseCase::class)->execute(
+            $this->searchAsentamiento, 
+            (int)$this->asentamiento_id,
+            $this->selectedEstado,
+            $this->selectedMunicipio,
+            $this->selectedCiudad
+        );
+    }
+
+    #[Computed]
+    public function tiposVivienda()
+    {
+        return app(GetTiposViviendaForSelectUseCase::class)->execute();
+    }
+
+    #[Computed]
+    public function creditosDisponibles()
+    {
+        return app(GetTiposCreditoForSelectUseCase::class)->execute('vivienda');
+    }
+
+    #[Computed]
+    public function amenidadesDisponibles()
+    {
+        return app(GetAmenidadesForSelectUseCase::class)->execute();
+    }
 
     public function mount()
     {
@@ -226,31 +275,10 @@ class CreateVivienda extends Component
         }
     }
 
-    public function render(
-        GetAsentamientosForSelectUseCase $asentamientosUseCase,
-        GetUniqueEstadosUseCase $estadosUseCase,
-        GetUniqueMunicipiosUseCase $municipiosUseCase,
-        GetUniqueCiudadesUseCase $ciudadesUseCase,
-        GetTiposViviendaForSelectUseCase $tiposUseCase,
-        GetTiposCreditoForSelectUseCase $creditosUseCase,
-        GetAmenidadesForSelectUseCase $amenidadesUseCase
-    ) {
-        return view('viviendas::create', [
-            'estados'               => $estadosUseCase->execute(),
-            'municipios'            => $municipiosUseCase->execute($this->selectedEstado),
-            'ciudades'              => $ciudadesUseCase->execute($this->selectedEstado, $this->selectedMunicipio),
-            'asentamientos'         => $asentamientosUseCase->execute(
-                                            $this->searchAsentamiento, 
-                                            (int)$this->asentamiento_id,
-                                            $this->selectedEstado,
-                                            $this->selectedMunicipio,
-                                            $this->selectedCiudad
-                                       ),
-            'tiposVivienda'         => $tiposUseCase->execute(),
-            'creditosDisponibles'   => $creditosUseCase->execute('vivienda'), 
-            'amenidadesDisponibles' => $amenidadesUseCase->execute()
-        ])
-        ->layout('shared::layouts.app')
-        ->title('Registrar Inmueble');
+    public function render()
+    {
+        return view('viviendas::create')
+            ->layout('shared::layouts.app')
+            ->title('Registrar Inmueble');
     }
 }

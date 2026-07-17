@@ -12,103 +12,95 @@ class EloquentViviendaRepository implements ViviendaRepositoryInterface
 {
     public function save(Vivienda $vivienda): int
     {
-        return DB::transaction(function () use ($vivienda) {
-            $model = ViviendaEloquentModel::updateOrCreate(
-                ['id' => $vivienda->getId()],
-                $vivienda->toArray()
-            );
+        $model = ViviendaEloquentModel::updateOrCreate(
+            ['id' => $vivienda->getId()],
+            $vivienda->toArray()
+        );
 
-            $model->creditos()->sync($vivienda->getCreditosIds());
-            $model->amenidades()->sync($vivienda->getAmenidadesIds());
+        $model->creditos()->sync($vivienda->getCreditosIds());
+        $model->amenidades()->sync($vivienda->getAmenidadesIds());
 
-            return $model->id;
-        });
+        return $model->id;
     }
 
     public function saveContactos(int $viviendaId, array $contactos): void
     {
-        DB::transaction(function () use ($viviendaId, $contactos) {
-            $model = ViviendaEloquentModel::findOrFail($viviendaId);
+        $model = ViviendaEloquentModel::findOrFail($viviendaId);
 
-            $contactosValidos = array_filter($contactos, function ($c) {
-                return !empty($c['nombre']) && !empty($c['telefono']);
-            });
-
-            $idsEnviados = array_filter(array_column($contactosValidos, 'id'));
-
-            $model->contactos()->whereNotIn('id', $idsEnviados)->delete();
-
-            foreach ($contactosValidos as $datos) {
-                $payload = [
-                    'nombre'   => $datos['nombre'],
-                    'relacion' => $datos['relacion'] ?? null,
-                    'telefono' => $datos['telefono'],
-                    'correo'   => $datos['correo'] ?? null,
-                    'notes'    => $datos['notes'] ?? null,
-                ];
-
-                if (!empty($datos['id'])) {
-                    $model->contactos()->where('id', $datos['id'])->update($payload);
-                } else {
-                    $model->contactos()->create($payload);
-                }
-            }
+        $contactosValidos = array_filter($contactos, function ($c) {
+            return !empty($c['nombre']) && !empty($c['telefono']);
         });
+
+        $idsEnviados = array_filter(array_column($contactosValidos, 'id'));
+
+        $model->contactos()->whereNotIn('id', $idsEnviados)->delete();
+
+        foreach ($contactosValidos as $datos) {
+            $payload = [
+                'nombre'   => $datos['nombre'],
+                'relacion' => $datos['relacion'] ?? null,
+                'telefono' => $datos['telefono'],
+                'correo'   => $datos['correo'] ?? null,
+                'notes'    => $datos['notes'] ?? null,
+            ];
+
+            if (!empty($datos['id'])) {
+                $model->contactos()->where('id', $datos['id'])->update($payload);
+            } else {
+                $model->contactos()->create($payload);
+            }
+        }
     }
 
     public function saveDocumentos(int $viviendaId, array $documentos): void
     {
-        DB::transaction(function () use ($viviendaId, $documentos) {
-            $model = ViviendaEloquentModel::findOrFail($viviendaId);
+        $model = ViviendaEloquentModel::findOrFail($viviendaId);
 
-            $documentosValidos = array_filter($documentos, function ($d) {
-                return !empty($d['url']) && !empty($d['tipo_documento']);
-            });
-
-            $idsEnviados = array_filter(array_column($documentosValidos, 'id'));
-
-            $model->documentos()->whereNotIn('id', $idsEnviados)->delete();
-
-            foreach ($documentosValidos as $datos) {
-                $model->documentos()->updateOrCreate(
-                    ['id' => $datos['id'] ?? null],
-                    [
-                        'url'             => $datos['url'],
-                        'nombre_original' => $datos['nombre_original'] ?? null,
-                        'tipo_documento'  => $datos['tipo_documento'],
-                        'peso_bytes'      => $datos['peso_bytes'] ?? null,
-                        'verificado'      => (bool)($datos['verificado'] ?? false),
-                    ]
-                );
-            }
+        $documentosValidos = array_filter($documentos, function ($d) {
+            return !empty($d['url']) && !empty($d['tipo_documento']);
         });
+
+        $idsEnviados = array_filter(array_column($documentosValidos, 'id'));
+
+        $model->documentos()->whereNotIn('id', $idsEnviados)->delete();
+
+        foreach ($documentosValidos as $datos) {
+            $model->documentos()->updateOrCreate(
+                ['id' => $datos['id'] ?? null],
+                [
+                    'url'             => $datos['url'],
+                    'nombre_original' => $datos['nombre_original'] ?? null,
+                    'tipo_documento'  => $datos['tipo_documento'],
+                    'peso_bytes'      => $datos['peso_bytes'] ?? null,
+                    'verificado'      => (bool)($datos['verificado'] ?? false),
+                ]
+            );
+        }
     }
 
     public function saveFotos(int $viviendaId, array $fotos): void
     {
-        DB::transaction(function () use ($viviendaId, $fotos) {
-            $model = ViviendaEloquentModel::findOrFail($viviendaId);
+        $model = ViviendaEloquentModel::findOrFail($viviendaId);
 
-            $fotosValidas = array_filter($fotos, function ($f) {
-                return !empty($f['url']);
-            });
-
-            $idsEnviados = array_filter(array_column($fotosValidas, 'id'));
-
-            $model->fotos()->whereNotIn('id', $idsEnviados)->delete();
-
-            foreach ($fotosValidas as $index => $datos) {
-                $model->fotos()->updateOrCreate(
-                    ['id' => $datos['id'] ?? null],
-                    [
-                        'url'             => $datos['url'],
-                        'nombre_original' => $datos['nombre_original'] ?? null,
-                        'orden'           => $datos['orden'] ?? $index,
-                        'es_principal'    => (bool)($datos['es_principal'] ?? false),
-                    ]
-                );
-            }
+        $fotosValidas = array_filter($fotos, function ($f) {
+            return !empty($f['url']);
         });
+
+        $idsEnviados = array_filter(array_column($fotosValidas, 'id'));
+
+        $model->fotos()->whereNotIn('id', $idsEnviados)->delete();
+
+        foreach ($fotosValidas as $index => $datos) {
+            $model->fotos()->updateOrCreate(
+                ['id' => $datos['id'] ?? null],
+                [
+                    'url'             => $datos['url'],
+                    'nombre_original' => $datos['nombre_original'] ?? null,
+                    'orden'           => $datos['orden'] ?? $index,
+                    'es_principal'    => (bool)($datos['es_principal'] ?? false),
+                ]
+            );
+        }
     }
 
     public function delete(int $id): void
