@@ -5,33 +5,45 @@ namespace App\Contexts\Clientes\Presentation\Livewire;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
+use Livewire\Attributes\Computed;
 use App\Contexts\Clientes\Application\UseCases\GetClienteByIdUseCase;
 use App\Contexts\Clientes\Application\UseCases\SaveClienteUseCase;
 use App\Contexts\Clientes\Application\UseCases\SaveClienteTelefonosUseCase;
 use App\Contexts\Clientes\Application\UseCases\SaveClienteReferenciasUseCase;
 use App\Contexts\Clientes\Application\UseCases\SaveClienteDocumentosUseCase;
+
 use App\Contexts\Shared\Application\UseCases\Asentamientos\GetAsentamientosForSelectUseCase;
+use App\Contexts\Shared\Application\UseCases\Asentamientos\GetUniqueEstadosUseCase;
+use App\Contexts\Shared\Application\UseCases\Asentamientos\GetUniqueMunicipiosUseCase;
+use App\Contexts\Shared\Application\UseCases\Asentamientos\GetUniqueCiudadesUseCase;
 use App\Contexts\Shared\Application\UseCases\TiposCredito\GetTiposCreditoForSelectUseCase;
+use App\Contexts\Shared\Application\UseCases\Asentamientos\GetAllAsentamientosUseCase;
 
 class EditCliente extends Component
 {
     use WithFileUploads;
-    // ID del registro a editar
+
     public int $clienteId;
 
-    // Campos del formulario vinculados por wire:model
+    public string $searchAsentamiento = '';
+    public string $selectedEstado = '';
+    public string $selectedMunicipio = '';
+    public string $selectedCiudad = '';
+
     public string $nombre = '';
     public string $apellido_paterno = '';
     public string $apellido_materno = '';
     public ?string $fecha_nacimiento = null;
     public ?string $rfc = null;
     public ?string $curp = null;
-    public ?int $asentamiento_id = null;
+    
+    public $asentamiento_id = null;
+    public $tipo_credito_id = null;
+
     public ?string $calle_numero = null;
     public ?string $nss = null;
     public ?string $correo_infonavit = null;
     public ?string $contrasena_infonavit = null;
-    public ?int $tipo_credito_id = null;
     public float $precalificacion = 0.0;
     public string $avaluo_solicitado = 'No';
     public ?string $estado_civil = null;
@@ -40,12 +52,11 @@ class EditCliente extends Component
     public array $zonas_ids = [];
     public array $telefonos = [];
     public array $referencias = [];
-
     public array $documentos = [];
+    
     public $temporalFile;
     public string $temporalTipo = '';
 
-    // Catálogo interno para desplegar etiquetas limpias
     public array $tiposDisponibles = [
         'INE' => 'Identificación Oficial (INE / Pasaporte)',
         'CURP' => 'Clave Única de Registro de Población (CURP)',
@@ -86,8 +97,9 @@ class EditCliente extends Component
         $this->regimen_casamiento = $cliente->getRegimenCasamiento();
 
         $this->zonas_ids = $cliente->getZonasInteres() ?? [];
-        $this->telefonos = collect($cliente->getTelefonos())->map(fn($t) =>$t->toArray())->toArray();
+        $this->telefonos = collect($cliente->getTelefonos())->map(fn($t) => $t->toArray())->toArray();
         $this->referencias = collect($cliente->getReferencias())->map(fn($r) => $r->toArray())->toArray();
+        
         $this->documentos = collect($cliente->getDocumentos())->map(function($d) {
             return [
                 'id'              => $d->getId(),
@@ -99,15 +111,84 @@ class EditCliente extends Component
             ];
         })->toArray();
 
+        if ($this->asentamiento_id) {
+            $asentamientosCatalogo = app(GetAsentamientosForSelectUseCase::class)->execute('', (int)$this->asentamiento_id);
+            if (!empty($asentamientosCatalogo)) {
+                $asentamientoActual = collect($asentamientosCatalogo)->first(fn($a) => $a->getId() === (int)$this->asentamiento_id);
+                if ($asentamientoActual) {
+                    $this->selectedEstado = $asentamientoActual->getEstado();
+                    $this->selectedMunicipio = $asentamientoActual->getMunicipio();
+                    $this->selectedCiudad = $asentamientoActual->getCiudad() ?? '';
+                }
+            }
+        }
+
         if (empty($this->telefonos)) {
             $this->addTelefono();
         }
         if (empty($this->referencias)) {
             $this->addReferencia();
         }
-        if (empty($this->documentos)) {
-            $this->documentos = [];
-        }
+    }
+
+    #[Computed]
+    public function estados()
+    {
+        return app(GetUniqueEstadosUseCase::class)->execute();
+    }
+
+    #[Computed]
+    public function municipios()
+    {
+        return app(GetUniqueMunicipiosUseCase::class)->execute($this->selectedEstado);
+    }
+
+    #[Computed]
+    public function ciudades()
+    {
+        return app(GetUniqueCiudadesUseCase::class)->execute($this->selectedEstado, $this->selectedMunicipio);
+    }
+
+    #[Computed]
+    public function asentamientos()
+    {
+        return app(GetAsentamientosForSelectUseCase::class)->execute(
+            $this->searchAsentamiento, 
+            (int)$this->asentamiento_id,
+            $this->selectedEstado,
+            $this->selectedMunicipio,
+            $this->selectedCiudad
+        );
+    }
+
+    #[Computed]
+    public function todosLosAsentamientos()
+    {
+        return app(GetAllAsentamientosUseCase::class)->execute();
+    }
+
+    #[Computed]
+    public function tiposCredito()
+    {
+        return app(GetTiposCreditoForSelectUseCase::class)->execute('cliente');
+    }
+
+    public function updatedSelectedEstado()
+    {
+        $this->selectedMunicipio = '';
+        $this->selectedCiudad = '';
+        $this->asentamiento_id = null;
+    }
+
+    public function updatedSelectedMunicipio()
+    {
+        $this->selectedCiudad = '';
+        $this->asentamiento_id = null;
+    }
+
+    public function updatedSelectedCiudad()
+    {
+        $this->asentamiento_id = null;
     }
 
     protected function rules(): array
@@ -119,7 +200,7 @@ class EditCliente extends Component
             'fecha_nacimiento' => 'nullable|date',
             'rfc' => 'nullable|string|max:13|unique:clientes,rfc,' . $this->clienteId,
             'curp' => 'nullable|string|max:18|unique:clientes,curp,' . $this->clienteId,
-            'asentamiento_id' => 'nullable|integer',
+            'asentamiento_id' => 'nullable|integer|exists:asentamientos,id',
             'calle_numero' => 'nullable|string|max:255',
             'nss' => 'nullable|string|max:15',
             'correo_infonavit' => 'nullable|email|max:255',
@@ -136,11 +217,11 @@ class EditCliente extends Component
             'telefonos.*.id'            => 'nullable|integer',
             'telefonos.*.telefono'      => 'required|string|min:8|max:20',
             'telefonos.*.tipo_telefono' => 'required|string|max:50',
-            'referencias' => 'nullable|array',
-            'referencias.*.id' => 'nullable|integer',
-            'referencias.*.nombre' => 'required|string|max:255',
-            'referencias.*.celular' => 'nullable|string|max:20',
-            'referencias.*.parentesco' => 'nullable|string|max:100',
+            'referencias'               => 'nullable|array',
+            'referencias.*.id'          => 'nullable|integer',
+            'referencias.*.nombre'      => 'required|string|max:255',
+            'referencias.*.celular'     => 'nullable|string|max:20',
+            'referencias.*.parentesco'   => 'nullable|string|max:100',
         ];
     }
 
@@ -180,7 +261,7 @@ class EditCliente extends Component
     public function addDocumento()
     {
         $this->validate([
-            'temporalFile' => 'required|file|max:10240', // 10MB Máx
+            'temporalFile' => 'required|file|max:10240',
             'temporalTipo' => 'required|string',
         ]);
 
@@ -213,7 +294,7 @@ class EditCliente extends Component
         SaveClienteReferenciasUseCase $referenciasUseCase,
         SaveClienteDocumentosUseCase $documentosUseCase 
     ) {
-        $this->validate();
+        $validatedData = $this->validate();
 
         $idGenerado = $useCase->execute([
             'id'                   => $this->clienteId,
@@ -223,12 +304,12 @@ class EditCliente extends Component
             'fecha_nacimiento'     => $this->fecha_nacimiento,
             'rfc'                  => $this->rfc,
             'curp'                 => $this->curp,
-            'asentamiento_id'      => $this->asentamiento_id,
+            'asentamiento_id'      => $this->asentamiento_id ? (int)$this->asentamiento_id : null,
             'calle_numero'         => $this->calle_numero,
             'nss'                  => $this->nss,
             'correo_infonavit'     => $this->correo_infonavit,
             'contrasena_infonavit' => $this->contrasena_infonavit,
-            'tipo_credito_id'      => $this->tipo_credito_id,
+            'tipo_credito_id'      => $this->tipo_credito_id ? (int)$this->tipo_credito_id : null,
             'precalificacion'      => $this->precalificacion,
             'avaluo_solicitado'    => $this->avaluo_solicitado,
             'estado_civil'         => $this->estado_civil,
@@ -244,15 +325,10 @@ class EditCliente extends Component
         return redirect()->route('clientes.index');
     }
 
-    public function render(
-        GetAsentamientosForSelectUseCase $getAsentamientosUseCase,
-        GetTiposCreditoForSelectUseCase $getTiposCreditoUseCase
-    ) {
-        return view('clientes::edit', [
-            'asentamientos' => $getAsentamientosUseCase->execute(),
-            'tiposCredito'  => $getTiposCreditoUseCase->execute('cliente') 
-        ])
-        ->layout('shared::layouts.app')
-        ->title('Editar Expediente de Cliente');
+    public function render()
+    {
+        return view('clientes::edit')
+            ->layout('shared::layouts.app')
+            ->title('Editar Expediente de Cliente');
     }
 }

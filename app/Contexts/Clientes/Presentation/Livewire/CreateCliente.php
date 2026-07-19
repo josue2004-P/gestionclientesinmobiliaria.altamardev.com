@@ -3,25 +3,32 @@
 namespace App\Contexts\Clientes\Presentation\Livewire;
 
 use Livewire\Component;
+use Livewire\Attributes\Computed;
 use App\Contexts\Clientes\Application\UseCases\SaveClienteUseCase;
 use App\Contexts\Shared\Application\UseCases\Asentamientos\GetAsentamientosForSelectUseCase;
+use App\Contexts\Shared\Application\UseCases\Asentamientos\GetUniqueEstadosUseCase;
+use App\Contexts\Shared\Application\UseCases\Asentamientos\GetUniqueMunicipiosUseCase;
+use App\Contexts\Shared\Application\UseCases\Asentamientos\GetUniqueCiudadesUseCase;
 use App\Contexts\Shared\Application\UseCases\TiposCredito\GetTiposCreditoForSelectUseCase;
 
 class CreateCliente extends Component
 {
-    // Campos del formulario vinculados por wire:model
+    public string $searchAsentamiento = '';
+    public string $selectedEstado = '';
+    public string $selectedMunicipio = '';
+    public string $selectedCiudad = '';
     public string $nombre = '';
     public string $apellido_paterno = '';
     public string $apellido_materno = '';
     public ?string $fecha_nacimiento = null;
     public ?string $rfc = null;
     public ?string $curp = null;
-    public ?int $asentamiento_id = null;
+    public $asentamiento_id = null;
     public ?string $calle_numero = null;
     public ?string $nss = null;
     public ?string $correo_infonavit = null;
     public ?string $contrasena_infonavit = null;
-    public ?int $tipo_credito_id = null;
+    public $tipo_credito_id = null;
     public float $precalificacion = 0.0;
     public string $avaluo_solicitado = 'No';
     public ?string $estado_civil = null;
@@ -36,6 +43,60 @@ class CreateCliente extends Component
         }
     }
 
+    #[Computed]
+    public function estados()
+    {
+        return app(GetUniqueEstadosUseCase::class)->execute();
+    }
+
+    #[Computed]
+    public function municipios()
+    {
+        return app(GetUniqueMunicipiosUseCase::class)->execute($this->selectedEstado);
+    }
+
+    #[Computed]
+    public function ciudades()
+    {
+        return app(GetUniqueCiudadesUseCase::class)->execute($this->selectedEstado, $this->selectedMunicipio);
+    }
+
+    #[Computed]
+    public function asentamientos()
+    {
+        return app(GetAsentamientosForSelectUseCase::class)->execute(
+            $this->searchAsentamiento, 
+            (int)$this->asentamiento_id,
+            $this->selectedEstado,
+            $this->selectedMunicipio,
+            $this->selectedCiudad
+        );
+    }
+
+    #[Computed]
+    public function tiposCredito()
+    {
+        return app(GetTiposCreditoForSelectUseCase::class)->execute('cliente');
+    }
+
+    public function updatedSelectedEstado()
+    {
+        $this->selectedMunicipio = '';
+        $this->selectedCiudad = '';
+        $this->asentamiento_id = null;
+    }
+
+    public function updatedSelectedMunicipio()
+    {
+        $this->selectedCiudad = '';
+        $this->asentamiento_id = null;
+    }
+
+    public function updatedSelectedCiudad()
+    {
+        $this->asentamiento_id = null;
+    }
+
     protected function rules(): array
     {
         return [
@@ -45,7 +106,7 @@ class CreateCliente extends Component
             'fecha_nacimiento' => 'nullable|date',
             'rfc' => 'nullable|string|max:13|unique:clientes,rfc',
             'curp' => 'nullable|string|max:18|unique:clientes,curp',
-            'asentamiento_id' => 'nullable|integer',
+            'asentamiento_id' => 'nullable|integer|exists:asentamientos,id',
             'calle_numero' => 'nullable|string|max:255',
             'nss' => 'nullable|string|max:15',
             'correo_infonavit' => 'nullable|email|max:255',
@@ -63,11 +124,12 @@ class CreateCliente extends Component
     public function store(SaveClienteUseCase $saveClienteUseCase)
     {
         $validatedData = $this->validate();
-
+        
+        $validatedData['asentamiento_id'] = $validatedData['asentamiento_id'] ? (int)$validatedData['asentamiento_id'] : null;
+        $validatedData['tipo_credito_id'] = $validatedData['tipo_credito_id'] ? (int)$validatedData['tipo_credito_id'] : null;
         $validatedData['zonas_interes'] = $this->zonas_ids;
 
         try {
-            // Invocamos al caso de uso de Dominio pasándole los datos limpios
             $saveClienteUseCase->execute($validatedData);
 
             $this->dispatch('swal-init', [
@@ -87,15 +149,10 @@ class CreateCliente extends Component
         }
     }
 
-    public function render(
-        GetAsentamientosForSelectUseCase $getAsentamientosUseCase,
-        GetTiposCreditoForSelectUseCase $getTiposCreditoUseCase
-    ) {
-        return view('clientes::create', [
-            'asentamientos' => $getAsentamientosUseCase->execute(),
-            'tiposCredito'  => $getTiposCreditoUseCase->execute('cliente') 
-        ])
-        ->layout('shared::layouts.app')
-        ->title('Registrar Nuevo Cliente');
+    public function render()
+    {
+        return view('clientes::create')
+            ->layout('shared::layouts.app')
+            ->title('Registrar Nuevo Cliente');
     }
 }
