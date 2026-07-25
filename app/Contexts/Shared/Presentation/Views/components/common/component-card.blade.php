@@ -7,7 +7,7 @@
 
 <div
     {{ $attributes->merge([
-        'class' => 'rounded-2xl border border-gray-200 bg-white shadow-sm transition-shadow duration-300 hover:shadow-md dark:border-gray-800 dark:bg-white/[0.03] flex flex-col'
+        'class' => 'rounded-md border border-gray-200 bg-white shadow-sm transition-shadow duration-300 hover:shadow-md dark:border-gray-800 dark:bg-white/[0.03] flex flex-col'
     ]) }}
 >
     @isset($title)

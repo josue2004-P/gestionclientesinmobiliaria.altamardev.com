@@ -7,24 +7,19 @@
     'title' => 'Registros'
 ])
 
-<div class="rounded-3xl border border-gray-200 bg-white shadow-sm transition-all duration-300 dark:border-gray-800 dark:bg-gray-900/50">
+<div class="rounded-md border border-gray-200 bg-white shadow-sm transition-all duration-300 dark:border-gray-800 dark:bg-gray-900/50">
     
     {{-- BARRA SUPERIOR PREMIUM --}}
     <div class="p-6">
         <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             
             <div class="flex flex-col gap-5 sm:flex-row sm:items-center flex-grow">
-                <div>
-                    <h3 class="text-2xl font-black tracking-tight text-gray-900 dark:text-white transition-colors">
-                        {{ $title }}
-                    </h3>
-                </div>
                 @if($search !== null)
                 <div class="relative w-full sm:w-80 group">
                     <x-shared::form.text-input 
                         wire:model.live.debounce.400ms="search" 
                         placeholder="Buscar..." 
-                        class="h-[46px] rounded-2xl pl-12 pr-10 text-gray-800 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500" 
+                        class="pl-12 pr-10" 
                     />
 
                     <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-450 group-focus-within:text-indigo-600 dark:text-gray-500 dark:group-focus-within:text-indigo-400 transition-colors pointer-events-none">
@@ -61,7 +56,7 @@
                 <div class="relative">
                     <select 
                         wire:model.live="perPage" 
-                        class="h-[46px] border appearance-none rounded-2xl border-gray-200 bg-white pl-4 pr-10 text-xs font-extrabold tracking-wide text-gray-700 transition-all focus:ring-4 focus:ring-indigo-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:focus:ring-indigo-500/20 focus:outline-none"
+                        class=" h-10  border appearance-none rounded-md border-gray-200 bg-white pl-4 pr-10 text-sm font-semibold  text-gray-700 transition-all focus:ring-4 focus:ring-indigo-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:focus:ring-indigo-500/20 focus:outline-none"
                     >
                         <option value="7">7 Filas</option>
                         <option value="25">25 Filas</option>
@@ -89,10 +84,11 @@
                     </div>
                 @endif
                 @if($createRoute)
-                    <x-shared::form.button-primary 
+                    <x-shared::ui.button
                         tag="a" 
+                        size="sm"
                         href="{{ $createRoute }}" 
-                        class="h-[46px] !rounded-2xl px-6 shadow-lg shadow-indigo-500/20 text-sm font-bold"
+                        class="font-bold"
                     >
                         <i class="fa-solid fa-plus mr-2 text-xs"></i>
                         {{ __('Nuevo Registro') }}

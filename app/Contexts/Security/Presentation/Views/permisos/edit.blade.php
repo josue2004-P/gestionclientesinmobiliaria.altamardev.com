@@ -1,7 +1,5 @@
-{{-- CONTENEDOR RAÍZ SIN LÍMITE DE ANCHO PARA QUE EL HEADER SE DESPLIEGUE A TODO LO ANCHO --}}
 <div class="w-full font-sans antialiased px-4 sm:px-6 pb-12 bg-transparent text-gray-900 dark:text-gray-100 transition-colors duration-200">
     
-    {{-- Componente Header de Shared a todo lo ancho, alineado a la izquierda --}}
     <x-shared::common.header 
         title="Modificar Llave de Acceso" 
         icon="fa-key"
@@ -12,7 +10,6 @@
         ]"
     />
 
-    {{-- CONTENEDOR LIMITADO (MAX-W-4XL) ALINEADO A LA IZQUIERDA (SIN mx-auto) --}}
     <div class="max-w-4xl text-left">
         <form wire:submit="save">
             <x-shared::common.component-card 
@@ -31,7 +28,7 @@
                                 type="text" 
                                 wire:model="nombre" 
                                 placeholder="ej: ventas.editar" 
-                                class="lowercase w-full font-mono font-bold text-indigo-600 dark:text-indigo-400 bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 focus:border-indigo-500 focus:ring-indigo-500"
+                                class="lowercase w-full font-semibold  text-indigo-600 dark:text-indigo-400"
                             />
                         </div>
                         <x-shared::form.input-error :messages="$errors->get('nombre')" class="mt-2" />
@@ -46,7 +43,7 @@
                                 type="text" 
                                 wire:model="descripcion" 
                                 placeholder="Describe qué acceso otorga esta llave" 
-                                class="w-full font-medium bg-white dark:bg-gray-900 text-gray-900 dark:text-white border-gray-300 dark:border-gray-700 focus:border-indigo-500 focus:ring-indigo-500"
+                                class="w-full font-medium bg-white dark:bg-gray-900 text-gray-900 "
                             />
                         </div>
                         <x-shared::form.input-error :messages="$errors->get('descripcion')" class="mt-2" />
@@ -59,7 +56,7 @@
                                 <i class="fa-solid fa-triangle-exclamation text-sm"></i>
                             </div>
                             <div>
-                                <h4 class="text-xs font-black text-red-900 dark:text-red-400 uppercase tracking-widest">Atención Inmediata</h4>
+                                <h4 class="text-sm font-bold text-red-900 dark:text-red-400 ">Atención Inmediata</h4>
                                 <p class="mt-1 text-xs text-red-700 dark:text-red-400/80 leading-relaxed font-medium italic">
                                     Alterar el identificador del permiso puede inhabilitar funciones en vivo si el código fuente del servidor no se actualiza simultáneamente.
                                 </p>
@@ -71,15 +68,18 @@
                 {{-- Footer alineado a la izquierda y derecha adecuadamente --}}
                 <x-slot:footer>
                     <div class="flex items-center justify-between">
-                        <a href="{{ route('permisos.index') }}" class="inline-flex items-center text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-red-555 dark:text-gray-400 dark:hover:text-red-400 transition-colors duration-150">
+                        <a href="{{ route('permisos.index') }}" class="inline-flex items-center text-sm font-semibold  text-gray-500 hover:text-red-555 dark:text-gray-400 dark:hover:text-red-400 transition-colors duration-150">
                             <i class="fa-solid fa-xmark mr-2 text-sm"></i> Descartar
                         </a>
                         
-                        <x-shared::form.button-primary type="submit" class="shadow-lg shadow-indigo-500/10 dark:shadow-indigo-500/5 px-5 h-11 text-xs" wire:loading.attr="disabled">
+                        <x-shared::ui.button 
+                            size="sm"
+                            type="submit" 
+                            wire:loading.attr="disabled">
                             <i class="fa-solid fa-floppy-disk mr-2" wire:loading.remove></i>
                             <i class="fa-solid fa-circle-notch animate-spin mr-2" wire:loading></i> 
                             <span>Guardar Cambios</span>
-                        </x-shared::form.button-primary>
+                        </x-shared::ui.button>
                     </div>
                 </x-slot:footer>
             </x-shared::common.component-card>

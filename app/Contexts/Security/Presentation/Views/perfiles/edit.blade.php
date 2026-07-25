@@ -1,7 +1,5 @@
-{{-- CONTENEDOR RAÍZ SIN LÍMITE DE ANCHO PARA QUE EL HEADER SE DESPLIEGUE A TODO LO ANCHO --}}
 <div class="w-full font-sans antialiased px-4 sm:px-6 pb-12 bg-transparent text-gray-900 dark:text-gray-100 transition-colors duration-200">
     
-    {{-- Componente Header de Shared a todo lo ancho, alineado a la izquierda --}}
     <x-shared::common.header 
         title="Arquitectura de Accesos" 
         icon="fa-shield-halved"
@@ -12,8 +10,7 @@
         ]"
     />
 
-    {{-- CONTENEDOR LIMITADO (MAX-W-7XL) ALINEADO A LA IZQUIERDA (SIN mx-auto) --}}
-    <div class="max-w-7xl text-left">
+    <div class="text-left">
         <form wire:submit="save" class="space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 
@@ -42,11 +39,20 @@
                         </div>
                         
                         <x-slot:footer>
-                            <x-shared::form.button-primary type="submit" class="w-full shadow-lg shadow-indigo-500/10 dark:shadow-indigo-500/5 px-5 h-11 text-xs" wire:loading.attr="disabled">
-                                <i class="fa-solid fa-shield-check mr-2" wire:loading.remove></i>
-                                <i class="fa-solid fa-circle-notch animate-spin mr-2" wire:loading></i> 
-                                <span>Guardar Configuración</span>
-                            </x-shared::form.button-primary>
+                            <div class="flex items-center justify-between">
+                                <a href="{{ route('perfiles.index') }}" class="inline-flex items-center text-sm font-semibold text-gray-500 hover:text-red-550 dark:text-gray-400 dark:hover:text-red-400 transition-colors duration-150">
+                                    <i class="fa-solid fa-xmark mr-2 text-sm"></i> Cancelar
+                                </a>
+                                
+                                <x-shared::ui.button 
+                                type="submit" 
+                                size="sm"
+                                >
+                                    <i class="fa-solid fa-shield-check mr-2" wire:loading.remove></i>
+                                    <i class="fa-solid fa-circle-notch animate-spin mr-2" wire:loading></i> 
+                                    <span>Guardar Configuración</span>
+                                </x-shared::ui.button>
+                            </div>
                         </x-slot:footer>
                     </x-shared::common.component-card>
                 </div>
@@ -69,12 +75,11 @@
                                                 <i class="fa-solid fa-cube text-sm"></i>
                                             </div>
                                             <div>
-                                                <p class="font-bold text-xs text-gray-900 dark:text-white uppercase tracking-tight">{{ $permiso['nombre'] }}</p>
+                                                <p class="font-bold uppercase text-xs text-gray-900 dark:text-white  ">{{ $permiso['nombre'] }}</p>
                                                 <p class="text-[11px] text-gray-450 dark:text-gray-500 font-medium italic mt-0.5">{{ $permiso['descripcion'] }}</p>
                                             </div>
                                         </div>
 
-                                        {{-- Switcheo de Capacidades CRUD --}}
                                         <div class="flex flex-wrap items-center gap-2">
                                             @foreach([
                                                 'is_read' => ['Leer', 'text-emerald-600 dark:text-emerald-400', 'hover:border-emerald-500/50 dark:hover:border-emerald-500/30', 'focus:ring-emerald-500/10'], 
@@ -88,7 +93,7 @@
                                                         wire:model="matriz.{{ $permiso['id'] }}.{{ $key }}" 
                                                         class="h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-indigo-600 focus:ring-4 dark:bg-gray-900 transition-all {{ $estilo[3] }}"
                                                     >
-                                                    <span class="ml-2 text-[10px] font-extrabold uppercase tracking-widest text-gray-400 dark:text-gray-500 group-hover:{{ $estilo[1] }} transition-colors">
+                                                    <span class="ml-2 text-[12px] font-semibold   text-gray-500 dark:text-gray-500 group-hover:{{ $estilo[1] }} transition-colors">
                                                         {{ $estilo[0] }}
                                                     </span>
                                                 </label>
