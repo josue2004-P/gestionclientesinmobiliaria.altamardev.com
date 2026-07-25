@@ -1,8 +1,6 @@
-{{-- UN SOLO CONTENEDOR RAÍZ PARA EVITAR MultipleRootElementsDetectedException --}}
 <div>
 
-        {{-- Componente Header de Shared a todo lo ancho, alineado a la izquierda --}}
- <x-shared::common.header 
+    <x-shared::common.header 
         title="Catálogo de Perfiles" 
         icon="fa-users-gear"
         desc="Catálogo de perfiles y roles asignados a los usuarios"
@@ -19,14 +17,11 @@
         :createRoute="route('perfiles.create')"
     >
         <x-slot:filters>
-            {{-- Espacio libre para filtros rápidos --}}
         </x-slot:filters>
 
-        {{-- CONTENEDOR EXTERIOR CON BORDES TOTALMENTE CUADRADOS (ROUNDED-NONE) --}}
         <div class="overflow-x-auto bg-transparent rounded-none border-t border-b border-gray-200 dark:border-gray-800 transition-colors duration-200">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800 border-collapse">
                 <thead>
-                    {{-- DIVISIONES VERTICALES Y HORIZONTALES EN EL TR DE LA CABECERA --}}
                     <tr class="bg-gray-50/50 dark:bg-gray-900/40 transition-colors divide-x divide-gray-200 dark:divide-gray-800 border-b border-gray-200 dark:border-gray-800">
                         <th scope="col" class="px-6 py-4 text-start text-xs font-bold text-gray-500 uppercase dark:text-gray-400 tracking-wide">Perfil del Sistema</th>
                         <th scope="col" class="px-6 py-4 text-start text-xs font-bold text-gray-500 uppercase dark:text-gray-400 tracking-wide">Alcance / Descripción</th>
@@ -34,7 +29,6 @@
                         <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase dark:text-gray-400 tracking-wide">Acciones</th>
                     </tr>
                 </thead>
-                {{-- TABLA INTERNA CON DIVIDE-Y PARA AGREGAR LA DIVISIÓN HORIZONTAL ENTRE CAMPOS/FILAS --}}
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-800 bg-transparent">
                     @forelse($perfiles as $perfil)
                         <tr class="group hover:bg-gray-50/80 dark:hover:bg-indigo-500/5 transition-all duration-200 divide-x divide-gray-200 dark:divide-gray-800" wire:key="perfil-{{ $perfil->id }}">
