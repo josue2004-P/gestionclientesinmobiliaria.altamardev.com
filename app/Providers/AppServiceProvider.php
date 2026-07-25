@@ -18,6 +18,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->register(\App\Contexts\Viviendas\Providers\ViviendasServiceProvider::class);
         $this->app->register(\App\Contexts\Clientes\Providers\ClientesServiceProvider::class);
 
+        if ($this->app->environment('local')) {
+            $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
+            $this->app->register(\App\Providers\TelescopeServiceProvider::class); 
+        }
     }
 
     /**
