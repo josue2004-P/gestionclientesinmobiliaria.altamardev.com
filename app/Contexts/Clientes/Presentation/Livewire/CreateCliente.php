@@ -10,6 +10,7 @@ use App\Contexts\Shared\Application\UseCases\Asentamientos\GetUniqueEstadosUseCa
 use App\Contexts\Shared\Application\UseCases\Asentamientos\GetUniqueMunicipiosUseCase;
 use App\Contexts\Shared\Application\UseCases\Asentamientos\GetUniqueCiudadesUseCase;
 use App\Contexts\Shared\Application\UseCases\TiposCredito\GetTiposCreditoForSelectUseCase;
+use App\Contexts\Shared\Application\UseCases\Asentamientos\GetAllAsentamientosUseCase; 
 
 class CreateCliente extends Component
 {
@@ -71,6 +72,12 @@ class CreateCliente extends Component
             $this->selectedMunicipio,
             $this->selectedCiudad
         );
+    }
+
+    #[Computed]
+    public function todosLosAsentamientos()
+    {
+        return app(GetAllAsentamientosUseCase::class)->execute();
     }
 
     #[Computed]
