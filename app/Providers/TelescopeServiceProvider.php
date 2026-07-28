@@ -2,6 +2,15 @@
 
 namespace App\Providers;
 
+if (!class_exists(\Laravel\Telescope\TelescopeApplicationServiceProvider::class)) {
+    class TelescopeServiceProvider extends \Illuminate\Support\ServiceProvider
+    {
+        public function register(): void {}
+        public function boot(): void {}
+    }
+    return;
+}
+
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Telescope\IncomingEntry;
