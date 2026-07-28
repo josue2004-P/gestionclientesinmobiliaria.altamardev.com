@@ -23,37 +23,10 @@ jobs:
 
             cd ${{ secrets.WORK_DIR }}
             echo "📥 Actualizando repositorio..."
-            git fetch origin ${{ secrets.MAIN_BRANCH }}
-            git checkout ${{ secrets.MAIN_BRANCH }}
-            git pull origin ${{ secrets.MAIN_BRANCH }}
+            # git fetch origin ${{ secrets.MAIN_BRANCH }}
+            # git checkout ${{ secrets.MAIN_BRANCH }}
+            # git pull origin ${{ secrets.MAIN_BRANCH }}
 
             echo "🚀 Construyendo y levantando contenedores..."
 
-            # docker compose up -d --build
-            
-            # echo "⏳ Esperando unos segundos a que la base de datos esté lista..."
-            # FORMA_LISTO=0
-            # for i in {1..60}; do
-            #   if docker compose exec -T app_inmobiliaria php artisan --version > /dev/null 2>&1; then
-            #     echo "⚡ ¡Contenedor listo y Artisan disponible!"
-            #     FORMA_LISTO=1
-            #     break
-            #   fi
-            #   echo "⏳ Aún construyendo o instalando... (Intento $i/60 - esperando 10s)"
-            #   sleep 10
-            # done
-
-            # if [ $FORMA_LISTO -eq 0 ]; then
-            #   echo "❌ Error: El contenedor tardó demasiado en iniciar."
-            #   exit 1
-            # fi
-
-            # echo "🗄️ Ejecutando migraciones de Laravel..."
-            # docker compose exec -T app_inmobiliaria php artisan migrate --force
-
-            # echo "🧹 Optimizando la aplicación (Caché)..."
-
-            # docker compose exec -T app_inmobiliaria php artisan config:cache
-            # docker compose exec -T app_inmobiliaria php artisan route:cache
-
-            # echo "✅ ¡Despliegue completado con éxito en $HOSTNAME!"
+            echo "✅ ¡Despliegue completado con éxito en $HOSTNAME!"
