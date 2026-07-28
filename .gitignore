@@ -55,3 +55,4 @@ Homestead.yaml
 
 docker-compose.yml
 Dockerfile
+docker-entrypoint.sh
