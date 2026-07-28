@@ -144,14 +144,32 @@ class EloquentViviendaRepository implements ViviendaRepositoryInterface
     public function paginateWithSearch(?string $search, ?string $estatus, int $perPage): LengthAwarePaginator
     {
         return ViviendaEloquentModel::query()
-            ->with(['asentamiento', 'tipoVivienda'])
+            ->with([
+                'asentamiento', 
+                'tipoVivienda', 
+                'contactos', 
+                'amenidades'
+            ])
+            ->withCount('amenidades')
             ->when($estatus, function ($query) use ($estatus) {
                 $query->where('estatus_vivienda', $estatus);
             })
             ->when($search, function ($query) use ($search) {
-                $query->where('fraccionamiento', 'like', '%' . $search . '%')
-                      ->orWhere('direccion', 'like', '%' . $search . '%');
+                $query->where(function ($q) use ($search) {
+                    $q->where('fraccionamiento', 'like', '%' . $search . '%')
+                      ->orWhere('direccion', 'like', '%' . $search . '%')
+                      ->orWhere('precio_lista', 'like', '%' . $search . '%')
+                      ->orWhereHas('asentamiento', function ($qAsentamiento) use ($search) {
+                          $qAsentamiento->where('nombre_asentamiento', 'like', '%' . $search . '%')
+                                        ->orWhere('codigo_postal', 'like', '%' . $search . '%');
+                      })
+                      ->orWhereHas('contactos', function ($qContacto) use ($search) {
+                          $qContacto->where('nombre', 'like', '%' . $search . '%')
+                                    ->orWhere('telefono', 'like', '%' . $search . '%');
+                      });
+                });
             })
+            ->latest('id')
             ->paginate($perPage);
     }
 }

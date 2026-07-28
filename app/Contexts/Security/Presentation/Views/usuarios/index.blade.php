@@ -17,7 +17,7 @@
         <x-slot:filters>
         </x-slot:filters>
 
-        <div class="overflow-x-auto bg-transparent rounded-none border border-gray-200 dark:border-gray-800 transition-colors duration-200">
+        <div class="overflow-x-auto bg-transparent rounded-none border-t  border-gray-200 dark:border-gray-800 transition-colors duration-200">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800 border-collapse">
                 <thead>
                     <tr class="bg-gray-50/50 dark:bg-gray-900/40 transition-colors divide-x divide-gray-200 dark:divide-gray-800 border-b border-gray-200 dark:border-gray-800">

@@ -36,16 +36,16 @@
             <div class="flex flex-wrap items-center gap-3">
                 
                 @if($exportPdf || $exportExcel)
-                <div class="flex items-center gap-1 rounded-2xl bg-gray-100/80 p-1.5 dark:bg-white/[0.03] border border-gray-200 dark:border-gray-800 transition-colors">
+                <div class="flex items-center gap-1 rounded-md bg-gray-100/80 p-1.5 dark:bg-white/[0.03] border border-gray-200 dark:border-gray-800 transition-colors">
                     @if($exportPdf)
                         <a href="{{ $exportPdf }}" target="_blank" 
-                           class="flex h-9 w-9 items-center justify-center rounded-xl text-gray-500 dark:text-gray-400 transition-all hover:bg-white hover:text-red-600 dark:hover:bg-gray-850 dark:hover:text-red-400 hover:shadow-sm">
+                           class="flex h-9 w-9 items-center justify-center rounded-md text-gray-500 dark:text-gray-400 transition-all hover:bg-white hover:text-red-600 dark:hover:bg-gray-850 dark:hover:text-red-400 hover:shadow-sm">
                             <i class="fa-solid fa-file-pdf"></i>
                         </a>
                     @endif
                     @if($exportExcel)
                         <a href="{{ $exportExcel }}" 
-                           class="flex h-9 w-9 items-center justify-center rounded-xl text-gray-500 dark:text-gray-400 transition-all hover:bg-white hover:text-green-650 dark:hover:bg-gray-850 dark:hover:text-green-400 hover:shadow-sm">
+                           class="flex h-9 w-9 items-center justify-center rounded-md text-gray-500 dark:text-gray-400 transition-all hover:bg-white hover:text-green-650 dark:hover:bg-gray-850 dark:hover:text-green-400 hover:shadow-sm">
                             <i class="fa-solid fa-file-excel"></i>
                         </a>
                     @endif
@@ -151,7 +151,7 @@
     </div>
 
     {{-- ÁREA DE TABLA --}}
-    <div class="relative min-h-[200px]">
+    <div class="relative">
         <div wire:loading.delay.longest 
              wire:target="search, perPage, deleteAsentamiento"
              class="absolute inset-0 z-20 flex items-center justify-center bg-white/60 backdrop-blur-[2px] dark:bg-gray-900/60 transition-all">
@@ -161,7 +161,7 @@
             </div>
         </div>
         
-        <div class="overflow-x-auto rounded-b-3xl pb-24">
+        <div class="overflow-x-auto rounded-b-3xl ">
             {{ $slot }}
         </div>
     </div>

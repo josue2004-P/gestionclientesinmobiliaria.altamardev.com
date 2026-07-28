@@ -17,7 +17,7 @@ class IndexTiposCredito extends Component
     public $search = '';
 
     #[Url(keep: true)]
-    public $perPage = 10;
+    public $perPage = 7;
 
     public function mount()
     {

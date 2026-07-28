@@ -8,6 +8,7 @@ use App\Contexts\Clientes\Domain\Entities\ClienteReferencia;
 use App\Contexts\Clientes\Domain\Entities\ClienteDocumento;
 use App\Contexts\Clientes\Domain\Repositories\ClienteRepositoryInterface;
 use App\Contexts\Clientes\Infrastructure\LaravelModels\ClienteEloquentModel;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use DateTime;
 
@@ -24,6 +25,43 @@ class EloquentClienteRepository implements ClienteRepositoryInterface
         if (!$modelo) return null;
 
         return $this->toEntity($modelo);
+    }
+
+    public function paginateWithSearch(?string $search, int $perPage): LengthAwarePaginator
+    {
+        return ClienteEloquentModel::query()
+            ->with([
+                'telefonos', 
+                'zonasInteres', 
+                'referencias'
+            ])
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('nombre', 'like', '%' . $search . '%')
+                      ->orWhere('apellido_paterno', 'like', '%' . $search . '%')
+                      ->orWhere('apellido_materno', 'like', '%' . $search . '%')
+                      ->orWhere('rfc', 'like', '%' . $search . '%')
+                      ->orWhere('curp', 'like', '%' . $search . '%')
+                      ->orWhere('nss', 'like', '%' . $search . '%')
+                      ->orWhere('correo_infonavit', 'like', '%' . $search . '%')
+
+                      ->orWhereHas('telefonos', function ($qTel) use ($search) {
+                          $qTel->where('telefono', 'like', '%' . $search . '%');
+                      })
+
+                      ->orWhereHas('referencias', function ($qRef) use ($search) {
+                          $qRef->where('nombre', 'like', '%' . $search . '%')
+                               ->orWhere('celular', 'like', '%' . $search . '%');
+                      })
+
+                      ->orWhereHas('zonasInteres', function ($qZona) use ($search) {
+                          $qZona->where('nombre_asentamiento', 'like', '%' . $search . '%')
+                                ->orWhere('codigo_postal', 'like', '%' . $search . '%');
+                      });
+                });
+            })
+            ->latest('id')
+            ->paginate($perPage);
     }
 
     public function save(Cliente $cliente): int

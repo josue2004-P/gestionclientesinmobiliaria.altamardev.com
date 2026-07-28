@@ -10,7 +10,7 @@
 
 @php
     // Mantenemos tus clases base y mapas exactamente igual
-    $base = 'inline-flex items-center justify-center font-medium gap-2 rounded-lg transition';
+    $base = 'inline-flex items-center justify-center font-medium gap-2 rounded-md transition';
 
     $sizeMap = [
         'sm' => 'px-4 py-2 ',

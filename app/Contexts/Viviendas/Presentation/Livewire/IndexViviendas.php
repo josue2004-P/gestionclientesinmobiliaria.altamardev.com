@@ -59,7 +59,11 @@ class IndexViviendas extends Component
     public function render(GetViviendasPaginatedUseCase $getUseCase)
     {
         return view('viviendas::index', [
-            'viviendas' => $getUseCase->execute($this->search, $this->estatus, (int)$this->perPage)
+            'viviendas' => $getUseCase->execute(
+                search: $this->search, 
+                estatus: $this->estatus, 
+                perPage: (int) $this->perPage
+            )
         ])
         ->layout('shared::layouts.app')
         ->title('Inventario de Inmuebles');

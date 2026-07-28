@@ -6,7 +6,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
-use App\Contexts\Clientes\Application\UseCases\GetClientesUseCase; 
+use App\Contexts\Clientes\Application\UseCases\GetClientesPaginatedUseCase; 
 use App\Contexts\Clientes\Application\UseCases\DeleteClienteUseCase;
 
 class IndexClientes extends Component
@@ -17,7 +17,7 @@ class IndexClientes extends Component
     public $search = '';
 
     #[Url(keep: true)]
-    public $perPage = 10;
+    public $perPage = 7;
 
     public function mount()
     {
@@ -59,12 +59,13 @@ class IndexClientes extends Component
         $this->dispatch('swal-init', ['icon' => 'success', 'title' => 'Eliminado', 'text' => 'El cliente ha sido removido correctamente.']);
     }
 
-    public function render(GetClientesUseCase $getClientesUseCase)
+    public function render(GetClientesPaginatedUseCase $useCase)
     {
-        $clientes = $getClientesUseCase->execute();
-
         return view('clientes::index', [
-            'clientes' => $clientes
+            'clientes' => $useCase->execute(
+                search: $this->search, 
+                perPage: (int) $this->perPage
+            )
         ])
         ->layout('shared::layouts.app')
         ->title('Control de Clientes');

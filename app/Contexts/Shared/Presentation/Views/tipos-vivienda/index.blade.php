@@ -1,10 +1,19 @@
 <div>
+    <x-shared::common.header 
+        title="Catálogo de Tipos de Viviendas" 
+        icon="fa-house-chimney"
+        desc="Catálogo y configuración de los tipos de viviendas, prototipos y desarrollos"
+        :breadcrumb="[
+            ['label' => 'Inicio', 'url' => route('dashboard')],
+            ['label' => 'Tipos de Viviendas', 'url' => null]
+        ]"
+    />
     <x-shared::form.table-filters title="Tipos de Vivienda" :search="$search" :perPage="$perPage" :createRoute="route('tipos-vivienda.create')">
              <x-slot:filters>
             {{-- Espacio libre para filtros rápidos --}}
         </x-slot:filters>
 
-        <div class="overflow-x-auto bg-transparent rounded-none border border-gray-200 dark:border-gray-800 transition-colors duration-200">
+        <div class="overflow-x-auto bg-transparent rounded-none border-t border-gray-200 dark:border-gray-800 transition-colors duration-200">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800 border-collapse">
                 <thead>
                     <tr class="bg-gray-50/50 dark:bg-gray-900/40 transition-colors divide-x divide-gray-200 dark:divide-gray-800 border-b border-gray-200 dark:border-gray-800">
@@ -14,12 +23,12 @@
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-800 bg-transparent">
                     @forelse($viviendas as $vivienda)
-                        <tr class="group hover:bg-gray-50/80 dark:hover:bg-indigo-500/5 transition-all duration-200 divide-x divide-gray-100 dark:divide-gray-800" wire:key="vivienda-{{ $vivienda->id }}">
-                            <td class="px-6 py-4 border-l border-r border-gray-150 dark:border-gray-850">
+                        <tr class="group hover:bg-gray-50/80 dark:hover:bg-indigo-500/5 transition-all duration-200 divide-x divide-gray-200 dark:divide-gray-800" wire:key="vivienda-{{ $vivienda->id }}">
+                            <td class="px-6 py-2">
                                 <div class="text-sm font-bold text-gray-900 dark:text-white tracking-tight">{{ $vivienda->nombre }}</div>
                                 <div class="text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5">{{ $vivienda->descripcion ?? 'Sin descripción' }}</div>
                             </td>
-                            <td class="px-6 py-4 text-center whitespace-nowrap z-30 border-l border-r border-gray-150 dark:border-gray-850">
+                            <td class="px-6 py-2 text-center whitespace-nowrap z-30">
                                 <div class="flex items-center justify-center gap-1">
                                     <a href="{{ route('tipos-vivienda.edit', $vivienda->id) }}" class="p-2 rounded-xl text-gray-400 hover:text-indigo-600 transition-all shadow-xs"><i class="fa-solid fa-pen-to-square text-base"></i></a>
                                     <button type="button" wire:click="confirmDelete({{ $vivienda->id }})" class="p-2 rounded-xl text-gray-400 hover:text-red-600 transition-all shadow-xs"><i class="fa-solid fa-trash-can text-base"></i></button>
@@ -28,7 +37,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="2" class="px-6 py-20 text-center border-l border-r border-gray-150 dark:border-gray-850">
+                            <td colspan="2" class="px-6 py-20 text-center">
                                 <div class="flex flex-col items-center"><h3 class="text-base font-extrabold text-gray-900 dark:text-white">Sin Registros</h3></div>
                             </td>
                         </tr>

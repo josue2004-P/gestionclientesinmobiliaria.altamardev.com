@@ -1,5 +1,13 @@
-{{-- UN SOLO CONTENEDOR RAÍZ PARA EVITAR MultipleRootElementsDetectedException --}}
 <div>
+    <x-shared::common.header 
+        title="Catálogo de Asentamientos" 
+        icon="fa-map-marked-alt"
+        desc="Catálogo de colonias, fraccionamientos y asentamientos registrados"
+        :breadcrumb="[
+            ['label' => 'Inicio', 'url' => route('dashboard')],
+            ['label' => 'Catálogo de Asentamientos', 'url' => null]
+        ]"
+    />
     <x-shared::form.table-filters 
         title="Control de Ubicaciones"
         :search="$search"
@@ -18,12 +26,12 @@
                 x-on:livewire-upload-cancel="uploading = false"
                 wire:key="asentamientos-import-container">
                 
-                <div class="flex items-center gap-2 rounded-2xl bg-gray-100/80 p-1 dark:bg-white/[0.03] border border-gray-200 dark:border-gray-800 transition-colors h-[46px] px-2">
+                <div class="flex items-center gap-2 rounded-md bg-gray-100/80 p-1 dark:bg-white/[0.03] border-t border-b border-gray-200 dark:border-gray-800 transition-colors h-[46px] px-2">
                     
                     {{-- Input encapsulado --}}
                     <label 
                         :class="{ 'opacity-50 cursor-not-allowed pointer-events-none': uploading }"
-                        class="flex items-center justify-center px-3 h-9 text-xs font-bold uppercase hover:bg-white dark:hover:bg-gray-850 text-gray-600 dark:text-gray-400 cursor-pointer transition-all rounded-xl select-none">
+                        class="flex items-center justify-center px-3 h-9 text-xs font-bold uppercase hover:bg-white dark:hover:bg-gray-850 text-gray-600 dark:text-gray-400 cursor-pointer transition-all rounded-md select-none">
 
                         <i class="fa-solid fa-circle-notch animate-spin text-indigo-500 mr-2" x-show="uploading" x-cloak></i>
                         <i class="fa-solid fa-file-excel text-green-600 dark:text-green-400 mr-2" x-show="!uploading"></i>
@@ -78,7 +86,7 @@
             </div>
         </x-slot:actions>
 
-        <div class="overflow-x-auto bg-transparent rounded-none border border-gray-200 dark:border-gray-800 transition-colors duration-200">
+        <div class="overflow-x-auto bg-transparent rounded-none border-t border-gray-200 dark:border-gray-800 transition-colors duration-200">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800 border-collapse">
                 <thead>
                     <tr class="bg-gray-50/50 dark:bg-gray-900/40 transition-colors divide-x divide-gray-200 dark:divide-gray-800 border-b border-gray-200 dark:border-gray-800">
@@ -91,29 +99,29 @@
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-800 bg-transparent">
                     @forelse($asentamientos as $asentamiento)
-                        <tr class="group hover:bg-gray-50/80 dark:hover:bg-indigo-500/5 transition-all duration-200 divide-x divide-gray-100 dark:divide-gray-800" wire:key="asentamiento-{{ $asentamiento->id }}">
+                        <tr class="group hover:bg-gray-50/80 dark:hover:bg-indigo-500/5 transition-all duration-200 divide-x divide-gray-200 dark:divide-gray-800" wire:key="asentamiento-{{ $asentamiento->id }}">
                             
-                            <td class="px-6 py-4 whitespace-nowrap font-mono text-sm font-bold text-indigo-600 dark:text-indigo-400 border-l border-r border-gray-150 dark:border-gray-850">
+                            <td class="px-6 py-4 whitespace-nowrap font-mono text-sm font-bold text-indigo-600 dark:text-indigo-400 ">
                                 {{ $asentamiento->codigo_postal }}
                             </td>
                             
-                            <td class="px-6 py-4 whitespace-nowrap border-l border-r border-gray-150 dark:border-gray-850">
+                            <td class="px-6 py-2 whitespace-nowrap ">
                                 <div class="text-sm font-bold text-gray-900 dark:text-white tracking-tight">{{ $asentamiento->nombre_asentamiento }}</div>
                                 <div class="text-[10px] font-extrabold text-gray-400 dark:text-gray-550 uppercase tracking-widest mt-0.5">{{ $asentamiento->tipo_asentamiento }}</div>
                             </td>
                             
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-600 dark:text-gray-300 border-l border-r border-gray-150 dark:border-gray-850">
+                            <td class="px-6 py-2 whitespace-nowrap text-sm font-semibold text-gray-600 dark:text-gray-300 ">
                                 {{ $asentamiento->municipio }} 
                                 @if($asentamiento->ciudad) 
                                     <span class="text-xs text-gray-400 dark:text-gray-550 font-medium">({{ $asentamiento->ciudad }})</span> 
                                 @endif
                             </td>
                             
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-700 dark:text-gray-400 border-l border-r border-gray-150 dark:border-gray-850">
+                            <td class="px-6 py-2 whitespace-nowrap text-sm font-bold text-gray-700 dark:text-gray-400 ">
                                 {{ $asentamiento->estado }}
                             </td>
                             
-                            <td class="px-6 py-4 text-center whitespace-nowrap z-30 border-l border-r border-gray-150 dark:border-gray-850">
+                            <td class="px-6 py-2 text-center whitespace-nowrap z-30 ">
                                 <div class="flex items-center justify-center gap-1">
                                     <a href="{{ route('asentamientos.edit', $asentamiento->id) }}" class="p-2 rounded-xl text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-all shadow-xs">
                                         <i class="fa-solid fa-pen-to-square text-base"></i>
@@ -128,7 +136,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-20 text-center border-l border-r border-gray-150 dark:border-gray-850">
+                            <td colspan="5" class="px-6 py-20 text-center ">
                                 <div class="flex flex-col items-center">
                                     <div class="h-16 w-16 bg-gray-50 dark:bg-gray-900 rounded-full flex items-center justify-center mb-4 border border-gray-200 dark:border-gray-800 transition-colors shadow-xs">
                                         <i class="fa-solid fa-earth-lines text-2xl text-gray-300 dark:text-gray-700"></i>

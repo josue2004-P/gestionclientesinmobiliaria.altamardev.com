@@ -17,7 +17,7 @@ class IndexAmenidades extends Component
     public $search = '';
 
     #[Url(keep: true)]
-    public $perPage = 10;
+    public $perPage = 7;
 
     public function mount() {
         if (!checkPermiso('amenidades.is_read')) abort(403, 'Acceso denegado.');

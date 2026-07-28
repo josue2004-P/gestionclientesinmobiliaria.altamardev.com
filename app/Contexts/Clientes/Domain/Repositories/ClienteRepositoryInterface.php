@@ -3,6 +3,7 @@
 namespace App\Contexts\Clientes\Domain\Repositories;
 
 use App\Contexts\Clientes\Domain\Entities\Cliente;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface ClienteRepositoryInterface
 {
@@ -10,4 +11,5 @@ interface ClienteRepositoryInterface
     public function findById(int $id): ?Cliente;
     public function save(Cliente $cliente): int;
     public function delete(int $id): bool;
+    public function paginateWithSearch(?string $search, int $perPage): LengthAwarePaginator;
 }
