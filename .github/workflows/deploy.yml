@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  ssh-test:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,14 +19,23 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           timeout: 20m
           script: |
-            echo "Conexión exitosa al servidor"
+            echo "🔌 Conexión exitosa al servidor..."
 
             cd ${{ secrets.WORK_DIR }}
-            echo "📥 Actualizando repositorio..."
-            # git fetch origin ${{ secrets.MAIN_BRANCH }}
-            # git checkout ${{ secrets.MAIN_BRANCH }}
-            # git pull origin ${{ secrets.MAIN_BRANCH }}
 
-            echo "🚀 Construyendo y levantando contenedores..."
+            echo "📥 Actualizando código desde Git..."
+            git fetch origin master
+            git checkout master
+            git pull origin master
+
+            echo "🌐 Verificando redes Docker requeridas..."
+            docker network create inmobiliaria_net 2>/dev/null || true
+            docker network create inmobiliaria_proxy 2>/dev/null || true
+
+            echo "🚀 Reconstruyendo solo los servicios de aplicación (App y Worker)..."
+            docker compose up -d --build app_inmobiliaria worker_inmobiliaria
+
+            echo "🧹 Limpiando imágenes obsoletas..."
+            docker image prune -f
 
             echo "✅ ¡Despliegue completado con éxito en $HOSTNAME!"
