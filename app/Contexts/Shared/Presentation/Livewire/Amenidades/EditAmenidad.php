@@ -24,5 +24,7 @@ class EditAmenidad extends Component
         return redirect()->route('amenidades.index');
     }
 
-    public function render() { return view('shared::amenidades.edit')->layout('shared::layouts.app'); }
+    public function render() { return view('shared::amenidades.edit')
+        ->title('Editar Anemidad')
+        ->layout('shared::layouts.app'); }
 }

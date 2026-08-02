@@ -34,16 +34,29 @@
                                 <div class="text-sm font-bold text-gray-900 dark:text-white tracking-tight">{{ $amenidad->nombre }}</div>
                                 <div class="text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5">{{ $amenidad->descripcion ?? 'Sin descripción' }}</div>
                             </td>
-                            <td class="px-6 py-2 text-center whitespace-nowrap z-30">
-                                <div class="flex items-center justify-center gap-1">
-                                    <a href="{{ route('amenidades.edit', $amenidad->id) }}" class="p-2 rounded-xl text-gray-400 hover:text-indigo-600 transition-all shadow-xs" title="Modificar">
-                                        <i class="fa-solid fa-pen-to-square text-base"></i>
-                                    </a>
-                                    <button type="button" wire:click="confirmDelete({{ $amenidad->id }})" class="p-2 rounded-xl text-gray-400 hover:text-red-600 transition-all shadow-xs" title="Eliminar">
-                                        <i class="fa-solid fa-trash-can text-base"></i>
-                                    </button>
-                                </div>
-                            </td>
+                            {{-- Acciones --}}
+                            <x-shared::form.dropdown-actions title="Opciones">
+                                
+                                {{-- Opción Editar --}}
+                                <x-shared::form.dropdown-item 
+                                    :href="route('amenidades.edit', $amenidad->id)" 
+                                    icon="fa-solid fa-pen-to-square"
+                                >
+                                    Modificar Amenidad
+                                </x-shared::form.dropdown-item>
+
+                                <div class="my-1 border-t border-gray-100 dark:border-gray-800"></div>
+
+                                {{-- Opción Eliminar (Livewire) --}}
+                                <x-shared::form.dropdown-item 
+                                    wire:click="confirmDelete({{ $amenidad->id }})" 
+                                    icon="fa-solid fa-trash-can" 
+                                    variant="danger"
+                                >
+                                    Eliminar Amenidad
+                                </x-shared::form.dropdown-item>
+
+                            </x-shared::form.dropdown-actions>
                         </tr>
                     @empty
                         <tr>

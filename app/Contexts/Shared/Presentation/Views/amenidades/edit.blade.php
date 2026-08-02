@@ -6,14 +6,31 @@
                 <div class="grid grid-cols-1 gap-6">
                     <div>
                         <x-shared::form.input-label for="nombre" :value="__('Nombre')" required />
-                        <div class="mt-1.5"><x-shared::form.text-input id="nombre" type="text" wire:model="nombre" class="w-full font-bold" /></div>
+                        <div class="mt-1.5"><x-shared::form.text-input id="nombre" type="text" wire:model="nombre" /></div>
                         <x-shared::form.input-error :messages="$errors->get('nombre')" class="mt-2" />
                     </div>
                 </div>
                 <x-slot:footer>
                     <div class="flex items-center justify-between">
-                        <a href="{{ route('amenidades.index') }}" class="text-xs font-bold uppercase text-gray-500 hover:text-red-550"><i class="fa-solid fa-xmark mr-2"></i>Cancelar</a>
-                        <x-shared::form.button-primary type="submit" class="px-5 h-11 text-xs"><i class="fa-solid fa-circle-check mr-2"></i>Actualizar</x-shared::form.button-primary>
+                        {{-- Enlace Cancelar con variante Danger --}}
+                        <x-shared::form.link 
+                            :href="route('amenidades.index')" 
+                            danger
+                        >
+                            <i class="fa-solid fa-xmark"></i>
+                            <span>Cancelar</span>
+                        </x-shared::form.link>
+                        
+                        {{-- Botón Actualizar (Primary con Spinner de Carga) --}}
+                        <x-shared::form.button-form 
+                            size="md"
+                            type="submit" 
+                            wire:loading.attr="disabled"
+                        >
+                            <i class="fa-solid fa-circle-check" wire:loading.remove></i>
+                            <i class="fa-solid fa-circle-notch animate-spin" wire:loading></i> 
+                            <span>Actualizar</span>
+                        </x-shared::form.button-form>
                     </div>
                 </x-slot:footer>
             </x-shared::common.component-card>

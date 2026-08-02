@@ -18,5 +18,7 @@ class CreateAmenidad extends Component
         return redirect()->route('amenidades.index');
     }
 
-    public function render() { return view('shared::amenidades.create')->layout('shared::layouts.app'); }
+    public function render() { return view('shared::amenidades.create')
+        ->title('Crear Anemidad')
+        ->layout('shared::layouts.app'); }
 }
