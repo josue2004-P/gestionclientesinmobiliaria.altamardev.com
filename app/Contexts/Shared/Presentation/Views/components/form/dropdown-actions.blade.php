@@ -2,7 +2,7 @@
     'title' => 'Acciones',
 ])
 
-<td {{ $attributes->merge(['class' => 'px-6 py-4 text-center whitespace-nowrap z-30']) }}>
+<td {{ $attributes->merge(['class' => 'px-6 py-2 text-center whitespace-nowrap z-30']) }}>
     <div 
         x-data="{ 
             dropdownOpen: false, 

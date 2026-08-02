@@ -54,6 +54,8 @@ class EditAsentamiento extends Component
 
     public function render()
     {
-        return view('shared::asentamientos.edit')->layout('shared::layouts.app');
+        return view('shared::asentamientos.edit')
+        ->title('Editar Asentamiento')
+        ->layout('shared::layouts.app');
     }
 }

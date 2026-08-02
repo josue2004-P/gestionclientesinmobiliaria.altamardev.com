@@ -42,6 +42,8 @@ class CreateAsentamiento extends Component
 
     public function render()
     {
-        return view('shared::asentamientos.create')->layout('shared::layouts.app');
+        return view('shared::asentamientos.create')
+        ->title('Crear Asentamiento')
+        ->layout('shared::layouts.app');
     }
 }

@@ -33,19 +33,22 @@
                     @forelse($usuarios as $user)
                         <tr class="group hover:bg-gray-50/80 dark:hover:bg-indigo-500/5 transition-all duration-200 divide-x divide-gray-200 dark:divide-gray-800" wire:key="usuario-{{ $user->id }}">
                             
-                            {{-- Usuario / Personal --}}
+                            {{-- Usuario / Personal con Asset Seguro --}}
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    {{-- Foto o Avatar con Iniciales --}}
                                     @if($user->foto)
-                                        <img class="h-10 w-10 shrink-0 rounded-lg object-cover mr-3.5 border border-gray-200 dark:border-gray-700/60 shadow-xs" src="{{ asset('storage/' . $user->foto) }}" alt="{{ $user->name }}">
+                                        <img 
+                                            class="h-10 w-10 shrink-0 rounded-lg object-cover mr-3.5 border border-gray-200 dark:border-gray-700/60 shadow-xs" 
+                                            src="{{ route('security.usuarios.asset', ['directory' => 'fotos', 'filename' => basename($user->foto)]) }}" 
+                                            alt="{{ $user->name }}"
+                                        >
                                     @else
                                         <div class="h-10 w-10 shrink-0 rounded-lg bg-gray-100/80 dark:bg-gray-800/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-xs mr-3.5 border border-gray-200 dark:border-gray-700/60 group-hover:bg-indigo-600 dark:group-hover:bg-indigo-500 group-hover:text-white dark:group-hover:text-white group-hover:border-transparent transition-all duration-200 shadow-xs">
                                             {{ strtoupper(substr($user->name, 0, 1)) }}{{ strtoupper(substr($user->apellido_paterno ?? '', 0, 1)) }}
                                         </div>
                                     @endif
 
-                                    {{-- Nombres y Cuenta --}}
+                                    {{-- Nombre y Alias --}}
                                     <div>
                                         <div class="text-sm font-bold text-gray-900 dark:text-gray-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                                             {{ trim("{$user->name} {$user->apellido_paterno} {$user->apellido_materno}") }}

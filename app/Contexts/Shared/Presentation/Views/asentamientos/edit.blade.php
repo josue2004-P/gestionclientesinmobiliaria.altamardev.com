@@ -19,49 +19,49 @@
             >
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
-                        <x-shared::form.input-label for="codigo_postal" :value="__('Código Postal')" required class="text-gray-700 dark:text-gray-300"/>
+                        <x-shared::form.input-label for="codigo_postal" :value="__('Código Postal')" required />
                         <div class="mt-1.5">
-                            <x-shared::form.text-input id="codigo_postal" type="text" wire:model="codigo_postal" class="w-full font-mono font-bold text-indigo-600 dark:text-indigo-400" />
+                            <x-shared::form.text-input id="codigo_postal" type="text" wire:model="codigo_postal"  />
                         </div>
                         <x-shared::form.input-error :messages="$errors->get('codigo_postal')" class="mt-2" />
                     </div>
 
                     <div class="md:col-span-2">
-                        <x-shared::form.input-label for="nombre_asentamiento" :value="__('Nombre del Asentamiento (Colonia)')" required class="text-gray-700 dark:text-gray-300"/>
+                        <x-shared::form.input-label for="nombre_asentamiento" :value="__('Nombre del Asentamiento (Colonia)')" required />
                         <div class="mt-1.5">
-                            <x-shared::form.text-input id="nombre_asentamiento" type="text" wire:model="nombre_asentamiento" class="w-full font-medium" />
+                            <x-shared::form.text-input id="nombre_asentamiento" type="text" wire:model="nombre_asentamiento" />
                         </div>
                         <x-shared::form.input-error :messages="$errors->get('nombre_asentamiento')" class="mt-2" />
                     </div>
 
                     <div>
-                        <x-shared::form.input-label for="tipo_asentamiento" :value="__('Tipo Asentamiento')" required class="text-gray-700 dark:text-gray-300"/>
+                        <x-shared::form.input-label for="tipo_asentamiento" :value="__('Tipo Asentamiento')" required />
                         <div class="mt-1.5">
-                            <x-shared::form.text-input id="tipo_asentamiento" type="text" wire:model="tipo_asentamiento" class="w-full font-medium" />
+                            <x-shared::form.text-input id="tipo_asentamiento" type="text" wire:model="tipo_asentamiento" />
                         </div>
                         <x-shared::form.input-error :messages="$errors->get('tipo_asentamiento')" class="mt-2" />
                     </div>
 
                     <div>
-                        <x-shared::form.input-label for="municipio" :value="__('Municipio o Delegación')" required class="text-gray-700 dark:text-gray-300"/>
+                        <x-shared::form.input-label for="municipio" :value="__('Municipio o Delegación')" required />
                         <div class="mt-1.5">
-                            <x-shared::form.text-input id="municipio" type="text" wire:model="municipio" class="w-full font-medium" />
+                            <x-shared::form.text-input id="municipio" type="text" wire:model="municipio" />
                         </div>
                         <x-shared::form.input-error :messages="$errors->get('municipio')" class="mt-2" />
                     </div>
 
                     <div>
-                        <x-shared::form.input-label for="ciudad" :value="__('Ciudad (Opcional)')" class="text-gray-700 dark:text-gray-300"/>
+                        <x-shared::form.input-label for="ciudad" :value="__('Ciudad (Opcional)')" />
                         <div class="mt-1.5">
-                            <x-shared::form.text-input id="ciudad" type="text" wire:model="ciudad" class="w-full font-medium" />
+                            <x-shared::form.text-input id="ciudad" type="text" wire:model="ciudad" />
                         </div>
                         <x-shared::form.input-error :messages="$errors->get('ciudad')" class="mt-2" />
                     </div>
 
                     <div class="md:col-span-3">
-                        <x-shared::form.input-label for="estado" :value="__('Estado')" required class="text-gray-700 dark:text-gray-300"/>
+                        <x-shared::form.input-label for="estado" :value="__('Estado')" required />
                         <div class="mt-1.5">
-                            <x-shared::form.text-input id="estado" type="text" wire:model="estado" class="w-full font-medium" />
+                            <x-shared::form.text-input id="estado" type="text" wire:model="estado" />
                         </div>
                         <x-shared::form.input-error :messages="$errors->get('estado')" class="mt-2" />
                     </div>
@@ -69,15 +69,24 @@
                 
                 <x-slot:footer>
                     <div class="flex items-center justify-between">
-                        <a href="{{ route('asentamientos.index') }}" class="inline-flex items-center text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-red-550 transition-colors">
+                        {{-- Enlace Cancelar con variante danger --}}
+                        <x-shared::form.link 
+                            :href="route('asentamientos.index')" 
+                            danger
+                        >
                             <i class="fa-solid fa-xmark mr-2 text-sm"></i> Cancelar
-                        </a>
+                        </x-shared::form.link>
                         
-                        <x-shared::form.button-primary type="submit" class="shadow-lg px-5 h-11 text-xs" wire:loading.attr="disabled">
-                            <i class="fa-solid fa-circle-check mr-2" wire:loading.remove></i>
-                            <i class="fa-solid fa-circle-notch animate-spin mr-2" wire:loading></i> 
+                        {{-- Botón Guardar / Actualizar Datos --}}
+                        <x-shared::form.button-form 
+                            size="md"
+                            type="submit" 
+                            wire:loading.attr="disabled"
+                        >
+                            <i class="fa-solid fa-circle-check" wire:loading.remove></i>
+                            <i class="fa-solid fa-circle-notch animate-spin" wire:loading></i> 
                             <span>Actualizar Datos</span>
-                        </x-shared::form.button-primary>
+                        </x-shared::form.button-form>
                     </div>
                 </x-slot:footer>
             </x-shared::common.component-card>
