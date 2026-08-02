@@ -28,12 +28,28 @@
                                 <div class="text-sm font-bold text-gray-900 dark:text-white tracking-tight">{{ $vivienda->nombre }}</div>
                                 <div class="text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5">{{ $vivienda->descripcion ?? 'Sin descripción' }}</div>
                             </td>
-                            <td class="px-6 py-2 text-center whitespace-nowrap z-30">
-                                <div class="flex items-center justify-center gap-1">
-                                    <a href="{{ route('tipos-vivienda.edit', $vivienda->id) }}" class="p-2 rounded-xl text-gray-400 hover:text-indigo-600 transition-all shadow-xs"><i class="fa-solid fa-pen-to-square text-base"></i></a>
-                                    <button type="button" wire:click="confirmDelete({{ $vivienda->id }})" class="p-2 rounded-xl text-gray-400 hover:text-red-600 transition-all shadow-xs"><i class="fa-solid fa-trash-can text-base"></i></button>
-                                </div>
-                            </td>
+                            <x-shared::form.dropdown-actions title="Opciones">
+                                
+                                {{-- Opción Editar --}}
+                                <x-shared::form.dropdown-item 
+                                    :href="route('tipos-vivienda.edit', $vivienda->id)" 
+                                    icon="fa-solid fa-pen-to-square"
+                                >
+                                    Editar Tipo de Vivienda
+                                </x-shared::form.dropdown-item>
+
+                                <div class="my-1 border-t border-gray-100 dark:border-gray-800"></div>
+
+                                {{-- Opción Eliminar (Livewire) --}}
+                                <x-shared::form.dropdown-item 
+                                    wire:click="confirmDelete({{ $vivienda->id }})" 
+                                    icon="fa-solid fa-trash-can" 
+                                    variant="danger"
+                                >
+                                    Eliminar Tipo de Vivienda
+                                </x-shared::form.dropdown-item>
+
+                            </x-shared::form.dropdown-actions>
                         </tr>
                     @empty
                         <tr>

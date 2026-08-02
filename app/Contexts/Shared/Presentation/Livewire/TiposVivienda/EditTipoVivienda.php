@@ -26,5 +26,7 @@ class EditTipoVivienda extends Component
         return redirect()->route('tipos-vivienda.index');
     }
 
-    public function render() { return view('shared::tipos-vivienda.edit')->layout('shared::layouts.app'); }
+    public function render() { return view('shared::tipos-vivienda.edit')
+        ->title('Editar Tipo De Vivienda')
+        ->layout('shared::layouts.app'); }
 }

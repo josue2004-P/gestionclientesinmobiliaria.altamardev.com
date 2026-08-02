@@ -22,5 +22,7 @@ class CreateTipoVivienda extends Component
         return redirect()->route('tipos-vivienda.index');
     }
 
-    public function render() { return view('shared::tipos-vivienda.create')->layout('shared::layouts.app'); }
+    public function render() { return view('shared::tipos-vivienda.create')
+        ->title('Crear Tipo De Vivienda')
+        ->layout('shared::layouts.app'); }
 }
