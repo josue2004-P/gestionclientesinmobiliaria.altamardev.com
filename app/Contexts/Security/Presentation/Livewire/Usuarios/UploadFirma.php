@@ -31,6 +31,7 @@ class UploadFirma extends Component
     {
         $this->firma = null;
         $this->existingFirma = null;
+        $this->resetErrorBag('firma'); 
         $this->dispatch('firmaUploaded', null);
     }
 

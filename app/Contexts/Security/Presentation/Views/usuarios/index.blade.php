@@ -8,6 +8,7 @@
             ['label' => 'Catálogo de Usuarios', 'url' => null]
         ]"
     />
+
     <x-shared::form.table-filters 
         title="Control de Usuarios"
         :search="$search"
@@ -17,12 +18,12 @@
         <x-slot:filters>
         </x-slot:filters>
 
-        <div class="overflow-x-auto bg-transparent rounded-none border-t  border-gray-200 dark:border-gray-800 transition-colors duration-200">
+        <div class="overflow-x-auto bg-transparent rounded-none border-t border-gray-200 dark:border-gray-800 transition-colors duration-200">
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800 border-collapse">
                 <thead>
                     <tr class="bg-gray-50/50 dark:bg-gray-900/40 transition-colors divide-x divide-gray-200 dark:divide-gray-800 border-b border-gray-200 dark:border-gray-800">
-                        <th scope="col" class="px-6 py-4 text-start text-xs font-bold text-gray-500 uppercase dark:text-gray-400 tracking-wide">Personal</th>
-                        <th scope="col" class="px-6 py-4 text-start text-xs font-bold text-gray-500 uppercase dark:text-gray-400 tracking-wide">Credencial Digital</th>
+                        <th scope="col" class="px-6 py-4 text-start text-xs font-bold text-gray-500 uppercase dark:text-gray-400 tracking-wide">Usuario / Personal</th>
+                        <th scope="col" class="px-6 py-4 text-start text-xs font-bold text-gray-500 uppercase dark:text-gray-400 tracking-wide">Correo Electrónico</th>
                         <th scope="col" class="px-6 py-4 text-start text-xs font-bold text-gray-500 uppercase dark:text-gray-400 tracking-wide">Roles Asignados</th>
                         <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase dark:text-gray-400 tracking-wide">Estado</th>
                         <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase dark:text-gray-400 tracking-wide">Acciones</th>
@@ -30,27 +31,35 @@
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-800 bg-transparent">
                     @forelse($usuarios as $user)
-                        <tr class="group hover:bg-gray-50/80 dark:hover:bg-indigo-500/5 transition-all duration-200 divide-x divide-gray-20 dark:divide-gray-800" wire:key="usuario-{{ $user->id }}">
+                        <tr class="group hover:bg-gray-50/80 dark:hover:bg-indigo-500/5 transition-all duration-200 divide-x divide-gray-200 dark:divide-gray-800" wire:key="usuario-{{ $user->id }}">
                             
-                            <td class="px-6 py-4 whitespace-nowrap ">
+                            {{-- Usuario / Personal --}}
+                            <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    <div class="h-10 w-10 rounded-md bg-gray-50 dark:bg-gray-900 flex items-center justify-center text-gray-400 dark:text-gray-500 mr-4 border border-gray-200 dark:border-gray-800 group-hover:bg-indigo-600 group-hover:text-white dark:group-hover:bg-indigo-500 group-hover:border-transparent transition-all duration-300 shadow-xs">
-                                        <i class="fa-solid fa-user-gear text-xs"></i>
-                                    </div>
-                                    <div>
-                                        <div class="text-sm font-bold text-gray-900 dark:text-whitetransition-colors group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
-                                            {{ $user->name }}
+                                    {{-- Foto o Avatar con Iniciales --}}
+                                    @if($user->foto)
+                                        <img class="h-10 w-10 shrink-0 rounded-lg object-cover mr-3.5 border border-gray-200 dark:border-gray-700/60 shadow-xs" src="{{ asset('storage/' . $user->foto) }}" alt="{{ $user->name }}">
+                                    @else
+                                        <div class="h-10 w-10 shrink-0 rounded-lg bg-gray-100/80 dark:bg-gray-800/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-xs mr-3.5 border border-gray-200 dark:border-gray-700/60 group-hover:bg-indigo-600 dark:group-hover:bg-indigo-500 group-hover:text-white dark:group-hover:text-white group-hover:border-transparent transition-all duration-200 shadow-xs">
+                                            {{ strtoupper(substr($user->name, 0, 1)) }}{{ strtoupper(substr($user->apellido_paterno ?? '', 0, 1)) }}
                                         </div>
-                                        <div class="text-[12px] font-semibold text-gray-400 dark:text-gray-500  mt-0.5 transition-colors">
-                                            Operador de Plataforma
+                                    @endif
+
+                                    {{-- Nombres y Cuenta --}}
+                                    <div>
+                                        <div class="text-sm font-bold text-gray-900 dark:text-gray-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                                            {{ trim("{$user->name} {$user->apellido_paterno} {$user->apellido_materno}") }}
+                                        </div>
+                                        <div class="text-xs font-semibold text-gray-500 dark:text-gray-400 mt-0.5 transition-colors flex items-center gap-1">
+                                            <span class="text-indigo-500 font-mono">@</span>{{ $user->usuario }}
                                         </div>
                                     </div>
                                 </div>
                             </td>
 
-                            {{-- Credencial Digital --}}
-                            <td class="px-6 py-4 whitespace-nowrap ">
-                                <div class="flex items-center gap-2.5 text-sm font-semibold text-gray-600 dark:text-gray-300 transition-colors">
+                            {{-- Correo Electrónico --}}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
                                     <i class="fa-regular fa-envelope text-xs text-gray-400 dark:text-gray-500"></i>
                                     <span class="lowercase">{{ $user->email }}</span>
                                 </div>
@@ -65,82 +74,47 @@
                                         </span>
                                     @empty
                                         <span class="text-xs text-gray-400 dark:text-gray-500 italic flex items-center gap-1.5 font-medium transition-colors">
-                                            <i class="fa-solid fa-user-shield opacity-40 text-[11px]"></i> Sin perfiles activos
+                                            <i class="fa-solid fa-user-shield opacity-40 text-xs"></i> Sin perfiles
                                         </span>
                                     @endforelse
                                 </div>
                             </td>
 
-                            {{-- Estado --}}
-                            <td class="px-6 py-4 text-center whitespace-nowrap ">
+                            {{-- Estado (Activo / Suspendido) --}}
+                            <td class="px-6 py-4 text-center whitespace-nowrap">
                                 @if($user->is_activo)
                                     <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-500/20 shadow-xs">
                                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
                                         Activo
                                     </span>
                                 @else
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400 border border-red-100 dark:border-red-500/20 shadow-xs">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400 border border-red-100 dark:border-red-500/20 shadow-xs">
                                         <span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5"></span>
-                                        Suspendido
+                                        Inactivo
                                     </span>
                                 @endif
                             </td>
 
-                            {{-- Acciones (Dropdown con Teleport) --}}
-                            <td class="px-6 py-4 text-center whitespace-nowrap z-30">
-                                <div x-data="{ 
-                                    dropdownOpen: false, 
-                                    position: { top: 0, left: 0 },
-                                    toggle(e) {
-                                        this.dropdownOpen = !this.dropdownOpen;
-                                        if (this.dropdownOpen) {
-                                            let rect = e.currentTarget.getBoundingClientRect();
-                                            this.position.top = rect.bottom + window.scrollY + 8;
-                                            this.position.left = rect.right - 208 + window.scrollX;
-                                        }
-                                    }
-                                }" 
-                                class="inline-block text-left">
-                                    
-                                    <button 
-                                        @click="toggle($event)" 
-                                        class="p-2.5 rounded-md text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-all border border-transparent hover:border-indigo-100 dark:hover:border-indigo-500/20 shadow-xs"
-                                    >
-                                        <i class="fa-solid fa-ellipsis-vertical text-base"></i>
-                                    </button>
+                            {{-- Acciones (Dropdown Component) --}}
+                            <x-shared::form.dropdown-actions title="Administración">
+                                <x-shared::form.dropdown-item 
+                                    :href="route('usuarios.edit', $user->id)" 
+                                    icon="fa-solid fa-user-pen"
+                                >
+                                    Modificar Perfil
+                                </x-shared::form.dropdown-item>
 
-                                    <template x-teleport="body">
-                                        <div 
-                                            x-show="dropdownOpen" 
-                                            @click.away="dropdownOpen = false"
-                                            x-cloak
-                                            x-transition:enter="transition ease-out duration-150"
-                                            x-transition:enter-start="opacity-0 scale-95"
-                                            x-transition:enter-end="opacity-100 scale-100"
-                                            :style="`position: absolute; top: ${position.top}px; left: ${position.left}px;`"
-                                            class="z-[200] w-52 rounded-md border border-gray-200 bg-white/95 dark:border-gray-800 dark:bg-gray-950 shadow-xl dark:shadow-2xl p-1.5 backdrop-blur-md"
-                                        >
-                                            <div class="px-3 py-2 text-[12px] font-bold text-gray-400 dark:text-gray-500  border-b border-gray-100 dark:border-gray-850 mb-1.5 text-left transition-colors">
-                                                Administración
-                                            </div>
-                                            <div class="space-y-0.5 text-left">
-                                                <a href="{{ route('usuarios.edit', $user->id) }}" class="flex items-center px-3 py-2.5 text-sm font-semibold  text-gray-600 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-md transition-colors group/item">
-                                                    <i class="fa-solid fa-user-pen mr-3 text-sm text-gray-400 dark:text-gray-500 group-hover/item:text-indigo-500 dark:group-hover/item:text-indigo-400 transition-colors"></i>Modificar Perfil
-                                                </a>
-                                                
-                                                <div class="my-1 border-t border-gray-100 dark:border-gray-850"></div>
-                                                
-                                                <button 
-                                                    wire:click="confirmDelete({{ $user->id }})" 
-                                                    class="flex w-full items-center px-3 py-2.5 text-sm font-semibold  text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-md transition-colors group/del"
-                                                >
-                                                    <i class="fa-solid fa-user-slash mr-3 text-sm text-red-400 group-hover/del:text-red-500 transition-colors"></i>Dar de Baja
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </template>
-                                </div>
-                            </td>
+                                <div class="my-1 border-t border-gray-100 dark:border-gray-800"></div>
+
+                                <x-shared::form.dropdown-item 
+                                    wire:click="confirmDelete({{ $user->id }})" 
+                                    icon="fa-solid fa-user-slash" 
+                                    variant="danger"
+                                >
+                                    Dar de Baja
+                                </x-shared::form.dropdown-item>
+                            </x-shared::form.dropdown-actions>
+
                         </tr>
                     @empty
                         <tr>
@@ -151,7 +125,7 @@
                                     </div>
                                     <h3 class="text-base font-extrabold text-gray-900 dark:text-white uppercase tracking-tight transition-colors">Sin Usuarios</h3>
                                     <p class="text-xs text-gray-500 dark:text-gray-400 max-w-xs mx-auto mt-1 transition-colors">
-                                        No hay operadores registrados o que coincidan con la búsqueda actual.
+                                        No hay usuarios registrados o que coincidan con la búsqueda actual.
                                     </p>
                                 </div>
                             </td>
@@ -168,4 +142,4 @@
             </div>
         @endif
     </x-shared::form.table-filters>
-</div>  
+</div>

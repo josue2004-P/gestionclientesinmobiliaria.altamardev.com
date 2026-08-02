@@ -6,7 +6,6 @@
     <div class="relative group">
         @if ($foto || $existingFoto)
             <div class="flex flex-col items-center gap-3">
-                {{-- Modificado para usar la ruta del controlador privado local --}}
                 <img src="{{ $foto ? $foto->temporaryUrl() : route('security.usuarios.asset', ['directory' => 'fotos', 'filename' => basename($existingFoto)]) }}" 
                      class="h-20 w-20 rounded-2xl object-cover border border-gray-200 dark:border-gray-800 shadow-sm" />
                 
@@ -16,11 +15,11 @@
                 </button>
             </div>
         @else
-            <div class="h-20 w-20 rounded-2xl bg-gray-50 dark:bg-gray-900 flex items-center justify-center text-gray-400 dark:text-gray-550 border border-gray-200 dark:border-gray-800 transition-colors">
+            <div class="h-20 w-20 rounded-2xl bg-gray-50 dark:bg-gray-900 flex items-center justify-center text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-800 transition-colors">
                 <i class="fa-solid fa-camera text-xl opacity-80"></i>
             </div>
             <label class="absolute inset-0 rounded-2xl bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-[10px] cursor-pointer transition-opacity duration-150">
-                <input type="file" wire:model="foto" class="hidden" accept="image/*" />
+                <input type="file" wire:model.live="foto" class="hidden" accept="image/*" />
                 <span class="font-bold">Subir</span>
             </label>
         @endif

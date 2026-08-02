@@ -28,10 +28,12 @@
         ]) }}
     >
     @if($showPassword)
-        <span @click="showPassword = !showPassword"
-            class="absolute top-1/2 right-4 z-30 -translate-y-1/2 cursor-pointer text-gray-500 dark:text-gray-400">
-            <x-shared::svg.svg-password-view :showPassword="$showPassword"/>
-        </span>
+    <span 
+        @click="showPassword = !showPassword"
+        class="absolute top-1/2 right-4 z-30 -translate-y-1/2 cursor-pointer text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors select-none"
+    >
+        <x-shared::svg.svg-password-view :showPassword="$showPassword"/>
+    </span>
     @endif
 
 

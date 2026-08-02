@@ -31,6 +31,7 @@ class UploadFoto extends Component
     {
         $this->foto = null;
         $this->existingFoto = null;
+        $this->resetErrorBag('foto'); 
         $this->dispatch('fotoUploaded', null);
     }
 

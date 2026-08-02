@@ -6,7 +6,6 @@
     <div class="relative group">
         @if ($firma || $existingFirma)
             <div class="flex flex-col items-center gap-3">
-                {{-- Modificado para usar la ruta del controlador privado local --}}
                 <img src="{{ $firma ? $firma->temporaryUrl() : route('security.usuarios.asset', ['directory' => 'firmas', 'filename' => basename($existingFirma)]) }}" 
                      class="h-16 w-36 rounded-xl object-contain bg-white border border-gray-200 dark:border-gray-800 shadow-sm p-1.5" />
                 
@@ -16,11 +15,11 @@
                 </button>
             </div>
         @else
-            <div class="h-16 w-36 rounded-xl bg-gray-50 dark:bg-gray-900 flex items-center justify-center text-gray-400 dark:text-gray-550 border border-gray-200 dark:border-gray-800 transition-colors duration-200">
+            <div class="h-16 w-36 rounded-xl bg-gray-50 dark:bg-gray-900 flex items-center justify-center text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-800 transition-colors duration-200">
                 <i class="fa-solid fa-signature text-xl opacity-85"></i>
             </div>
             <label class="absolute inset-0 rounded-xl bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-[10px] cursor-pointer transition-opacity duration-150">
-                <input type="file" wire:model="firma" class="hidden" accept="image/*" />
+                <input type="file" wire:model.live="firma" class="hidden" accept="image/*" />
                 <span class="font-bold tracking-wide">Subir</span>
             </label>
         @endif

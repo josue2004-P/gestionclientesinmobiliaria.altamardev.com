@@ -38,7 +38,7 @@ class UserEloquentModel extends Authenticatable
             'is_activo'         => 'boolean',
         ];
     }
-
+    
     public function perfiles(): BelongsToMany
     {
         return $this->belongsToMany(PerfilEloquentModel::class, 'perfil_user', 'user_id', 'perfil_id')
