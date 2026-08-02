@@ -21,14 +21,14 @@
                     
                     {{-- Nombre Clave --}}
                     <div class="col-span-1">
-                        <x-shared::form.input-label for="nombre" :value="__('Nombre Clave')" required class="text-gray-700 dark:text-gray-300"/>
+                        <x-shared::form.input-label for="nombre" :value="__('Nombre Clave')" required />
                         <div class="mt-1.5 relative group">
                             <x-shared::form.text-input 
                                 id="nombre" 
                                 type="text" 
                                 wire:model="nombre" 
                                 placeholder="ej: administrador, tecnico_lab" 
-                                class="lowercase w-full  font-medium text-indigo-600 "
+                                class="lowercase"
                             />
                         </div>
                         <x-shared::form.input-error :messages="$errors->get('nombre')" class="mt-2" />
@@ -36,14 +36,13 @@
                     
                     {{-- Descripción Funcional --}}
                     <div class="col-span-1">
-                        <x-shared::form.input-label for="descripcion" :value="__('Descripción Funcional')" class="text-gray-700 dark:text-gray-300"/>
+                        <x-shared::form.input-label for="descripcion" :value="__('Descripción Funcional')" />
                         <div class="mt-1.5">
                             <x-shared::form.text-input 
                                 id="descripcion" 
                                 type="text" 
                                 wire:model="descripcion" 
                                 placeholder="Ej. Acceso total a reportes" 
-                                class="w-full font-medium  text-gray-900 "
                             />
                         </div>
                         <x-shared::form.input-error :messages="$errors->get('descripcion')" class="mt-2" />
@@ -53,18 +52,24 @@
                 {{-- Footer con alineación y contraste perfecto --}}
                 <x-slot:footer>
                     <div class="flex items-center justify-between">
-                        <a href="{{ route('perfiles.index') }}" class="inline-flex items-center text-sm font-semibold  text-gray-500 hover:text-red-550 dark:text-gray-400 dark:hover:text-red-400 transition-colors duration-150">
+                        {{-- Enlace de Cancelar (Link con variante danger) --}}
+                        <x-shared::form.link 
+                            :href="route('perfiles.index')" 
+                            danger
+                        >
                             <i class="fa-solid fa-xmark mr-2 text-sm"></i> Cancelar
-                        </a>
+                        </x-shared::form.link>
                         
-                        <x-shared::ui.button 
+                        {{-- Botón Enviar (Acción Registrar Perfil en tamaño md) --}}
+                        <x-shared::form.button-form 
+                            size="md"
                             type="submit" 
-                            size="sm"
-                            wire:loading.attr="disabled">
-                            <i class="fa-solid fa-shield-check mr-2" wire:loading.remove></i>
-                            <i class="fa-solid fa-circle-notch animate-spin mr-2" wire:loading></i> 
+                            wire:loading.attr="disabled"
+                        >
+                            <i class="fa-solid fa-shield-check" wire:loading.remove></i>
+                            <i class="fa-solid fa-circle-notch animate-spin" wire:loading></i> 
                             <span>Registrar Perfil</span>
-                        </x-shared::ui.button>
+                        </x-shared::form.button-form>
                     </div>
                 </x-slot:footer>
             </x-shared::common.component-card>

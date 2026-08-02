@@ -34,16 +34,19 @@
                         <tr class="group hover:bg-gray-50/80 dark:hover:bg-indigo-500/5 transition-all duration-200 divide-x divide-gray-200 dark:divide-gray-800" wire:key="perfil-{{ $perfil->id }}">
                             
                             {{-- Perfil del Sistema --}}
-                            <td class="px-6 py-4 whitespace-nowrap ">
+                            <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    <div class="h-10 w-10 rounded-md     bg-gray-50 dark:bg-gray-900 flex items-center justify-center text-gray-400 dark:text-gray-500 mr-4 border border-gray-200 dark:border-gray-800 group-hover:bg-indigo-600 group-hover:text-white dark:group-hover:bg-indigo-500 group-hover:border-transparent transition-all duration-300 shadow-xs">
+                                    {{-- Contenedor del Ícono --}}
+                                    <div class="h-10 w-10 shrink-0 rounded-lg bg-gray-100/80 dark:bg-gray-800/60 flex items-center justify-center text-gray-500 dark:text-gray-400 mr-3.5 border border-gray-200 dark:border-gray-700/60 group-hover:bg-indigo-600 dark:group-hover:bg-indigo-500 group-hover:text-white dark:group-hover:text-white group-hover:border-transparent transition-all duration-200 shadow-xs">
                                         <i class="fa-solid fa-shield-halved text-xs"></i>
                                     </div>
+
+                                    {{-- Textos --}}
                                     <div>
-                                        <div class="text-sm font-bold text-gray-900 dark:text-white transition-colors group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                                        <div class="text-sm font-bold text-gray-900 dark:text-gray-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                                             {{ $perfil->nombre }}
                                         </div>
-                                        <div class="text-[12px] font-bold text-gray-400 dark:text-gray-500  mt-0.5 transition-colors">
+                                        <div class="text-xs font-semibold text-gray-500 dark:text-gray-400 mt-0.5 transition-colors">
                                             Rol de Seguridad
                                         </div>
                                     </div>
@@ -65,61 +68,29 @@
                                 </span>
                             </td>
                             
-                            {{-- Acciones (Dropdown con Teleport) --}}
-                            <td class="px-6 py-4 text-center whitespace-nowrap z-30 ">
-                                <div x-data="{ 
-                                    dropdownOpen: false, 
-                                    position: { top: 0, left: 0 },
-                                    toggle(e) {
-                                        this.dropdownOpen = !this.dropdownOpen;
-                                        if (this.dropdownOpen) {
-                                            let rect = e.currentTarget.getBoundingClientRect();
-                                            this.position.top = rect.bottom + window.scrollY + 8;
-                                            this.position.left = rect.right - 208 + window.scrollX;
-                                        }
-                                    }
-                                }" 
-                                class="inline-block text-left">
-                                    
-                                    <button 
-                                        @click="toggle($event)" 
-                                        class="p-2.5 rounded-md text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-all border border-transparent hover:border-indigo-100 dark:hover:border-indigo-500/20 shadow-xs"
-                                    >
-                                        <i class="fa-solid fa-ellipsis-vertical text-base"></i>
-                                    </button>
+                            {{-- Acciones (Dropdown con Teleport para Perfiles) --}}
+                            <x-shared::form.dropdown-actions title="Infraestructura">
+                                
+                                {{-- Opción Configurar Matriz (Enlace) --}}
+                                <x-shared::form.dropdown-item 
+                                    :href="route('perfiles.edit', $perfil->id)" 
+                                    icon="fa-solid fa-gears"
+                                >
+                                    Configurar Matriz
+                                </x-shared::form.dropdown-item>
 
-                                    <template x-teleport="body">
-                                        <div 
-                                            x-show="dropdownOpen" 
-                                            @click.away="dropdownOpen = false"
-                                            x-cloak
-                                            x-transition:enter="transition ease-out duration-150"
-                                            x-transition:enter-start="opacity-0 scale-95"
-                                            x-transition:enter-end="opacity-100 scale-100"
-                                            :style="`position: absolute; top: ${position.top}px; left: ${position.left}px;`"
-                                            class="z-[200] w-52 rounded-md border border-gray-200 bg-white/95 dark:border-gray-800 dark:bg-gray-950 shadow-xl dark:shadow-2xl p-1.5 backdrop-blur-md"
-                                        >
-                                            <div class="px-3 py-2 text-[12px] font-bold text-gray-400 dark:text-gray-500  border-b border-gray-100 dark:border-gray-850 mb-1.5 text-left transition-colors">
-                                                Infraestructura
-                                            </div>
-                                            <div class="space-y-0.5 text-left">
-                                                <a href="{{ route('perfiles.edit', $perfil->id) }}" class="flex items-center px-3 py-2.5 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-md transition-colors group/item">
-                                                    <i class="fa-solid fa-gears mr-3 text-sm text-gray-400 dark:text-gray-500 group-hover/item:text-indigo-500 dark:group-hover/item:text-indigo-400 transition-colors"></i>Configurar Matriz
-                                                </a>
-                                                
-                                                <div class="my-1 border-t border-gray-100 dark:border-gray-850"></div>
-                                                
-                                                <button 
-                                                    wire:click="confirmDelete({{ $perfil->id }})" 
-                                                    class="flex w-full items-center px-3 py-2.5 text-sm font-semibold  text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-md transition-colors group/del"
-                                                >
-                                                    <i class="fa-solid fa-trash-can mr-3 text-sm text-red-400 dark:text-red-500 transition-colors"></i>Eliminar Perfil
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </template>
-                                </div>
-                            </td>
+                                <div class="my-1 border-t border-gray-100 dark:border-gray-800"></div>
+
+                                {{-- Opción Eliminar Perfil (Acción Livewire) --}}
+                                <x-shared::form.dropdown-item 
+                                    wire:click="confirmDelete({{ $perfil->id }})" 
+                                    icon="fa-solid fa-trash-can" 
+                                    variant="danger"
+                                >
+                                    Eliminar Perfil
+                                </x-shared::form.dropdown-item>
+
+                            </x-shared::form.dropdown-actions>
                         </tr>
                     @empty
                         <tr>

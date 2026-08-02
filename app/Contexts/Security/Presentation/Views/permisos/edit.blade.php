@@ -21,14 +21,14 @@
                     
                     {{-- Identificador (Slug) --}}
                     <div class="col-span-1">
-                        <x-shared::form.input-label for="nombre" :value="__('Identificador (Slug)')" required class="text-gray-700 dark:text-gray-300"/>
+                        <x-shared::form.input-label for="nombre" :value="__('Identificador (Slug)')" required />
                         <div class="mt-1.5 relative group">
                             <x-shared::form.text-input 
                                 id="nombre" 
                                 type="text" 
                                 wire:model="nombre" 
                                 placeholder="ej: ventas.editar" 
-                                class="lowercase w-full font-semibold  text-indigo-600 dark:text-indigo-400"
+                                class="lowercase "
                             />
                         </div>
                         <x-shared::form.input-error :messages="$errors->get('nombre')" class="mt-2" />
@@ -36,14 +36,13 @@
                     
                     {{-- Descripción Funcional --}}
                     <div class="col-span-1">
-                        <x-shared::form.input-label for="descripcion" :value="__('Descripción Funcional')" class="text-gray-700 dark:text-gray-300"/>
+                        <x-shared::form.input-label for="descripcion" :value="__('Descripción Funcional')" />
                         <div class="mt-1.5">
                             <x-shared::form.text-input 
                                 id="descripcion" 
                                 type="text" 
                                 wire:model="descripcion" 
                                 placeholder="Describe qué acceso otorga esta llave" 
-                                class="w-full font-medium bg-white dark:bg-gray-900 text-gray-900 "
                             />
                         </div>
                         <x-shared::form.input-error :messages="$errors->get('descripcion')" class="mt-2" />
