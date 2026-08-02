@@ -43,6 +43,8 @@ class CreateTipoCredito extends Component
 
     public function render()
     {
-        return view('shared::tipos-credito.create')->layout('shared::layouts.app');
+        return view('shared::tipos-credito.create')
+        ->title('Crear Tipo De Credito')
+        ->layout('shared::layouts.app');
     }
 }

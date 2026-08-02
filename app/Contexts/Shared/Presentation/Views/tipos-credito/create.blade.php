@@ -22,57 +22,65 @@
                 <div class="grid grid-cols-1 gap-6">
                     {{-- Nombre --}}
                     <div>
-                        <x-shared::form.input-label for="nombre" :value="__('Nombre del Crédito')" required class="text-gray-700 dark:text-gray-300"/>
+                        <x-shared::form.input-label for="nombre" :value="__('Nombre del Crédito')" required />
                         <div class="mt-1.5">
-                            <x-shared::form.text-input id="nombre" type="text" wire:model="nombre" placeholder="ej: INFONAVIT, Bancario, FOVISSSTE" class="w-full font-bold" />
+                            <x-shared::form.text-input id="nombre" type="text" wire:model="nombre" placeholder="ej: INFONAVIT, Bancario, FOVISSSTE" />
                         </div>
                         <x-shared::form.input-error :messages="$errors->get('nombre')" class="mt-2" />
                     </div>
 
                     {{-- Descripción --}}
                     <div>
-                        <x-shared::form.input-label for="descripcion" :value="__('Descripción o Alcance')" class="text-gray-700 dark:text-gray-300"/>
+                        <x-shared::form.input-label for="descripcion" :value="__('Descripción o Alcance')" />
                         <div class="mt-1.5">
-                            <x-shared::form.text-input id="descripcion" type="text" wire:model="descripcion" placeholder="Opcional: Detalles del tipo de financiamiento" class="w-full font-medium" />
+                            <x-shared::form.text-input id="descripcion" type="text" wire:model="descripcion" placeholder="Opcional: Detalles del tipo de financiamiento"  />
                         </div>
                         <x-shared::form.input-error :messages="$errors->get('descripcion')" class="mt-2" />
                     </div>
 
                     {{-- Flags de Aplicación --}}
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
-                        <div class="flex items-start gap-3">
-                            <div class="flex h-5 items-center">
-                                <input id="aplica_vivienda" type="checkbox" wire:model="aplica_vivienda" class="h-4 w-4 rounded-none border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:border-gray-800 dark:bg-gray-900">
-                            </div>
-                            <div class="text-xs">
-                                <label for="aplica_vivienda" class="font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide">Aplica para Viviendas</label>
-                                <p class="text-gray-400 dark:text-gray-500 font-medium mt-0.5">Determina si este financiamiento puede ligarse a las propiedades.</p>
-                            </div>
-                        </div>
+                        {{-- Aplica para Viviendas --}}
+                        <x-shared::form.checkbox-input
+                            id="aplica_vivienda"
+                            wire:model.live="aplica_vivienda"
+                            label="Aplica para Viviendas"
+                            description="Determina si este financiamiento puede ligarse a las propiedades."
+                            :messages="$errors->get('aplica_vivienda')"
+                        />
 
-                        <div class="flex items-start gap-3">
-                            <div class="flex h-5 items-center">
-                                <input id="aplica_cliente" type="checkbox" wire:model="aplica_cliente" class="h-4 w-4 rounded-none border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:border-gray-800 dark:bg-gray-900">
-                            </div>
-                            <div class="text-xs">
-                                <label for="aplica_cliente" class="font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide">Aplica para Clientes</label>
-                                <p class="text-gray-400 dark:text-gray-500 font-medium mt-0.5">Determina si este financiamiento puede asignarse al perfil de un prospecto.</p>
-                            </div>
-                        </div>
+                        {{-- Aplica para Clientes --}}
+                        <x-shared::form.checkbox-input
+                            id="aplica_cliente"
+                            wire:model.live="aplica_cliente"
+                            label="Aplica para Clientes"
+                            description="Determina si este financiamiento puede asignarse al perfil de un prospecto."
+                            :messages="$errors->get('aplica_cliente')"
+                        />
                     </div>
                 </div>
                 
                 <x-slot:footer>
                     <div class="flex items-center justify-between">
-                        <a href="{{ route('tipos-credito.index') }}" class="inline-flex items-center text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-red-550 transition-colors">
-                            <i class="fa-solid fa-xmark mr-2 text-sm"></i> Cancelar
-                        </a>
+                        {{-- Botón Cancelar (Enlace con estilo Danger) --}}
+                        <x-shared::form.link 
+                            :href="route('tipos-credito.index')" 
+                            danger
+                        >
+                            <i class="fa-solid fa-xmark"></i>
+                            <span>Cancelar</span>
+                        </x-shared::form.link>
                         
-                        <x-shared::form.button-primary type="submit" class="shadow-lg px-5 h-11 text-xs" wire:loading.attr="disabled">
-                            <i class="fa-solid fa-floppy-disk mr-2" wire:loading.remove></i>
-                            <i class="fa-solid fa-circle-notch animate-spin mr-2" wire:loading></i> 
+                        {{-- Botón Registrar Crédito (Primary) --}}
+                        <x-shared::form.button-form 
+                            size="md"
+                            type="submit" 
+                            wire:loading.attr="disabled"
+                        >
+                            <i class="fa-solid fa-floppy-disk" wire:loading.remove></i>
+                            <i class="fa-solid fa-circle-notch animate-spin" wire:loading></i> 
                             <span>Registrar Crédito</span>
-                        </x-shared::form.button-primary>
+                        </x-shared::form.button-form>
                     </div>
                 </x-slot:footer>
             </x-shared::common.component-card>

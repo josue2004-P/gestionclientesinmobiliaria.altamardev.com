@@ -56,18 +56,29 @@
                                 @endif
                             </td>
                             
-                            {{-- Acciones --}}
-                            <td class="px-6 py-2 text-center whitespace-nowrap z-30 ">
-                                <div class="flex items-center justify-center gap-1">
-                                    <a href="{{ route('tipos-credito.edit', $credito->id) }}" class="p-2 rounded-xl text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-all shadow-xs">
-                                        <i class="fa-solid fa-pen-to-square text-base"></i>
-                                    </a>
-                                    
-                                    <button type="button" wire:click="confirmDelete({{ $credito->id }})" class="p-2 rounded-xl text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all shadow-xs">
-                                        <i class="fa-solid fa-trash-can text-base"></i>
-                                    </button>
-                                </div>
-                            </td>
+                            {{-- Acciones  --}}
+                            <x-shared::form.dropdown-actions title="Opciones">
+                                
+                                {{-- Opción Editar --}}
+                                <x-shared::form.dropdown-item 
+                                    :href="route('tipos-credito.edit', $credito->id)" 
+                                    icon="fa-solid fa-pen-to-square"
+                                >
+                                    Editar Tipo de Crédito
+                                </x-shared::form.dropdown-item>
+
+                                <div class="my-1 border-t border-gray-100 dark:border-gray-800"></div>
+
+                                {{-- Opción Eliminar (Livewire) --}}
+                                <x-shared::form.dropdown-item 
+                                    wire:click="confirmDelete({{ $credito->id }})" 
+                                    icon="fa-solid fa-trash-can" 
+                                    variant="danger"
+                                >
+                                    Eliminar Tipo de Crédito
+                                </x-shared::form.dropdown-item>
+
+                            </x-shared::form.dropdown-actions>
                         </tr>
                     @empty
                         <tr>

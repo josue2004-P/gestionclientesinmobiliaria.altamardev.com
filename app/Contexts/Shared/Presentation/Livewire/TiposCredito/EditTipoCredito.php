@@ -50,6 +50,8 @@ class EditTipoCredito extends Component
 
     public function render()
     {
-        return view('shared::tipos-credito.edit')->layout('shared::layouts.app');
+        return view('shared::tipos-credito.edit')
+        ->title('Editar Tipo De Credito')
+        ->layout('shared::layouts.app');
     }
 }
