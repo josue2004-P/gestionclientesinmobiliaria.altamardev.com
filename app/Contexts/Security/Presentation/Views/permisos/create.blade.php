@@ -21,14 +21,14 @@
                     
                     {{-- Identificador (Clave) --}}
                     <div class="col-span-1">
-                        <x-shared::form.input-label for="nombre" :value="__('Identificador (Clave)')" required class="text-gray-700 dark:text-gray-300"/>
+                        <x-shared::form.input-label for="nombre" :value="__('Identificador (Clave)')" required />
                         <div class="mt-1.5 relative group">
                             <x-shared::form.text-input 
                                 id="nombre" 
                                 type="text" 
                                 wire:model="nombre" 
                                 placeholder="ej: reportes.ver, usuarios.crear" 
-                                class="lowercase w-full  text-indigo-600 dark:text-indigo-400"
+                                class="lowercase "
                             />
                         </div>
                         <x-shared::form.input-error :messages="$errors->get('nombre')" class="mt-2" />
@@ -36,14 +36,13 @@
                     
                     {{-- Descripción del Alcance --}}
                     <div class="col-span-1">
-                        <x-shared::form.input-label for="descripcion" :value="__('Descripción del Alcance')" class="text-gray-700 dark:text-gray-300"/>
+                        <x-shared::form.input-label for="descripcion" :value="__('Descripción del Alcance')" />
                         <div class="mt-1.5">
                             <x-shared::form.text-input 
                                 id="descripcion" 
                                 type="text" 
                                 wire:model="descripcion" 
                                 placeholder="Ej. Permite ver el reporte financiero" 
-                                class=" w-full  text-indigo-600 dark:text-indigo-400"
                             />
                         </div>
                         <x-shared::form.input-error :messages="$errors->get('descripcion')" class="mt-2" />
@@ -68,18 +67,22 @@
                 {{-- Footer con alineación y contraste perfecto --}}
                 <x-slot:footer>
                     <div class="flex items-center justify-between">
-                        <a href="{{ route('permisos.index') }}" class="inline-flex items-center text-sm font-semibold text-gray-500 hover:text-red-550 dark:text-gray-400 dark:hover:text-red-400 transition-colors duration-150">
+                        <x-shared::form.link 
+                            :href="route('permisos.index')" 
+                            danger
+                        >
                             <i class="fa-solid fa-xmark mr-2 text-sm"></i> Cancelar
-                        </a>
+                        </x-shared::form.link>
                         
-                        <x-shared::ui.button 
-                            size="sm"
+                        <x-shared::form.button-form 
+                            size="md"
                             type="submit" 
-                            wire:loading.attr="disabled">
-                            <i class="fa-solid fa-key-skeleton mr-2" wire:loading.remove></i>
-                            <i class="fa-solid fa-circle-notch animate-spin mr-2" wire:loading></i> 
+                            wire:loading.attr="disabled"
+                        >
+                            <i class="fa-solid fa-key-skeleton" wire:loading.remove></i>
+                            <i class="fa-solid fa-circle-notch animate-spin" wire:loading></i> 
                             <span>Crear Llave de Acceso</span>
-                        </x-shared::ui.button>
+                        </x-shared::form.button-form>
                     </div>
                 </x-slot:footer>
             </x-shared::common.component-card>

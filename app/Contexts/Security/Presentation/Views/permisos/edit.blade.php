@@ -68,18 +68,24 @@
                 {{-- Footer alineado a la izquierda y derecha adecuadamente --}}
                 <x-slot:footer>
                     <div class="flex items-center justify-between">
-                        <a href="{{ route('permisos.index') }}" class="inline-flex items-center text-sm font-semibold  text-gray-500 hover:text-red-555 dark:text-gray-400 dark:hover:text-red-400 transition-colors duration-150">
+                        {{-- Enlace Descartar / Cancelar con estilo danger --}}
+                        <x-shared::form.link 
+                            :href="route('permisos.index')" 
+                            danger
+                        >
                             <i class="fa-solid fa-xmark mr-2 text-sm"></i> Descartar
-                        </a>
+                        </x-shared::form.link>
                         
-                        <x-shared::ui.button 
-                            size="sm"
+                        {{-- Botón Guardar Cambios --}}
+                        <x-shared::form.button-form 
+                            size="md"
                             type="submit" 
-                            wire:loading.attr="disabled">
-                            <i class="fa-solid fa-floppy-disk mr-2" wire:loading.remove></i>
-                            <i class="fa-solid fa-circle-notch animate-spin mr-2" wire:loading></i> 
+                            wire:loading.attr="disabled"
+                        >
+                            <i class="fa-solid fa-floppy-disk" wire:loading.remove></i>
+                            <i class="fa-solid fa-circle-notch animate-spin" wire:loading></i> 
                             <span>Guardar Cambios</span>
-                        </x-shared::ui.button>
+                        </x-shared::form.button-form>
                     </div>
                 </x-slot:footer>
             </x-shared::common.component-card>

@@ -150,7 +150,7 @@
         </div>
     </div>
 
-    {{-- ÁREA DE TABLA --}}
+{{-- ÁREA DE TABLA --}}
     <div class="relative">
         <div wire:loading.delay.longest 
              wire:target="search, perPage, deleteAsentamiento"
@@ -161,7 +161,8 @@
             </div>
         </div>
         
-        <div class="overflow-x-auto rounded-b-3xl ">
+        {{-- CAMBIO AQUÍ: Se reemplaza rounded-b-3xl por rounded-b-md --}}
+        <div class="overflow-x-auto rounded-b-md">
             {{ $slot }}
         </div>
     </div>
