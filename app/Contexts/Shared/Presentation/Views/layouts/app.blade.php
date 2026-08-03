@@ -10,8 +10,6 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <script src="https://kit.fontawesome.com/698b0c3ebe.js" crossorigin="anonymous"></script>
-
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.store('theme', {
@@ -134,27 +132,5 @@
     @livewireScripts 
     @stack('scripts')
 
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Sortable engine global
-            const lists = document.querySelectorAll('.sortable-list');
-            lists.forEach(list => {
-                new Sortable(list, {
-                    animation: 150,
-                    handle: '.sortable-item',
-                    ghostClass: 'bg-purple-50',
-                    onEnd: function() {
-                        const items = list.querySelectorAll('.sortable-item');
-                        items.forEach((item, index) => {
-                            const newOrder = index + 1;
-                            if(item.querySelector('.input-orden')) item.querySelector('.input-orden').value = newOrder;
-                            if(item.querySelector('.badge-orden')) item.querySelector('.badge-orden').textContent = '#' + newOrder;
-                        });
-                    }
-                });
-            });
-        });
-    </script>
 </body>
 </html>

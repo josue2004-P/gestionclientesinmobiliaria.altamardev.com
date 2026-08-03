@@ -2,8 +2,6 @@
 
 namespace App\Contexts\Clientes\Presentation\Livewire;
 
-use Livewire\WithFileUploads;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\Attributes\Computed;
 use App\Contexts\Clientes\Application\UseCases\GetClienteByIdUseCase;
@@ -21,8 +19,6 @@ use App\Contexts\Shared\Application\UseCases\Asentamientos\GetAllAsentamientosUs
 
 class EditCliente extends Component
 {
-    use WithFileUploads;
-
     public int $clienteId;
 
     public string $searchAsentamiento = '';
@@ -53,18 +49,15 @@ class EditCliente extends Component
     public array $telefonos = [];
     public array $referencias = [];
     public array $documentos = [];
-    
-    public $temporalFile;
-    public string $temporalTipo = '';
 
-    public array $tiposDisponibles = [
-        'INE' => 'Identificación Oficial (INE / Pasaporte)',
-        'CURP' => 'Clave Única de Registro de Población (CURP)',
-        'RFC' => 'Constancia de Situación Fiscal (RFC)',
-        'Acta_Nacimiento' => 'Acta de Nacimiento Certificada',
-        'Comprobante_Domicilio' => 'Comprobante de Domicilio Reciente',
-        'Estado_Cuenta' => 'Estado de Cuenta Bancario (CLABE)'
+    protected $listeners = [
+        'documentos-updated' => 'onDocumentosUpdated'
     ];
+
+    public function onDocumentosUpdated(array $documentos): void
+    {
+        $this->documentos = $documentos;
+    }
 
     public function mount(int $id, GetClienteByIdUseCase $getClienteUseCase)
     {
@@ -256,36 +249,6 @@ class EditCliente extends Component
     {
         unset($this->referencias[$index]);
         $this->referencias = array_values($this->referencias);
-    }
-
-    public function addDocumento()
-    {
-        $this->validate([
-            'temporalFile' => 'required|file|max:10240',
-            'temporalTipo' => 'required|string',
-        ]);
-
-        $path = $this->temporalFile->store('clientes/documentos', 'local');
-
-        $this->documentos[] = [
-            'id'              => null,
-            'url'             => $path,
-            'nombre_original' => $this->temporalFile->getClientOriginalName(),
-            'tipo_documento'  => $this->temporalTipo,
-            'peso_bytes'      => $this->temporalFile->getSize(),
-            'verificado'      => false,
-        ];
-
-        $this->reset(['temporalFile', 'temporalTipo']);
-    }
-
-    public function removeDocumento($index)
-    {
-        if (isset($this->documentos[$index]['url'])) {
-            Storage::disk('local')->delete($this->documentos[$index]['url']);
-        }
-        unset($this->documentos[$index]);
-        $this->documentos = array_values($this->documentos);
     }
 
     public function save(

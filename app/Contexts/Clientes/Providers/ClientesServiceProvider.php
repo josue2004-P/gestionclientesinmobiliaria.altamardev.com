@@ -9,6 +9,7 @@ use Livewire\Livewire;
 use App\Contexts\Clientes\Presentation\Livewire\IndexClientes;
 use App\Contexts\Clientes\Presentation\Livewire\CreateCliente;
 use App\Contexts\Clientes\Presentation\Livewire\EditCliente;
+use App\Contexts\Clientes\Presentation\Livewire\DocumentosManager; 
 
 class ClientesServiceProvider extends ServiceProvider
 {
@@ -27,7 +28,6 @@ class ClientesServiceProvider extends ServiceProvider
         Livewire::component('index-clientes', IndexClientes::class);
         Livewire::component('create-cliente', CreateCliente::class);
         Livewire::component('edit-cliente', EditCliente::class);
- 
-   
+        Livewire::component('documentos-manager', DocumentosManager::class); 
     }
 }

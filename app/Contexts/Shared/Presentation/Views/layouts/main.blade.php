@@ -12,9 +12,6 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    {{-- FontAwesome 6 --}}
-    <script src="https://kit.fontawesome.com/698b0c3ebe.js" crossorigin="anonymous"></script>
-
     <style>
         [x-cloak] { display: none !important; }
         

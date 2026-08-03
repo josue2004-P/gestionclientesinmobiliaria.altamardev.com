@@ -115,8 +115,8 @@
         x-transition:leave="transition ease-in duration-100"
         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
         x-transition:leave-end="opacity-0 translate-y-1 scale-98"
-        class="absolute z-[999] mt-1.5 w-full bg-white dark:bg-gray-900 shadow-xl rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden flex flex-col backdrop-blur-md"
-    >
+        class="absolute z-[9999] mt-1.5 w-full bg-white dark:bg-gray-900 shadow-2xl rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden backdrop-blur-md"
+        >
         {{-- Buscador Interno --}}
         <div class="p-2 border-b border-gray-100 dark:border-gray-800/80 bg-gray-50/50 dark:bg-gray-950/40">
             <div class="relative flex items-center">
