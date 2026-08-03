@@ -1,4 +1,4 @@
-<div wire:key="cliente-referencias-modulo-{{ $clienteId }}">
+<div wire:key="cliente-referencias-modulo-{{ $clienteId ?? 'new' }}">
     {{-- Encabezado estilizado alineado al diseño del sistema --}}
     <div class="flex items-center justify-between mb-4">
         <h3 class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
@@ -116,7 +116,7 @@
                                 placeholder="-- BUSCAR ZONA --"
                             >
                                 <option value="">-- Sin asignar --</option>
-                                @foreach($this->asentamientos as $asentamiento)
+                                @foreach($this->todosLosAsentamientos as $asentamiento)
                                     <option value="{{ $asentamiento->getId() }}">
                                         {{ $asentamiento->getNombreAsentamiento() }} (C.P. {{ $asentamiento->getCodigoPostal() }})
                                     </option>

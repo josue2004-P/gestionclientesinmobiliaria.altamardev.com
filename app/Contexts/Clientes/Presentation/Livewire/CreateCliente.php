@@ -4,7 +4,14 @@ namespace App\Contexts\Clientes\Presentation\Livewire;
 
 use Livewire\Component;
 use Livewire\Attributes\Computed;
+
+// Use Cases
 use App\Contexts\Clientes\Application\UseCases\SaveClienteUseCase;
+use App\Contexts\Clientes\Application\UseCases\SaveClienteTelefonosUseCase;
+use App\Contexts\Clientes\Application\UseCases\SaveClienteReferenciasUseCase;
+use App\Contexts\Clientes\Application\UseCases\SaveClienteDocumentosUseCase;
+
+// Shared Use Cases
 use App\Contexts\Shared\Application\UseCases\Asentamientos\GetAsentamientosForSelectUseCase;
 use App\Contexts\Shared\Application\UseCases\Asentamientos\GetUniqueEstadosUseCase;
 use App\Contexts\Shared\Application\UseCases\Asentamientos\GetUniqueMunicipiosUseCase;
@@ -18,6 +25,7 @@ class CreateCliente extends Component
     public string $selectedEstado = '';
     public string $selectedMunicipio = '';
     public string $selectedCiudad = '';
+
     public string $nombre = '';
     public string $apellido_paterno = '';
     public string $apellido_materno = '';
@@ -36,11 +44,31 @@ class CreateCliente extends Component
     public ?string $regimen_casamiento = null;
 
     public array $zonas_ids = [];
+    public array $telefonos = [];
+    public array $referencias = [];
+    public array $documentos = [];
+
+    protected $listeners = [
+        'documentos-updated' => 'onDocumentosUpdated'
+    ];
+
+    public function onDocumentosUpdated(array $documentos): void
+    {
+        $this->documentos = $documentos;
+    }
 
     public function mount()
     {
         if (!checkPermiso('clientes.is_update')) {
             abort(403, 'Acceso denegado.');
+        }
+
+        // Inicializar al menos una fila vacía para Teléfono y Referencia
+        if (empty($this->telefonos)) {
+            $this->addTelefono();
+        }
+        if (empty($this->referencias)) {
+            $this->addReferencia();
         }
     }
 
@@ -66,11 +94,11 @@ class CreateCliente extends Component
     public function asentamientos()
     {
         return app(GetAsentamientosForSelectUseCase::class)->execute(
-            $this->searchAsentamiento, 
-            (int)$this->asentamiento_id,
-            $this->selectedEstado,
-            $this->selectedMunicipio,
-            $this->selectedCiudad
+            search: $this->searchAsentamiento, 
+            selectedId: $this->asentamiento_id ? (int)$this->asentamiento_id : null,
+            estado: $this->selectedEstado,
+            municipio: $this->selectedMunicipio,
+            ciudad: $this->selectedCiudad
         );
     }
 
@@ -104,6 +132,41 @@ class CreateCliente extends Component
         $this->asentamiento_id = null;
     }
 
+    // MÉTODOS PARA TELÉFONOS
+    public function addTelefono(): void
+    {
+        $this->telefonos[] = [
+            'id' => null,
+            'telefono' => '',
+            'tipo_telefono' => 'Celular'
+        ];
+    }
+
+    public function removeTelefono(int $index): void
+    {
+        unset($this->telefonos[$index]);
+        $this->telefonos = array_values($this->telefonos);
+    }
+
+    // MÉTODOS PARA REFERENCIAS
+    public function addReferencia(): void
+    {
+        $this->referencias[] = [
+            'id' => null,
+            'nombre' => '',
+            'celular' => '',
+            'parentesco' => '',
+            'asentamiento_id' => null,
+            'calle_numero' => ''
+        ];
+    }
+
+    public function removeReferencia(int $index): void
+    {
+        unset($this->referencias[$index]);
+        $this->referencias = array_values($this->referencias);
+    }
+
     protected function rules(): array
     {
         return [
@@ -125,25 +188,59 @@ class CreateCliente extends Component
             'regimen_casamiento' => 'nullable|string|max:100',
             'zonas_ids' => 'nullable|array',
             'zonas_ids.*' => 'integer|exists:asentamientos,id',
+
+            // Validaciones de Relaciones (1:N)
+            'telefonos'                 => 'required|array|min:1',
+            'telefonos.*.id'            => 'nullable|integer',
+            'telefonos.*.telefono'      => 'required|string|min:8|max:20',
+            'telefonos.*.tipo_telefono' => 'required|string|max:50',
+            'referencias'               => 'nullable|array',
+            'referencias.*.id'          => 'nullable|integer',
+            'referencias.*.nombre'      => 'required|string|max:255',
+            'referencias.*.celular'     => 'nullable|string|max:20',
+            'referencias.*.parentesco'   => 'nullable|string|max:100',
         ];
     }
 
-    public function store(SaveClienteUseCase $saveClienteUseCase)
-    {
+    public function store(
+        SaveClienteUseCase $saveClienteUseCase,
+        SaveClienteTelefonosUseCase $telefonosUseCase,
+        SaveClienteReferenciasUseCase $referenciasUseCase,
+        SaveClienteDocumentosUseCase $documentosUseCase
+    ) {
         $validatedData = $this->validate();
 
-        $validatedData['precalificacion'] = $validatedData['precalificacion'] ?? 0.0;
-        $validatedData['asentamiento_id'] = $validatedData['asentamiento_id'] ? (int)$validatedData['asentamiento_id'] : null;
-        $validatedData['tipo_credito_id'] = $validatedData['tipo_credito_id'] ? (int)$validatedData['tipo_credito_id'] : null;
-        $validatedData['zonas_interes'] = $this->zonas_ids;
-
         try {
-            $saveClienteUseCase->execute($validatedData);
+            // 1. Guardar cliente base
+            $clienteId = $saveClienteUseCase->execute([
+                'nombre'               => $this->nombre,
+                'apellido_paterno'     => $this->apellido_paterno,
+                'apellido_materno'     => $this->apellido_materno,
+                'fecha_nacimiento'     => $this->fecha_nacimiento,
+                'rfc'                  => $this->rfc,
+                'curp'                 => $this->curp,
+                'asentamiento_id'      => $this->asentamiento_id ? (int)$this->asentamiento_id : null,
+                'calle_numero'         => $this->calle_numero,
+                'nss'                  => $this->nss,
+                'correo_infonavit'     => $this->correo_infonavit,
+                'contrasena_infonavit' => $this->contrasena_infonavit,
+                'tipo_credito_id'      => $this->tipo_credito_id ? (int)$this->tipo_credito_id : null,
+                'precalificacion'      => $this->precalificacion ?? 0.0,
+                'avaluo_solicitado'    => $this->avaluo_solicitado,
+                'estado_civil'         => $this->estado_civil,
+                'regimen_casamiento'   => $this->regimen_casamiento,
+                'zonas_ids'            => $this->zonas_ids,
+            ]);
+
+            // 2. Guardar Relaciones con el ID del cliente generado
+            $telefonosUseCase->execute($clienteId, $this->telefonos);
+            $referenciasUseCase->execute($clienteId, $this->referencias);
+            $documentosUseCase->execute($clienteId, $this->documentos);
 
             $this->dispatch('swal-init', [
                 'icon' => 'success',
                 'title' => '¡Éxito!',
-                'text' => 'El cliente ha sido registrado correctamente.'
+                'text' => 'El cliente y su expediente se han registrado correctamente.'
             ]);
 
             return redirect()->route('clientes.index');

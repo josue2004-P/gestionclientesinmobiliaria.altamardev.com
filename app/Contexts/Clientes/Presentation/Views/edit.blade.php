@@ -34,15 +34,23 @@
                 </div>
 
                 <x-slot:footer>
-                    <div class="flex items-center justify-between">
-                        <a href="{{ route('clientes.index') }}" class="inline-flex items-center text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-red-550 transition-colors">
+                    <div class="flex items-center justify-between w-full">
+                        {{-- Botón Cancelar --}}
+                        <x-shared::form.link 
+                            :href="route('clientes.index')" 
+                            danger
+                        >
                             <i class="fa-solid fa-xmark mr-2 text-sm"></i> Cancelar
-                        </a>
-                        <x-shared::form.button-primary type="submit" class="shadow-lg px-5 h-11 text-xs" wire:loading.attr="disabled">
-                            <i class="fa-solid fa-floppy-disk mr-2" wire:loading.remove></i>
-                            <i class="fa-solid fa-circle-notch animate-spin mr-2" wire:loading></i> 
-                            <span>Actualizar Cambios</span>
-                        </x-shared::form.button-primary>
+                        </x-shared::form.link>
+
+                         <x-shared::form.button-form 
+                            type="submit" 
+                            wire:loading.attr="disabled"
+                            startIcon='<i class="fa-solid fa-floppy-disk" wire:loading.remove></i>'
+                        >
+                            <i class="fa-solid fa-circle-notch animate-spin mr-2" wire:loading></i>
+                            <span>Actualizar Cliente</span>
+                        </x-shared::form.button-form>
                     </div>
                 </x-slot:footer>
             </x-shared::common.component-card>

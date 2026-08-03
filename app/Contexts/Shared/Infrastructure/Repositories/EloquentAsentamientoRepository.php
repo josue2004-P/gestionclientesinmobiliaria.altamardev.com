@@ -50,10 +50,11 @@ class EloquentAsentamientoRepository implements AsentamientoRepositoryInterface
         }, $rawArray);
     }
 
-    public function searchForSelect(?string $search, ?int $selectedId, ?string $estado = null, ?string $municipio = null, ?string $ciudad = null): array
+    public function searchForSelect(?string $search, ?int $selectedId = null, ?string $estado = null, ?string $municipio = null, ?string $ciudad = null): array
     {
         $query = AsentamientoEloquentModel::query();
 
+        // 1. Filtros de ubicación
         if (!empty($estado)) {
             $query->where('estado', $estado);
         }
@@ -64,28 +65,37 @@ class EloquentAsentamientoRepository implements AsentamientoRepositoryInterface
             $query->where('ciudad', $ciudad);
         }
 
+        // 2. Filtro de búsqueda por texto / C.P.
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('codigo_postal', 'like', $search . '%')
-                  ->orWhere('nombre_asentamiento', 'like', '%' . $search . '%');
+                ->orWhere('nombre_asentamiento', 'like', '%' . $search . '%');
             });
-        } elseif (!empty($selectedId)) {
-            $query->where('id', $selectedId);
-        } else {
-            if (empty($estado) && empty($municipio) && empty($ciudad)) {
+        }
+
+        // 3. Si no hay filtros de ubicación NI búsqueda, devolvemos array vacío para no saturar memoria
+        if (empty($search) && empty($estado) && empty($municipio) && empty($ciudad)) {
+            // Excepción: Si solo tenemos $selectedId sin ubicación/búsqueda, traemos solo ese registrado
+            if (!empty($selectedId)) {
+                $query->where('id', $selectedId);
+            } else {
                 return [];
             }
         }
 
+        // 4. Ejecutar consulta
         $models = $query->orderBy('nombre_asentamiento', 'asc')->get();
 
-        if (!empty($search) && !empty($selectedId) && !$models->contains('id', $selectedId)) {
+        // 5. Garantizar que el asentamiento previamente seleccionado siempre esté en la colección
+        // (Incluso si los filtros de estado/municipio/búsqueda lo hubieran excluido)
+        if (!empty($selectedId) && !$models->contains('id', $selectedId)) {
             $selectedModel = AsentamientoEloquentModel::find($selectedId);
             if ($selectedModel) {
-                $models->push($selectedModel);
+                $models->prepend($selectedModel); // Lo agrega al principio de la lista
             }
         }
 
+        // 6. Mapear al Objeto de Dominio
         return $models->map(function ($model) {
             return new Asentamiento(
                 $model->id,

@@ -1,4 +1,4 @@
-<div wire:key="cliente-telefonos-modulo-{{ $clienteId }}">
+<div wire:key="cliente-telefonos-modulo-{{ $clienteId ?? 'new' }}">
     {{-- Encabezado estilizado igual a Información Personal --}}
     <div class="flex items-center justify-between mb-4">
         <h3 class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
