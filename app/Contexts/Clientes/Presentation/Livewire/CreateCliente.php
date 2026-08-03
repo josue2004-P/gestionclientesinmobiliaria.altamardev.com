@@ -30,7 +30,7 @@ class CreateCliente extends Component
     public ?string $correo_infonavit = null;
     public ?string $contrasena_infonavit = null;
     public $tipo_credito_id = null;
-    public float $precalificacion = 0.0;
+    public ?float $precalificacion = 0.0;
     public string $avaluo_solicitado = 'No';
     public ?string $estado_civil = null;
     public ?string $regimen_casamiento = null;
@@ -119,7 +119,7 @@ class CreateCliente extends Component
             'correo_infonavit' => 'nullable|email|max:255',
             'contrasena_infonavit' => 'nullable|string|max:255',
             'tipo_credito_id' => 'nullable|integer',
-            'precalificacion' => 'numeric|min:0',
+            'precalificacion' => 'nullable|numeric|min:0',
             'avaluo_solicitado' => 'required|in:Sí,No',
             'estado_civil' => 'nullable|in:Soltero,Casado,Divorciado,Viudo,Union_Libre',
             'regimen_casamiento' => 'nullable|string|max:100',
@@ -131,7 +131,8 @@ class CreateCliente extends Component
     public function store(SaveClienteUseCase $saveClienteUseCase)
     {
         $validatedData = $this->validate();
-        
+
+        $validatedData['precalificacion'] = $validatedData['precalificacion'] ?? 0.0;
         $validatedData['asentamiento_id'] = $validatedData['asentamiento_id'] ? (int)$validatedData['asentamiento_id'] : null;
         $validatedData['tipo_credito_id'] = $validatedData['tipo_credito_id'] ? (int)$validatedData['tipo_credito_id'] : null;
         $validatedData['zonas_interes'] = $this->zonas_ids;

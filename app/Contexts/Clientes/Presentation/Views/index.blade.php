@@ -110,7 +110,7 @@
                             <tr class="group hover:bg-gray-50/80 dark:hover:bg-indigo-500/5 transition-all duration-200 divide-x divide-gray-200 dark:divide-gray-800" wire:key="cliente-table-{{ $cliente->id }}">
                                 
                                 {{-- Cliente --}}
-                                <td class="px-6 py-4">
+                                <td class="px-6 py-2">
                                     <div class="text-sm font-bold text-gray-900 dark:text-white capitalize">
                                         {{ $cliente->nombre }} {{ $cliente->apellido_paterno }} {{ $cliente->apellido_materno }}
                                     </div>
@@ -120,44 +120,56 @@
                                 </td>
 
                                 {{-- Teléfonos --}}
-                                <td class="px-6 py-4">
+                                <td class="px-6 py-2">
                                     <div class="space-y-1">
                                         @forelse($cliente->telefonos as $tel)
-                                            <a href="tel:{{ $tel->telefono }}" class="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
+                                            <a href="tel:{{ $tel->telefono }}" class="inline-flex items-center gap-1 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
                                                 <i class="fa-solid fa-phone text-[9px]"></i> {{ $tel->telefono }}
                                             </a>
                                         @empty
-                                            <span class="text-xs text-gray-400 italic">Sin teléfonos</span>
+                                            <span class="text-sm text-gray-400 italic">Sin teléfonos</span>
                                         @endforelse
                                     </div>
                                 </td>
 
                                 {{-- Zonas --}}
-                                <td class="px-6 py-4">
-                                    <div class="flex flex-wrap gap-1 max-w-xs">
+                                <td class="px-6 py-2">
+                                    <div class="flex flex-wrap gap-1 ">
                                         @forelse($cliente->zonasInteres as $zona)
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-500/20">
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[12px] font-bold bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-500/20">
                                                 C.P. {{ $zona->codigo_postal }} - {{ $zona->nombre_asentamiento }}
                                             </span>
                                         @empty
-                                            <span class="text-xs text-gray-400 italic">Sin zonas</span>
+                                            <span class="text-sm text-gray-400 italic">Sin zonas</span>
                                         @endforelse
                                     </div>
                                 </td>
 
                                 {{-- Acciones --}}
-                                <td class="px-6 py-4 text-center whitespace-nowrap">
-                                    <div class="flex items-center justify-center gap-1">
-                                        <a href="{{ route('clientes.edit', $cliente->id) }}" class="p-2 rounded-xl text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10">
-                                            <i class="fa-solid fa-user-pen text-base"></i>
-                                        </a>
-                                        @if(checkPermiso('clientes.is_update'))
-                                            <button type="button" wire:click="confirmDelete({{ $cliente->id }})" class="p-2 rounded-xl text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10">
-                                                <i class="fa-solid fa-user-slash text-base"></i>
-                                            </button>
-                                        @endif
-                                    </div>
-                                </td>
+                                <x-shared::form.dropdown-actions title="Opciones">
+                                    
+                                    {{-- Opción Editar Cliente --}}
+                                    <x-shared::form.dropdown-item 
+                                        :href="route('clientes.edit', $cliente->id)" 
+                                        icon="fa-solid fa-user-pen"
+                                    >
+                                        Editar Cliente
+                                    </x-shared::form.dropdown-item>
+
+                                    {{-- Opción Dar de Baja / Eliminar --}}
+                                    @if(checkPermiso('clientes.is_update'))
+                                        <div class="my-1 border-t border-gray-100 dark:border-gray-800"></div>
+
+                                        <x-shared::form.dropdown-item 
+                                            wire:click="confirmDelete({{ $cliente->id }})" 
+                                            icon="fa-solid fa-user-slash" 
+                                            variant="danger"
+                                        >
+                                            Dar de Baja Cliente
+                                        </x-shared::form.dropdown-item>
+                                    @endif
+
+                                </x-shared::form.dropdown-actions>
                             </tr>
                         @empty
                             <tr>

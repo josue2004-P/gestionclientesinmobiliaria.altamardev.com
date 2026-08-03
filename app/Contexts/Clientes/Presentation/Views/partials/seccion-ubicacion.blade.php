@@ -75,18 +75,17 @@
         </div>
     </div>
 
-<div class="mt-6 pt-6 border-t border-dashed border-gray-150 dark:border-gray-900">
-    <x-shared::form.multi-select-tags 
-        id="zonas_ids"
-        wire:model="zonas_ids"
-        label="Zonas geográficas de interés / Preferencias de compra"
-        placeholder="Escriba para buscar y agregar asentamientos..."
-        :messages="$errors->get('zonas_ids')"
-        {{-- 🟢 Usamos la nueva propiedad computada unificada conectada al GetAllAsentamientosUseCase --}}
-        :options="collect($this->todosLosAsentamientos)->map(fn($a) => [
-            'id' => $a->getId(),
-            'label' => $a->getNombreAsentamiento() . ' (C.P. ' . $a->getCodigoPostal() . ')'
-        ])->toArray()"
-    />
-</div>
+    <div class="mt-6 pt-6 border-t border-dashed border-gray-150 dark:border-gray-900">
+        <x-shared::form.multi-select-tags 
+            id="zonas_ids"
+            wire:model="zonas_ids"
+            label="Zonas geográficas de interés / Preferencias de compra"
+            placeholder="Escriba para buscar y agregar asentamientos..."
+            :messages="$errors->get('zonas_ids')"
+            :options="collect($this->todosLosAsentamientos)->map(fn($a) => [
+                'id' => $a->getId(),
+                'label' => $a->getNombreAsentamiento() . ' (C.P. ' . $a->getCodigoPostal() . ')'
+            ])->toArray()"
+        />
+    </div>
 </div>

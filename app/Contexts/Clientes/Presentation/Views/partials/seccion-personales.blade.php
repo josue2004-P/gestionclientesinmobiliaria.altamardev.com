@@ -7,7 +7,7 @@
         <div>
             <x-shared::form.input-label for="nombre" :value="__('Nombre(s)')" required/>
             <div class="mt-1.5">
-                <x-shared::form.text-input id="nombre" type="text" wire:model="nombre" placeholder="ej: Juan" class="w-full font-medium" />
+                <x-shared::form.text-input id="nombre" type="text" wire:model="nombre" placeholder="ej: Juan"  />
             </div>
             <x-shared::form.input-error :messages="$errors->get('nombre')" class="mt-2" />
         </div>
@@ -15,7 +15,7 @@
         <div>
             <x-shared::form.input-label for="apellido_paterno" :value="__('Apellido Paterno')" required/>
             <div class="mt-1.5">
-                <x-shared::form.text-input id="apellido_paterno" type="text" wire:model="apellido_paterno" placeholder="ej: Pérez" class="w-full font-medium" />
+                <x-shared::form.text-input id="apellido_paterno" type="text" wire:model="apellido_paterno" placeholder="ej: Pérez"  />
             </div>
             <x-shared::form.input-error :messages="$errors->get('apellido_paterno')" class="mt-2" />
         </div>
@@ -23,7 +23,7 @@
         <div>
             <x-shared::form.input-label for="apellido_materno" :value="__('Apellido Materno')" required/>
             <div class="mt-1.5">
-                <x-shared::form.text-input id="apellido_materno" type="text" wire:model="apellido_materno" placeholder="ej: López" class="w-full font-medium" />
+                <x-shared::form.text-input id="apellido_materno" type="text" wire:model="apellido_materno" placeholder="ej: López" />
             </div>
             <x-shared::form.input-error :messages="$errors->get('apellido_materno')" class="mt-2" />
         </div>
@@ -54,7 +54,7 @@
         <div>
             <x-shared::form.input-label for="regimen_casamiento" :value="__('Régimen Patrimonial')"/>
             <div class="mt-1.5">
-                <x-shared::form.text-input id="regimen_casamiento" type="text" wire:model="regimen_casamiento" :disabled="$estado_civil !== 'Casado'" placeholder="Bienes Mancomunados, etc." class="w-full font-medium disabled:bg-gray-100 dark:disabled:bg-gray-900 transition-colors" />
+                <x-shared::form.text-input id="regimen_casamiento" type="text" wire:model="regimen_casamiento" :disabled="$estado_civil !== 'Casado'" placeholder="Bienes Mancomunados, etc."  />
             </div>
             <x-shared::form.input-error :messages="$errors->get('regimen_casamiento')" class="mt-2" />
         </div>

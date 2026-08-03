@@ -7,7 +7,7 @@
         <div>
             <x-shared::form.input-label for="curp" :value="__('CURP')"/>
             <div class="mt-1.5">
-                <x-shared::form.text-input id="curp" type="text" wire:model="curp" placeholder="18 Caracteres" class="w-full font-mono uppercase font-bold tracking-wide" />
+                <x-shared::form.text-input id="curp" type="text" wire:model="curp" placeholder="18 Caracteres"  />
             </div>
             <x-shared::form.input-error :messages="$errors->get('curp')" class="mt-2" />
         </div>
@@ -15,7 +15,7 @@
         <div>
             <x-shared::form.input-label for="rfc" :value="__('RFC')"/>
             <div class="mt-1.5">
-                <x-shared::form.text-input id="rfc" type="text" wire:model="rfc" placeholder="13 Homoclave" class="w-full font-mono uppercase font-bold tracking-wide" />
+                <x-shared::form.text-input id="rfc" type="text" wire:model="rfc" placeholder="13 Homoclave" />
             </div>
             <x-shared::form.input-error :messages="$errors->get('rfc')" class="mt-2" />
         </div>
@@ -23,7 +23,7 @@
         <div>
             <x-shared::form.input-label for="nss" :value="__('NSS (Seguro Social)')"/>
             <div class="mt-1.5">
-                <x-shared::form.text-input id="nss" type="text" wire:model="nss" placeholder="11 dígitos" class="w-full font-mono font-bold tracking-wide" />
+                <x-shared::form.text-input id="nss" type="text" wire:model="nss" placeholder="11 dígitos"  />
             </div>
             <x-shared::form.input-error :messages="$errors->get('nss')" class="mt-2" />
         </div>
@@ -33,23 +33,35 @@
         <div class="md:col-span-2">
             <x-shared::form.input-label for="correo_infonavit" :value="__('Correo Cuenta Infonavit')"/>
             <div class="mt-1.5">
-                <x-shared::form.text-input id="correo_infonavit" type="email" wire:model="correo_infonavit" placeholder="usuario@ejemplo.com" class="w-full font-medium" />
+                <x-shared::form.text-input id="correo_infonavit" type="email" wire:model="correo_infonavit" placeholder="usuario@ejemplo.com" />
             </div>
             <x-shared::form.input-error :messages="$errors->get('correo_infonavit')" class="mt-2" />
         </div>
 
         <div>
             <x-shared::form.input-label for="contrasena_infonavit" :value="__('Contraseña Infonavit')"/>
-            <div class="mt-1.5">
-                <x-shared::form.text-input id="contrasena_infonavit" type="password" wire:model="contrasena_infonavit" placeholder="••••••••" class="w-full font-medium" />
+            <div class="mt-1.5" x-data="{ showPassword: false }">
+                <x-shared::form.text-input 
+                    id="contrasena_infonavit" 
+                    type="password" 
+                    wire:model="contrasena_infonavit" 
+                    placeholder="••••••••" 
+                    :showPassword="true"
+                    :messages="$errors->get('contrasena_infonavit')"
+                />
             </div>
             <x-shared::form.input-error :messages="$errors->get('contrasena_infonavit')" class="mt-2" />
         </div>
 
         <div>
-            <x-shared::form.input-label for="precalificacion" :value="__('Monto Precalificación ($)')"/>
+            <x-shared::form.input-label for="precalificacion" :value="__('Precalificación ($)')" />
             <div class="mt-1.5">
-                <x-shared::form.text-input id="precalificacion" type="number" step="0.01" wire:model="precalificacion" placeholder="0.00" class="w-full font-mono font-bold" />
+                <x-shared::form.money-input 
+                    id="precalificacion" 
+                    wire:model.live="precalificacion" 
+                    placeholder="0.00" 
+                    :messages="$errors->get('precalificacion')"
+                />
             </div>
             <x-shared::form.input-error :messages="$errors->get('precalificacion')" class="mt-2" />
         </div>
@@ -70,7 +82,7 @@
         <div>
             <x-shared::form.input-label for="tipo_credito_id" :value="__('Tipo de Crédito Tentativo')"/>
             <div class="mt-1.5">
-                <x-shared::form.searchable-select wire:model="tipo_credito_id" placeholder="-- BUSCAR O SELECCIONAR CRÉDITO --" :messages="$errors->get('tipo_credito_id')">
+                <x-shared::form.searchable-select wire:model="tipo_credito_id" placeholder="Buscar o Seleccionar Crédito" :messages="$errors->get('tipo_credito_id')">
                     <option value="">-- No Asignado --</option>
                     @foreach($this->tiposCredito as $tipo)
                         <option value="{{ $tipo->getId() }}">{{ $tipo->getNombre() }}</option>
