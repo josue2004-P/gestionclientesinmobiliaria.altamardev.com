@@ -18,7 +18,7 @@
         </span> --}}
 
        <span class="block mr-1 font-medium text-theme-sm">
-            {{ Auth::user()->name }}
+            {{ Auth::user()->getNombreCompleto() }}
         </span>
 
         <!-- Chevron Icon -->

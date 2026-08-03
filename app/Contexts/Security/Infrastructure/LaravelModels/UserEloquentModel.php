@@ -38,6 +38,26 @@ class UserEloquentModel extends Authenticatable
             'is_activo'         => 'boolean',
         ];
     }
+
+    /**
+     * Obtiene el nombre completo del usuario omitiendo el apellido materno si es null o vacío.
+     */
+    public function getNombreCompleto(): string
+    {
+        return implode(' ', array_filter([
+            $this->name,
+            $this->apellido_paterno,
+            $this->apellido_materno
+        ]));
+    }
+
+    /**
+     * Accessor para acceder como propiedad ($user->nombre_completo)
+     */
+    public function getNombreCompletoAttribute(): string
+    {
+        return $this->getNombreCompleto();
+    }
     
     public function perfiles(): BelongsToMany
     {

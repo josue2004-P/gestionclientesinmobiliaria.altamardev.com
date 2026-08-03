@@ -114,11 +114,11 @@
                         <div class="mb-5 sm:mb-8">
                             <x-shared::form.auth-session-status class="mb-4" :status="session('status')" />
                             
-                            <h1 class="text-title-sm sm:text-title-md mb-2 font-black text-gray-900 dark:text-white">
+                            <h1 class="text-title-sm sm:text-title-md mb-2 font-bold text-gray-900 dark:text-white">
                                 @isset($titleCard) {{ $titleCard }} @else @yield('titleCard') @endisset
                             </h1>
                             
-                            <p class="text-sm text-gray-500 dark:text-gray-400 italic">
+                            <p class="text-sm text-gray-500 dark:text-gray-400 ">
                                 @isset($descripcionCard) {{ $descripcionCard }} @else @yield('descripcionCard') @endisset
                             </p>
                         </div>
@@ -141,7 +141,7 @@
                         <a href="/" class="mb-4 block">
                             <img src="{{ asset('images/logo/auth-logo.svg') }}" alt="Logo" />
                         </a>
-                        <p class="text-center text-xs uppercase tracking-widest font-black text-gray-400 dark:text-white/60">
+                        <p class="text-center text-xs uppercase  font-bold text-gray-400 dark:text-white/60">
                             Laboratorio Químico La Piedad
                         </p>
                     </div>

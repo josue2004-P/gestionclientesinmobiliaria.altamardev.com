@@ -22,7 +22,7 @@
 
             <div>
                 <x-shared::form.input-label required for="password" :value="__('Password')" />
-                <div class="relative">
+                <div class="mt-1.5 relative" x-data="{ showPassword: false }">
                     <x-shared::form.text-input
                         wire:model="password"
                         name="password"
@@ -30,6 +30,7 @@
                         type="password"
                         placeholder="Ingresa tu contraseña"
                         required 
+                        :showPassword="true"
                         autocomplete="current-password"
                     />
                 </div>
@@ -48,12 +49,24 @@
             </div>
 
             <div>
-                <x-shared::form.button-primary type="submit" wire:loading.attr="disabled" class="w-full justify-center shadow-lg shadow-indigo-500/10">
-                    <span wire:loading.remove>Iniciar Sesión</span>
-                    <span wire:loading class="flex items-center gap-2">
-                        <i class="fa-solid fa-circle-notch animate-spin text-xs"></i> Verificando credenciales...
+                <x-shared::form.button-form 
+                    type="submit" 
+                    variant="primary"
+                    class="w-full justify-center shadow-lg shadow-indigo-500/10 h-11"
+                    wire:loading.attr="disabled"
+                >
+                    {{-- Estado normal --}}
+                    <span wire:loading.remove class="flex items-center gap-2">
+                        <i class="fa-solid fa-right-to-bracket text-xs"></i>
+                        <span>Iniciar Sesión</span>
                     </span>
-                </x-shared::form.button-primary>
+
+                    {{-- Estado de carga --}}
+                    <span wire:loading class="flex items-center gap-2">
+                        <i class="fa-solid fa-circle-notch animate-spin text-xs"></i>
+                        <span>Verificando credenciales...</span>
+                    </span>
+                </x-shared::form.button-form>
             </div>
         </div>
     </form>
