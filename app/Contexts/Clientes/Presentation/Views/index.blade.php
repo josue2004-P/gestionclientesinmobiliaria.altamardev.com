@@ -17,7 +17,7 @@
         :createRoute="route('clientes.create')"
     >
         <x-slot:filters>
-            {{-- Espacio para filtros --}}
+            {{-- Espacio para filtros opcionales --}}
         </x-slot:filters>
 
         <div class="border-t border-gray-200 dark:border-gray-800">
@@ -45,7 +45,7 @@
                                 </div>
                             </div>
 
-                            {{-- Botones Rápidos --}}
+                            {{-- Botones Rápidos Móvil --}}
                             <div class="flex items-center gap-1 shrink-0">
                                 <a href="{{ route('clientes.edit', $cliente->id) }}" class="p-2 text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">
                                     <i class="fa-solid fa-user-pen text-sm"></i>
@@ -56,6 +56,29 @@
                                     </button>
                                 @endif
                             </div>
+                        </div>
+
+                        {{-- Ubicación / Residencia del Cliente --}}
+                        <div class="pt-2 border-t border-gray-100 dark:border-gray-800">
+                            <span class="text-[10px] font-black uppercase text-gray-400 block mb-1">Ubicación de Residencia</span>
+                            @if($cliente->asentamiento)
+                                <div class="text-xs text-gray-700 dark:text-gray-300 font-medium flex items-start gap-1.5">
+                                    <i class="fa-solid fa-location-dot text-indigo-500 mt-0.5 text-[11px] shrink-0"></i>
+                                    <div>
+                                        <span class="font-bold">{{ $cliente->asentamiento->nombre_asentamiento }}</span>
+                                        <span class="text-[11px] text-gray-500 dark:text-gray-400 block">
+                                            {{ $cliente->asentamiento->municipio }}, {{ $cliente->asentamiento->estado }} (C.P. {{ $cliente->asentamiento->codigo_postal }})
+                                        </span>
+                                        @if($cliente->calle_numero)
+                                            <span class="text-[11px] text-gray-400 italic block mt-0.5">
+                                                {{ $cliente->calle_numero }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+                            @else
+                                <span class="text-xs text-gray-400 italic">Sin ubicación asignada</span>
+                            @endif
                         </div>
 
                         {{-- Teléfonos Directos --}}
@@ -100,6 +123,7 @@
                     <thead>
                         <tr class="bg-gray-50/50 dark:bg-gray-900/40 divide-x divide-gray-200 dark:divide-gray-800 border-b border-gray-200 dark:border-gray-800">
                             <th scope="col" class="px-6 py-4 text-start text-xs font-bold text-gray-500 uppercase dark:text-gray-400 tracking-wide">Cliente / Expediente</th>
+                            <th scope="col" class="px-6 py-4 text-start text-xs font-bold text-gray-500 uppercase dark:text-gray-400 tracking-wide">Ubicación / Residencia</th>
                             <th scope="col" class="px-6 py-4 text-start text-xs font-bold text-gray-500 uppercase dark:text-gray-400 tracking-wide">Teléfonos Directos</th>
                             <th scope="col" class="px-6 py-4 text-start text-xs font-bold text-gray-500 uppercase dark:text-gray-400 tracking-wide">Zonas de Interés</th>
                             <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-gray-500 uppercase dark:text-gray-400 tracking-wide">Acciones</th>
@@ -110,7 +134,7 @@
                             <tr class="group hover:bg-gray-50/80 dark:hover:bg-indigo-500/5 transition-all duration-200 divide-x divide-gray-200 dark:divide-gray-800" wire:key="cliente-table-{{ $cliente->id }}">
                                 
                                 {{-- Cliente --}}
-                                <td class="px-6 py-2">
+                                <td class="px-6 py-3">
                                     <div class="text-sm font-bold text-gray-900 dark:text-white capitalize">
                                         {{ $cliente->nombre }} {{ $cliente->apellido_paterno }} {{ $cliente->apellido_materno }}
                                     </div>
@@ -119,36 +143,54 @@
                                     </div>
                                 </td>
 
-                                {{-- Teléfonos --}}
-                                <td class="px-6 py-2">
+                                {{-- Ubicación / Residencia --}}
+                                <td class="px-6 py-3">
+                                    @if($cliente->asentamiento)
+                                        <div class="text-xs font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1.5">
+                                            <i class="fa-solid fa-location-dot text-indigo-500 text-[11px] shrink-0"></i>
+                                            <span>{{ $cliente->asentamiento->nombre_asentamiento }}</span>
+                                        </div>
+                                        <div class="text-[11px] text-gray-500 dark:text-gray-400">
+                                            {{ $cliente->asentamiento->municipio }}, {{ $cliente->asentamiento->estado }} (C.P. {{ $cliente->asentamiento->codigo_postal }})
+                                        </div>
+                                        @if($cliente->calle_numero)
+                                            <div class="text-[11px] text-gray-400 italic truncate max-w-xs" title="{{ $cliente->calle_numero }}">
+                                                {{ $cliente->calle_numero }}
+                                            </div>
+                                        @endif
+                                    @else
+                                        <span class="text-xs text-gray-400 italic">Sin ubicación asignada</span>
+                                    @endif
+                                </td>
+
+                                {{-- Teléfonos Directos --}}
+                                <td class="px-6 py-3">
                                     <div class="space-y-1">
                                         @forelse($cliente->telefonos as $tel)
-                                            <a href="tel:{{ $tel->telefono }}" class="inline-flex items-center gap-1 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
+                                            <a href="tel:{{ $tel->telefono }}" class="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
                                                 <i class="fa-solid fa-phone text-[9px]"></i> {{ $tel->telefono }}
                                             </a>
                                         @empty
-                                            <span class="text-sm text-gray-400 italic">Sin teléfonos</span>
+                                            <span class="text-xs text-gray-400 italic">Sin teléfonos</span>
                                         @endforelse
                                     </div>
                                 </td>
 
-                                {{-- Zonas --}}
-                                <td class="px-6 py-2">
-                                    <div class="flex flex-wrap gap-1 ">
+                                {{-- Zonas de Interés --}}
+                                <td class="px-6 py-3">
+                                    <div class="flex flex-wrap gap-1">
                                         @forelse($cliente->zonasInteres as $zona)
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[12px] font-bold bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-500/20">
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-500/20">
                                                 C.P. {{ $zona->codigo_postal }} - {{ $zona->nombre_asentamiento }}
                                             </span>
                                         @empty
-                                            <span class="text-sm text-gray-400 italic">Sin zonas</span>
+                                            <span class="text-xs text-gray-400 italic">Sin zonas</span>
                                         @endforelse
                                     </div>
                                 </td>
 
-                                {{-- Acciones --}}
+                                {{-- Dropdown Acciones --}}
                                 <x-shared::form.dropdown-actions title="Opciones">
-                                    
-                                    {{-- Opción Editar Cliente --}}
                                     <x-shared::form.dropdown-item 
                                         :href="route('clientes.edit', $cliente->id)" 
                                         icon="fa-solid fa-user-pen"
@@ -156,7 +198,6 @@
                                         Editar Cliente
                                     </x-shared::form.dropdown-item>
 
-                                    {{-- Opción Dar de Baja / Eliminar --}}
                                     @if(checkPermiso('clientes.is_update'))
                                         <div class="my-1 border-t border-gray-100 dark:border-gray-800"></div>
 
@@ -168,12 +209,11 @@
                                             Dar de Baja Cliente
                                         </x-shared::form.dropdown-item>
                                     @endif
-
                                 </x-shared::form.dropdown-actions>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="px-6 py-12 text-center text-xs text-gray-500">Sin clientes registrados.</td>
+                                <td colspan="5" class="px-6 py-12 text-center text-xs text-gray-500">Sin clientes registrados.</td>
                             </tr>
                         @endforelse
                     </tbody>

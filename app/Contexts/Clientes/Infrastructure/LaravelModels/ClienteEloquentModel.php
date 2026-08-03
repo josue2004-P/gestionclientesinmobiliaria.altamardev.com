@@ -4,6 +4,7 @@ namespace App\Contexts\Clientes\Infrastructure\LaravelModels;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo; // 👈 Importar BelongsTo
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 use App\Contexts\Shared\Infrastructure\LaravelModels\AsentamientoEloquentModel;
@@ -18,6 +19,14 @@ class ClienteEloquentModel extends Model
         'correo_infonavit', 'contrasena_infonavit', 'tipo_redito_id',
         'precalificacion', 'avaluo_solicitado', 'estado_civil', 'regimen_casamiento'
     ];
+
+    /**
+     * Relación con el Asentamiento / Ubicación donde vive el cliente
+     */
+    public function asentamiento(): BelongsTo
+    {
+        return $this->belongsTo(AsentamientoEloquentModel::class, 'asentamiento_id');
+    }
 
     public function zonasInteres(): BelongsToMany
     {

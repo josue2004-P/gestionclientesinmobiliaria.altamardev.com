@@ -31,33 +31,47 @@ class EloquentClienteRepository implements ClienteRepositoryInterface
     {
         return ClienteEloquentModel::query()
             ->with([
+                'asentamiento',
                 'telefonos', 
                 'zonasInteres', 
                 'referencias'
             ])
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
+                    // 1. Campos directos del Cliente
                     $q->where('nombre', 'like', '%' . $search . '%')
-                      ->orWhere('apellido_paterno', 'like', '%' . $search . '%')
-                      ->orWhere('apellido_materno', 'like', '%' . $search . '%')
-                      ->orWhere('rfc', 'like', '%' . $search . '%')
-                      ->orWhere('curp', 'like', '%' . $search . '%')
-                      ->orWhere('nss', 'like', '%' . $search . '%')
-                      ->orWhere('correo_infonavit', 'like', '%' . $search . '%')
+                    ->orWhere('apellido_paterno', 'like', '%' . $search . '%')
+                    ->orWhere('apellido_materno', 'like', '%' . $search . '%')
+                    ->orWhere('rfc', 'like', '%' . $search . '%')
+                    ->orWhere('curp', 'like', '%' . $search . '%')
+                    ->orWhere('nss', 'like', '%' . $search . '%')
+                    ->orWhere('correo_infonavit', 'like', '%' . $search . '%')
+                    ->orWhere('calle_numero', 'like', '%' . $search . '%')
 
-                      ->orWhereHas('telefonos', function ($qTel) use ($search) {
-                          $qTel->where('telefono', 'like', '%' . $search . '%');
-                      })
+                    // 2. Búsqueda por Ubicación / Asentamiento donde vive actualmente
+                    ->orWhereHas('asentamiento', function ($qAsen) use ($search) {
+                        $qAsen->where('nombre_asentamiento', 'like', '%' . $search . '%')
+                                ->orWhere('codigo_postal', 'like', '%' . $search . '%')
+                                ->orWhere('municipio', 'like', '%' . $search . '%')
+                                ->orWhere('estado', 'like', '%' . $search . '%');
+                    })
 
-                      ->orWhereHas('referencias', function ($qRef) use ($search) {
-                          $qRef->where('nombre', 'like', '%' . $search . '%')
-                               ->orWhere('celular', 'like', '%' . $search . '%');
-                      })
+                    // 3. Búsqueda en Teléfonos
+                    ->orWhereHas('telefonos', function ($qTel) use ($search) {
+                        $qTel->where('telefono', 'like', '%' . $search . '%');
+                    })
 
-                      ->orWhereHas('zonasInteres', function ($qZona) use ($search) {
-                          $qZona->where('nombre_asentamiento', 'like', '%' . $search . '%')
+                    // 4. Búsqueda en Referencias
+                    ->orWhereHas('referencias', function ($qRef) use ($search) {
+                        $qRef->where('nombre', 'like', '%' . $search . '%')
+                            ->orWhere('celular', 'like', '%' . $search . '%');
+                    })
+
+                    // 5. Búsqueda en Zonas de Interés
+                    ->orWhereHas('zonasInteres', function ($qZona) use ($search) {
+                        $qZona->where('nombre_asentamiento', 'like', '%' . $search . '%')
                                 ->orWhere('codigo_postal', 'like', '%' . $search . '%');
-                      });
+                    });
                 });
             })
             ->latest('id')
