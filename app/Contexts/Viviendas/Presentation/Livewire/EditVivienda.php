@@ -5,8 +5,8 @@ namespace App\Contexts\Viviendas\Presentation\Livewire;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 use App\Contexts\Viviendas\Application\UseCases\FindViviendaByIdUseCase;
 use App\Contexts\Viviendas\Application\UseCases\SaveViviendaUseCase;
@@ -46,20 +46,7 @@ class EditVivienda extends Component
 
     public array $contactos = [];
     public array $documentos = [];
-
-    public $temporalFile;
-    public $temporalTipo = '';
-
     public array $fotos = [];
-    public $temporalFotoFile; 
-
-    public array $tiposDisponibles = [
-        'Escrituras' => 'Escrituras Públicas',
-        'Predial' => 'Boleta de Impuesto Predial',
-        'Identificacion' => 'Identificación Oficial Propietario',
-        'Plano' => 'Plano Arquitectónico / Poligonal',
-        'Contrato' => 'Contrato de Exclusividad',
-    ];
 
     protected array $rules = [
         'fraccionamiento'  => 'nullable|string|max:255',
@@ -197,130 +184,16 @@ class EditVivienda extends Component
         $this->contactos = array_values($this->contactos);
     }
 
-public function addDocumento()
-{
-    try {
-        // 🔍 Forzamos validación y atrapamos si falla
-        $this->validate([
-            'temporalFile' => 'required|file|max:10240',
-            'temporalTipo' => 'required|string',
-        ]);
-        
-        // 🔍 Si pasa, inspeccionamos el archivo antes de guardarlo
-        // dd($this->temporalFile);
-
-        $path = $this->temporalFile->store('viviendas/documentos', 'local');
-
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        // 💥 Si el error es por reglas de validación (Tamaño, tipo, etc.)
-        dd([
-            'Fase' => 'Validación de Documento Fallida',
-            'Errores' => $e->errors(),
-            'Datos Recibidos' => [
-                'temporalTipo' => $this->temporalTipo,
-                'temporalFile' => $this->temporalFile
-            ]
-        ]);
-    } catch (\Exception $e) {
-        // 💥 Si el error es de disco, permisos, Docker o PHP general
-        dd([
-            'Fase' => 'Excepción Crítica en Servidor (Documento)',
-            'Mensaje' => $e->getMessage(),
-            'Archivo' => $e->getFile(),
-            'Línea' => $e->getLine(),
-            'Trace' => $e->getTraceAsString()
-        ]);
-    }
-
-    $this->documentos[] = [
-        'id'              => null,
-        'url'             => $path,
-        'nombre_original' => $this->temporalFile->getClientOriginalName(),
-        'tipo_documento'  => $this->temporalTipo,
-        'peso_bytes'      => $this->temporalFile->getSize(),
-        'verificado'      => false,
-    ];
-
-    $this->reset(['temporalFile', 'temporalTipo']);
-}
-
-    public function removeDocumento($index)
+    #[On('vivienda-documentos-updated')]
+    public function updateDocumentos(array $documentos)
     {
-        if (isset($this->documentos[$index]['url'])) {
-            Storage::disk('local')->delete($this->documentos[$index]['url']);
-        }
-
-        unset($this->documentos[$index]);
-        $this->documentos = array_values($this->documentos);
+        $this->documentos = $documentos;
     }
 
-public function addFoto()
-{
-    try {
-        // 🔍 Forzamos validación y atrapamos si falla
-        $this->validate([
-            'temporalFotoFile' => 'required|image|max:5120',
-        ]);
-        
-        // 🔍 Si pasa, inspeccionamos las propiedades del archivo temporal
-        // dd($this->temporalFotoFile);
-
-        $path = $this->temporalFotoFile->store('viviendas/fotos', 'local');
-
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        // 💥 Si el error es por reglas de validación de la imagen
-        dd([
-            'Fase' => 'Validación de Foto Fallida',
-            'Errores' => $e->errors(),
-            'Datos Recibidos' => [
-                'temporalFotoFile' => $this->temporalFotoFile
-            ]
-        ]);
-    } catch (\Exception $e) {
-        // 💥 Si el error es de disco, permisos o manipulación de imagen
-        dd([
-            'Fase' => 'Excepción Crítica en Servidor (Foto)',
-            'Mensaje' => $e->getMessage(),
-            'Archivo' => $e->getFile(),
-            'Línea' => $e->getLine(),
-            'Trace' => $e->getTraceAsString()
-        ]);
-    }
-
-    $esPrincipal = count($this->fotos) === 0;
-
-    $this->fotos[] = [
-        'id'              => null,
-        'url'             => $path,
-        'nombre_original' => $this->temporalFotoFile->getClientOriginalName(),
-        'orden'           => count($this->fotos),
-        'es_principal'    => $esPrincipal,
-        'preview'         => $this->temporalFotoFile->temporaryUrl()
-    ];
-
-    $this->reset('temporalFotoFile');
-}
-
-    public function setFotoPrincipal($index)
+    #[On('vivienda-fotos-updated')]
+    public function updateFotos(array $fotos)
     {
-        foreach ($this->fotos as $key => $foto) {
-            $this->fotos[$key]['es_principal'] = ($key === $index);
-        }
-    }
-
-    public function removeFoto($index)
-    {
-        if (isset($this->fotos[$index]['url'])) {
-            \Illuminate\Support\Facades\Storage::disk('local')->delete($this->fotos[$index]['url']);
-        }
-
-        $fuePrincipal = $this->fotos[$index]['es_principal'];
-        unset($this->fotos[$index]);
-        $this->fotos = array_values($this->fotos);
-
-        if ($fuePrincipal && count($this->fotos) > 0) {
-            $this->fotos[0]['es_principal'] = true;
-        }
+        $this->fotos = $fotos;
     }
 
     public function save(
@@ -331,7 +204,9 @@ public function addFoto()
     ) {
         $this->validate();
 
-        DB::transaction(function() use ($useCase, $contactosUseCase, $documentosUseCase, $fotosUseCase) {
+        try {
+            DB::beginTransaction();
+
             $useCase->execute([
                 'id'               => $this->viviendaId,
                 'fraccionamiento'  => $this->fraccionamiento,
@@ -349,10 +224,16 @@ public function addFoto()
             $contactosUseCase->execute($this->viviendaId, $this->contactos);
             $documentosUseCase->execute($this->viviendaId, $this->documentos);
             $fotosUseCase->execute($this->viviendaId, $this->fotos);
-        });
 
-        session()->flash('success', 'Ficha de la propiedad actualizada correctamente.');
-        return redirect()->route('viviendas.index');
+            DB::commit();
+
+            session()->flash('success', 'Ficha de la propiedad actualizada correctamente.');
+            return redirect()->route('viviendas.index');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $this->addError('fraccionamiento', 'Error en el proceso de actualización: ' . $e->getMessage());
+        }
     }
     
     public function render() 

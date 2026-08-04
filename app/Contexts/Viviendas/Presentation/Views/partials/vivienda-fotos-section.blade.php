@@ -44,18 +44,36 @@
     @if(count($fotos) > 0)
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             @foreach($fotos as $index => $f)
+                @php
+                    // Resolver URL según origen (Existente en BD o Temporal)
+                    $fotoUrl = null;
+                    if (!empty($f['id'])) {
+                        $fotoUrl = route('viviendas.fotos.show', $f['id']);
+                    } elseif (!empty($f['preview'])) {
+                        $fotoUrl = $f['preview'];
+                    }
+                @endphp
+
                 <div 
                     wire:key="foto-card-{{ $index }}"
                     class="relative border border-gray-200 dark:border-gray-800 p-2.5 bg-white dark:bg-gray-900 rounded-xl group shadow-2xs transition-all hover:border-indigo-500/40"
                 >
                     <input type="hidden" wire:model="fotos.{{ $index }}.id">
                     
-                    {{-- Preview de la Imagen --}}
-                    <div class="aspect-video w-full bg-gray-100 dark:bg-gray-950 rounded-lg flex items-center justify-center overflow-hidden border border-gray-100 dark:border-gray-800">
-                        @if(!empty($f['id']))
-                            <img src="{{ route('viviendas.fotos.show', $f['id']) }}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
-                        @elseif(!empty($f['preview']))
-                            <img src="{{ $f['preview'] }}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
+                    {{-- Preview de la Imagen con Botón Flotante Overlay --}}
+                    <div class="aspect-video w-full bg-gray-100 dark:bg-gray-950 rounded-lg flex items-center justify-center overflow-hidden border border-gray-100 dark:border-gray-800 relative group/img">
+                        @if($fotoUrl)
+                            <img src="{{ $fotoUrl }}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
+                            
+                            {{-- Botón Flotante de Acceso Rápido --}}
+                            <a 
+                                href="{{ $fotoUrl }}" 
+                                target="_blank" 
+                                class="absolute top-2 right-2 p-1.5 rounded-lg bg-black/60 text-white hover:bg-black/80 backdrop-blur-xs transition-all opacity-0 group-hover/img:opacity-100 shadow-sm"
+                                title="Abrir imagen en pestaña nueva"
+                            >
+                                <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                            </a>
                         @endif
                     </div>
 
@@ -64,8 +82,10 @@
                         {{ $f['nombre_original'] }}
                     </div>
 
-                    {{-- Acciones (Fijar Principal / Eliminar) --}}
-                    <div class="mt-3 pt-2 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                    {{-- Acciones (Fijar Principal / Abrir / Eliminar) --}}
+                    <div class="mt-3 pt-2 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between gap-1">
+                        
+                        {{-- Marcar como Principal --}}
                         <button 
                             type="button" 
                             wire:click="setFotoPrincipal({{ $index }})" 
@@ -77,14 +97,29 @@
                             </span>
                         </button>
 
-                        <button 
-                            type="button" 
-                            wire:click="removeFoto({{ $index }})" 
-                            class="p-1.5 rounded-lg text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all"
-                            title="Eliminar foto"
-                        >
-                            <i class="fa-solid fa-trash-can text-xs"></i>
-                        </button>
+                        <div class="flex items-center gap-1">
+                            {{-- Botón Ver en Pestaña Nueva --}}
+                            @if($fotoUrl)
+                                <a 
+                                    href="{{ $fotoUrl }}" 
+                                    target="_blank" 
+                                    class="p-1.5 rounded-lg text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 transition-all flex items-center justify-center"
+                                    title="Ver en nueva pestaña"
+                                >
+                                    <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                                </a>
+                            @endif
+
+                            {{-- Botón Eliminar --}}
+                            <button 
+                                type="button" 
+                                wire:click="removeFoto({{ $index }})" 
+                                class="p-1.5 rounded-lg text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all flex items-center justify-center"
+                                title="Eliminar foto"
+                            >
+                                <i class="fa-solid fa-trash-can text-xs"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             @endforeach

@@ -79,18 +79,38 @@
                                     {{ $tiposDisponibles[$doc['tipo_documento']] ?? $doc['tipo_documento'] }}
                                 </span>
                                 <span>•</span>
-                                <span>{{ round($doc['peso_bytes'] / 1024, 2) }} KB</span>
+                                <span>{{ round(($doc['peso_bytes'] ?? 0) / 1024, 2) }} KB</span>
                                 <span>•</span>
-                                <span class="text-amber-600 dark:text-amber-400 font-bold flex items-center gap-1">
-                                    <i class="fa-solid fa-clock"></i> Pendiente por Guardar
-                                </span>
+                                @if(!empty($doc['id']))
+                                    <span class="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
+                                        <i class="fa-solid fa-circle-check"></i> En Servidor
+                                    </span>
+                                @else
+                                    <span class="text-amber-600 dark:text-amber-400 font-bold flex items-center gap-1">
+                                        <i class="fa-solid fa-clock"></i> Pendiente por Guardar
+                                    </span>
+                                @endif
                             </div>
                         </div>
                     </div>
 
                     <div class="flex items-center gap-2 self-end sm:self-center shrink-0">
-                        {{-- Previsualización limpia y segura --}}
-                        @if(isset($doc['file_instance']) && is_object($doc['file_instance']) && method_exists($doc['file_instance'], 'temporaryUrl'))
+                        
+                        {{-- CASO 1: Documento ya guardado en la Base de Datos --}}
+                        @if(!empty($doc['id']))
+                            <x-shared::form.button-form
+                                type="a"
+                                :href="route('viviendas.documentos.download', $doc['id'])"
+                                target="_blank"
+                                variant="secondary"
+                                class="h-9 px-3"
+                                title="Ver en nueva pestaña"
+                            >
+                                <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                            </x-shared::form.button-form>
+
+                        {{-- CASO 2: Documento temporal en proceso de carga --}}
+                        @elseif(isset($doc['file_instance']) && is_object($doc['file_instance']) && method_exists($doc['file_instance'], 'temporaryUrl'))
                             @php
                                 $tempUrl = null;
                                 try {
@@ -107,19 +127,20 @@
                                     target="_blank"
                                     variant="secondary"
                                     class="h-9 px-3"
-                                    title="Previsualizar"
+                                    title="Previsualizar archivo temporal"
                                 >
                                     <i class="fa-solid fa-eye text-xs"></i>
                                 </x-shared::form.button-form>
                             @endif
                         @endif
 
+                        {{-- Botón Quitar / Eliminar --}}
                         <x-shared::form.button-form
                             type="button"
                             variant="danger"
                             wire:click="removeDocumento({{ $index }})"
                             class="h-9 px-3"
-                            title="Quitar"
+                            title="Quitar de la lista"
                         >
                             <i class="fa-solid fa-trash-can text-xs"></i>
                         </x-shared::form.button-form>

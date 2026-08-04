@@ -53,11 +53,11 @@ class ViviendaFotosSection extends Component
 
     public function removeFoto($index)
     {
-        if (!empty($this->fotos[$index]['url'])) {
+        if (empty($this->fotos[$index]['id']) && !empty($this->fotos[$index]['url'])) {
             Storage::disk('local')->delete($this->fotos[$index]['url']);
         }
 
-        $fuePrincipal = $this->fotos[$index]['es_principal'];
+        $fuePrincipal = $this->fotos[$index]['es_principal'] ?? false;
         unset($this->fotos[$index]);
         $this->fotos = array_values($this->fotos);
 

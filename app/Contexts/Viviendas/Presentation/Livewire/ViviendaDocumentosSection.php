@@ -52,7 +52,7 @@ class ViviendaDocumentosSection extends Component
 
     public function removeDocumento($index)
     {
-        if (!empty($this->documentos[$index]['url'])) {
+        if (empty($this->documentos[$index]['id']) && !empty($this->documentos[$index]['url'])) {
             Storage::disk('local')->delete($this->documentos[$index]['url']);
         }
 

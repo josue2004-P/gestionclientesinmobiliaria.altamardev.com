@@ -169,24 +169,34 @@
                             <tr class="group hover:bg-gray-50/80 dark:hover:bg-indigo-500/5 transition-all duration-200 divide-x divide-gray-200 dark:divide-gray-800" wire:key="vivienda-row-{{ $vivienda->id }}">
                                 
                                 {{-- Ubicación & Ficha --}}
-                                <td class="px-6 py-2">
+                                <td class="px-6 py-2 group/card">
                                     <div class="flex items-start gap-3">
-                                        <div class="h-10 w-10 rounded-md bg-gray-50 dark:bg-gray-900 flex items-center justify-center text-gray-400 dark:text-gray-500 group-hover:bg-indigo-600 group-hover:text-white dark:group-hover:bg-indigo-500 transition-all duration-300 shadow-xs border border-gray-200 dark:border-gray-800 shrink-0 mt-0.5">
-                                            <i class="fa-solid fa-building-circle-check text-xs"></i>
+                                        {{-- Contenedor del Icono con Hover Corregido --}}
+                                        <div class="h-10 w-10 rounded-xl bg-gray-100/80 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 border border-gray-200/80 dark:border-gray-700/60 flex items-center justify-center shrink-0 mt-0.5 transition-all duration-300 shadow-2xs group-hover/card:bg-indigo-600 group-hover/card:text-white group-hover/card:border-indigo-600 dark:group-hover/card:bg-indigo-500 dark:group-hover/card:border-indigo-500 group-hover/card:shadow-md group-hover/card:shadow-indigo-500/20">
+                                            <i class="fa-solid fa-building-circle-check text-sm transition-transform duration-300 group-hover/card:scale-110"></i>
                                         </div>
+
                                         <div>
-                                            <div class="text-sm font-bold text-gray-900 dark:text-white tracking-tight group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors uppercase">
+                                            {{-- Título / Fraccionamiento --}}
+                                            <div class="text-sm font-bold text-gray-900 dark:text-white tracking-tight group-hover/card:text-indigo-600 dark:group-hover/card:text-indigo-400 transition-colors uppercase">
                                                 {{ $vivienda->fraccionamiento ?? 'Desarrollo Independiente' }}
                                             </div>
-                                            <div class="text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5 max-w-xs truncate uppercase">
-                                                <i class="fa-solid fa-location-dot text-[10px] text-gray-400 mr-1"></i>{{ $vivienda->direccion }}
+
+                                            {{-- Dirección --}}
+                                            <div class="text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5 max-w-xs truncate uppercase flex items-center gap-1">
+                                                <i class="fa-solid fa-location-dot text-[11px] text-gray-400 dark:text-gray-500 shrink-0"></i>
+                                                <span class="truncate">{{ $vivienda->direccion }}</span>
                                             </div>
+
+                                            {{-- Asentamiento & Código Postal --}}
                                             @if($vivienda->asentamiento)
-                                                <div class="text-[10px] font-mono font-bold text-indigo-600 dark:text-indigo-400 mt-1 uppercase tracking-wider flex items-center gap-1">
-                                                    <span class="bg-indigo-50 dark:bg-indigo-500/10 px-1.5 py-0.5 rounded border border-indigo-100 dark:border-indigo-500/20">
+                                                <div class="text-[10px] font-mono font-bold text-indigo-600 dark:text-indigo-400 mt-1 uppercase tracking-wider flex items-center gap-1.5">
+                                                    <span class="bg-indigo-50 dark:bg-indigo-500/10 px-1.5 py-0.5 rounded-md border border-indigo-100 dark:border-indigo-500/20">
                                                         C.P. {{ $vivienda->asentamiento->codigo_postal }}
                                                     </span>
-                                                    <span class="truncate max-w-[180px] uppercase">{{ $vivienda->asentamiento->nombre_asentamiento }}</span>
+                                                    <span class="truncate max-w-[180px] uppercase font-sans text-gray-600 dark:text-gray-300 font-medium">
+                                                        {{ $vivienda->asentamiento->nombre_asentamiento }}
+                                                    </span>
                                                 </div>
                                             @endif
                                         </div>
