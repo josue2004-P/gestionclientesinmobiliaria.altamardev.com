@@ -26,14 +26,27 @@
                 
                 <x-slot:footer>
                     <div class="flex items-center justify-between">
-                        <a href="{{ route('viviendas.index') }}" class="inline-flex items-center text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-red-550 transition-colors">
+                        {{-- Botón Cancelar  --}}
+                        <x-shared::form.link 
+                            :href="route('viviendas.index')" 
+                            danger
+                        >
                             <i class="fa-solid fa-xmark mr-2 text-sm"></i> Cancelar
-                        </a>
-                        <x-shared::form.button-primary type="submit" class="shadow-lg px-5 h-11 text-xs" wire:loading.attr="disabled" wire:target="save">
-                            <i class="fa-solid fa-circle-check mr-2" wire:loading.remove wire:target="save"></i>
-                            <i class="fa-solid fa-circle-notch animate-spin mr-2" wire:loading wire:target="save"></i> 
-                            <span>Guardar Cambios</span>
-                        </x-shared::form.button-primary>
+                        </x-shared::form.link>
+
+                        {{-- Botón Guardar / Acción con soporte Livewire --}}
+                        <x-shared::form.button-form 
+                            type="submit" 
+                            variant="primary" 
+                            size="md"
+                            wire:loading.attr="disabled"
+                            wire:target="save"
+                        >
+                            <i class="fa-solid fa-floppy-disk text-sm" wire:loading.remove wire:target="save"></i>
+                            <i class="fa-solid fa-circle-notch animate-spin text-sm" wire:loading wire:target="save"></i>
+                            <span class="" wire:loading.remove wire:target="save">Guardar Cambios</span>
+                            <span class="" wire:loading wire:target="save">Procesando...</span>
+                        </x-shared::form.button-form>
                     </div>
                 </x-slot:footer>
             </x-shared::common.component-card>

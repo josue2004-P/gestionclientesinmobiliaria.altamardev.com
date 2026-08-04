@@ -170,16 +170,25 @@
                 {{-- Footer con alineación y contraste perfecto --}}
                 <x-slot:footer>
                     <div class="flex items-center justify-between">
-                        <a href="{{ route('usuarios.index') }}"
-                            class="inline-flex items-center text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-red-555 dark:text-gray-400 dark:hover:text-red-400 transition-colors duration-150">
-                            <i class="fa-solid fa-xmark mr-2 text-sm"></i> Cancelar Registro
-                        </a>
-                        
-                        <x-shared::form.button-primary type="submit" class="shadow-lg shadow-indigo-500/10 dark:shadow-indigo-500/5 px-5 h-11 text-xs" wire:loading.attr="disabled">
-                            <i class="fa-solid fa-user-check mr-2 text-sm" wire:loading.remove></i>
-                            <i class="fa-solid fa-circle-notch animate-spin mr-2 text-sm" wire:loading></i>
-                            <span>Crear y Guardar</span>
-                        </x-shared::form.button-primary>
+                        <x-shared::form.link 
+                            :href="route('usuarios.index')" 
+                            danger
+                        >
+                            <i class="fa-solid fa-xmark mr-2 text-sm"></i> Cancelar
+                        </x-shared::form.link>
+                        {{-- Botón de Guardar Cambios (Primary) --}}
+                        <div class="w-full sm:w-auto">
+                            <x-shared::form.button-form 
+                                type="submit" 
+                                size="md"
+                                wire:loading.attr="disabled"
+                                class="w-full sm:w-auto"
+                            >
+                                <i class="fa-solid fa-floppy-disk" wire:loading.remove></i>
+                                <i class="fa-solid fa-circle-notch animate-spin" wire:loading></i>
+                                <span>Guardar Cambios</span>
+                            </x-shared::form.button-form>
+                        </div>
                     </div>
                 </x-slot:footer>
 

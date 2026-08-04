@@ -1,48 +1,117 @@
 <div class="md:col-span-3 pt-6 mt-4 border-t-2 border-dashed border-gray-200 dark:border-gray-800">
-    <div class="flex items-center justify-between mb-4">
+    {{-- Encabezado de la Sección --}}
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
         <div>
-            <span class="block text-sm font-black uppercase tracking-tight text-gray-900 dark:text-white">Contactos Relacionados Propietario / Llaves</span>
-            <p class="text-xs text-gray-400 dark:text-gray-550 font-medium">Asigne números telefónicos de administradores, dueños anteriores o agentes con acceso al inmueble.</p>
+            <span class="block text-sm font-extrabold uppercase tracking-tight text-gray-900 dark:text-white">
+                Contactos Relacionados Propietario / Llaves
+            </span>
+            <p class="text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5">
+                Asigne números telefónicos de administradores, dueños anteriores o agentes con acceso al inmueble.
+            </p>
         </div>
-        <button type="button" wire:click="addContacto" class="inline-flex items-center justify-center px-3 h-9 text-xs font-bold uppercase border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900 rounded-none transition-colors">
-            <i class="fa-solid fa-plus mr-2 text-indigo-600"></i> Añadir Contacto
-        </button>
+
+        {{-- Botón Agregar Contacto --}}
+        <x-shared::form.button-form
+            type="button"
+            variant="secondary"
+            wire:click="addContacto"
+            class="shrink-0"
+        >
+            <i class="fa-solid fa-plus text-indigo-600 dark:text-indigo-400"></i>
+            <span>Añadir Contacto</span>
+        </x-shared::form.button-form>
     </div>
 
+    {{-- Lista Dinámica de Contactos --}}
     <div class="space-y-4">
         @foreach($contactos as $index => $contacto)
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 border border-gray-200 dark:border-gray-800 bg-gray-50/30 dark:bg-gray-900/10 relative rounded-none" wire:key="contacto-row-{{ $index }}">
+            <div 
+                wire:key="contacto-row-{{ $index }}"
+                class="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50/40 dark:bg-gray-900/20 relative shadow-2xs transition-all"
+            >
                 <input type="hidden" wire:model="contactos.{{ $index }}.id">
                 
+                {{-- Nombre Completo --}}
                 <div class="md:col-span-3">
-                    <label class="block text-[10px] font-bold text-gray-400 dark:text-gray-550 uppercase tracking-wider mb-1">Nombre Completo</label>
-                    <x-shared::form.text-input type="text" wire:model="contactos.{{ $index }}.nombre" placeholder="ej: Juan Pérez" class="w-full text-xs font-bold h-9 rounded-none" />
+                    <x-shared::form.input-label for="contacto_nombre_{{ $index }}" :value="__('Nombre Completo')" required />
+                    <div class="mt-1">
+                        <x-shared::form.text-input 
+                            id="contacto_nombre_{{ $index }}"
+                            type="text" 
+                            wire:model="contactos.{{ $index }}.nombre" 
+                            placeholder="ej: Juan Pérez" 
+                            :messages="$errors->get('contactos.' . $index . '.nombre')"
+                        />
+                    </div>
                 </div>
                 
+                {{-- Relación / Vínculo --}}
                 <div class="md:col-span-2">
-                    <label class="block text-[10px] font-bold text-gray-400 dark:text-gray-550 uppercase tracking-wider mb-1">Relación / Vínculo</label>
-                    <x-shared::form.text-input type="text" wire:model="contactos.{{ $index }}.relacion" placeholder="ej: Propietario, Vecino" class="w-full text-xs font-medium h-9 rounded-none" />
+                    <x-shared::form.input-label for="contacto_relacion_{{ $index }}" :value="__('Relación / Vínculo')" />
+                    <div class="mt-1">
+                        <x-shared::form.text-input 
+                            id="contacto_relacion_{{ $index }}"
+                            type="text" 
+                            wire:model="contactos.{{ $index }}.relacion" 
+                            placeholder="ej: Propietario" 
+                            :messages="$errors->get('contactos.' . $index . '.relacion')"
+                        />
+                    </div>
                 </div>
                 
+                {{-- Teléfono --}}
                 <div class="md:col-span-2">
-                    <label class="block text-[10px] font-bold text-gray-400 dark:text-gray-550 uppercase tracking-wider mb-1">Teléfono</label>
-                    <x-shared::form.text-input type="text" wire:model="contactos.{{ $index }}.telefono" placeholder="10 dígitos" class="w-full text-xs font-mono font-bold h-9 rounded-none" />
+                    <x-shared::form.input-label for="contacto_telefono_{{ $index }}" :value="__('Teléfono')" />
+                    <div class="mt-1">
+                        <x-shared::form.text-input 
+                            id="contacto_telefono_{{ $index }}"
+                            type="text" 
+                            wire:model="contactos.{{ $index }}.telefono" 
+                            placeholder="10 dígitos" 
+                            :messages="$errors->get('contactos.' . $index . '.telefono')"
+                        />
+                    </div>
                 </div>
                 
+                {{-- Correo Electrónico --}}
                 <div class="md:col-span-2">
-                    <label class="block text-[10px] font-bold text-gray-400 dark:text-gray-550 uppercase tracking-wider mb-1">Correo Electrónico</label>
-                    <x-shared::form.text-input type="email" wire:model="contactos.{{ $index }}.correo" placeholder="ejemplo@mail.com" class="w-full text-xs font-medium h-9 rounded-none" />
+                    <x-shared::form.input-label for="contacto_correo_{{ $index }}" :value="__('Correo Electrónico')" />
+                    <div class="mt-1">
+                        <x-shared::form.text-input 
+                            id="contacto_correo_{{ $index }}"
+                            type="email" 
+                            wire:model="contactos.{{ $index }}.correo" 
+                            placeholder="ejemplo@mail.com" 
+                            :messages="$errors->get('contactos.' . $index . '.correo')"
+                        />
+                    </div>
                 </div>
                 
+                {{-- Notas Cortas --}}
                 <div class="md:col-span-2">
-                    <label class="block text-[10px] font-bold text-gray-400 dark:text-gray-550 uppercase tracking-wider mb-1">Notas Cortas</label>
-                    <x-shared::form.text-input type="text" wire:model="contactos.{{ $index }}.notes" placeholder="ej: Horarios de atención" class="w-full text-xs font-medium h-9 rounded-none" />
+                    <x-shared::form.input-label for="contacto_notes_{{ $index }}" :value="__('Notas Cortas')" />
+                    <div class="mt-1">
+                        <x-shared::form.text-input 
+                            id="contacto_notes_{{ $index }}"
+                            type="text" 
+                            wire:model="contactos.{{ $index }}.notes" 
+                            placeholder="Horarios, etc." 
+                            :messages="$errors->get('contactos.' . $index . '.notes')"
+                        />
+                    </div>
                 </div>
 
-                <div class="md:col-span-1 flex items-end justify-center pb-0.5">
-                    <button type="button" wire:click="removeContacto({{ $index }})" class="h-9 w-full border border-red-200 dark:border-red-900/30 bg-red-50/50 hover:bg-red-100 text-red-600 dark:bg-red-950/20 dark:text-red-400 dark:hover:bg-red-950/50 transition-colors flex items-center justify-center rounded-none shadow-xs">
-                        <i class="fa-solid fa-trash-can text-xs"></i>
-                    </button>
+                {{-- Botón Eliminar Fila --}}
+                <div class="md:col-span-1 flex items-end justify-center">
+                    <x-shared::form.button-form
+                        type="button"
+                        variant="danger"
+                        wire:click="removeContacto({{ $index }})"
+                        class="w-full h-11 justify-center"
+                        title="Eliminar contacto"
+                    >
+                        <i class="fa-solid fa-trash-can text-sm"></i>
+                    </x-shared::form.button-form>
                 </div>
             </div>
         @endforeach

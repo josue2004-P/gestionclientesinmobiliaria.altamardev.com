@@ -4,7 +4,7 @@
     'messages' => [],
     'required' => false,
     'accept' => '*/*',
-    'file' => null, // 🟢 Ahora es opcional y por defecto es null
+    'file' => null,
 ])
 
 <div class="w-full">
@@ -36,36 +36,45 @@
             />
 
             {{-- Indicador de Carga --}}
-            <div x-show="isUploading" class="flex items-center gap-2 text-brand-600 dark:text-brand-400 text-xs font-medium shrink-0">
+            <div x-show="isUploading" class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 text-xs font-medium shrink-0">
                 <i class="fa-solid fa-circle-notch animate-spin"></i>
                 <span x-text="progress + '%'" class="text-[10px] font-mono font-bold"></span>
             </div>
 
-            {{-- Previsualización temporal --}}
-            @if ($file && !is_string($file))
-                <div x-show="!isUploading">
-                    @try {
+            {{-- Previsualización temporal segura --}}
+            @if ($file && is_object($file) && method_exists($file, 'temporaryUrl'))
+                @php
+                    $tempUrl = null;
+                    try {
+                        $tempUrl = $file->temporaryUrl();
+                    } catch (\Throwable $e) {
+                        $tempUrl = null;
+                    }
+                @endphp
+
+                <div x-show="!isUploading" class="shrink-0">
+                    @if ($tempUrl)
                         <a 
-                            href="{{ $file->temporaryUrl() }}" 
+                            href="{{ $tempUrl }}" 
                             target="_blank" 
-                            class="inline-flex items-center gap-1.5 px-2 py-1 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 rounded transition-colors text-xs font-bold shrink-0" 
+                            class="inline-flex items-center gap-1.5 px-2 py-1 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 rounded transition-colors text-xs font-bold" 
                             title="Ver archivo temporal"
                         >
                             <i class="fa-solid fa-eye animate-pulse text-[11px]"></i> 
                             <span class="text-[10px] font-bold uppercase tracking-wider">Ver</span>
                         </a>
-                    } @catch (\Exception $e) {
-                        <span class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded text-[10px] font-bold uppercase tracking-wider shrink-0">
+                    @else
+                        <span class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded text-[10px] font-bold uppercase tracking-wider">
                             <i class="fa-solid fa-paperclip text-[10px]"></i> Listo
                         </span>
-                    }
+                    @endif
                 </div>
             @endif
         </div>
 
         {{-- Barra de Progreso --}}
         <div x-show="isUploading" class="w-full bg-gray-200 dark:bg-gray-800 h-1 rounded-full overflow-hidden mt-1">
-            <div class="bg-brand-500 h-full transition-all duration-150" :style="'width: ' + progress + '%'"></div>
+            <div class="bg-indigo-500 h-full transition-all duration-150" :style="'width: ' + progress + '%'"></div>
         </div>
     </div>
 

@@ -1,6 +1,6 @@
 {{-- Estado --}}
 <div wire:key="geo-shared-estado-block">
-    <x-shared::form.input-label for="selectedEstado" :value="__('Estado / Entidad')" class="text-gray-700 dark:text-gray-300"/>
+    <x-shared::form.input-label for="selectedEstado" :value="__('Estado / Entidad')" />
     <div class="mt-1.5">
         <x-shared::form.input-select id="selectedEstado" wire:model.live="selectedEstado">
             <option value="">-- SELECCIONAR ESTADO --</option>
@@ -14,7 +14,7 @@
 
 {{-- Municipio --}}
 <div wire:key="geo-shared-municipio-block-{{ $selectedEstado }}">
-    <x-shared::form.input-label for="selectedMunicipio" :value="__('Municipio / Alcaldía')" class="text-gray-700 dark:text-gray-300"/>
+    <x-shared::form.input-label for="selectedMunicipio" :value="__('Municipio / Alcaldía')" />
     <div class="mt-1.5">
         <x-shared::form.input-select id="selectedMunicipio" wire:model.live="selectedMunicipio" :disabled="empty($selectedEstado)">
             <option value="">-- SELECCIONAR MUNICIPIO --</option>
@@ -28,7 +28,7 @@
 
 {{-- Ciudad --}}
 <div wire:key="geo-shared-ciudad-block-{{ $selectedMunicipio }}">
-    <x-shared::form.input-label for="selectedCiudad" :value="__('Ciudad / Localidad')" class="text-gray-700 dark:text-gray-300"/>
+    <x-shared::form.input-label for="selectedCiudad" :value="__('Ciudad / Localidad')" />
     <div class="mt-1.5">
         <x-shared::form.input-select id="selectedCiudad" wire:model.live="selectedCiudad" :disabled="empty($selectedMunicipio)">
             <option value="">-- SELECCIONAR CIUDAD --</option>
@@ -42,7 +42,7 @@
 
 {{-- Asentamiento --}}
 <div wire:key="geo-shared-asentamiento-block-{{ $selectedCiudad }}" class="md:col-span-1">
-    <x-shared::form.input-label for="asentamiento_id" :value="__('Ubicación Postal / Asentamiento')" required class="text-gray-700 dark:text-gray-300"/>
+    <x-shared::form.input-label for="asentamiento_id" :value="__('Ubicación Postal / Asentamiento')" required />
     <div class="mt-1.5">
         <x-shared::form.searchable-select id="asentamiento_id" wire:model="asentamiento_id" liveSearch="searchAsentamiento" placeholder="Buscar por C.P. o Colonia...">
             @if(count($this->asentamientos) === 0)
@@ -60,18 +60,28 @@
 
 {{-- Precio Lista --}}
 <div>
-    <x-shared::form.input-label for="precio_lista" :value="__('Precio de Lista ($)')" required class="text-gray-700 dark:text-gray-300"/>
+    <x-shared::form.input-label for="precio_lista" :value="__('Precio de Lista')" required />
     <div class="mt-1.5">
-        <x-shared::form.text-input id="precio_lista" type="number" step="0.01" wire:model="precio_lista" placeholder="0.00" class="w-full font-mono font-bold" />
+        <x-shared::form.money-input 
+            id="precio_lista" 
+            wire:model="precio_lista" 
+            placeholder="0.00" 
+            :messages="$errors->get('precio_lista')"
+        />
     </div>
     <x-shared::form.input-error :messages="$errors->get('precio_lista')" class="mt-2" />
 </div>
 
 {{-- Recámaras --}}
 <div>
-    <x-shared::form.input-label for="recamaras" :value="__('Número de Recámaras')" required class="text-gray-700 dark:text-gray-300"/>
+    <x-shared::form.input-label for="recamaras" :value="__('Número de Recámaras')" required />
     <div class="mt-1.5">
-        <x-shared::form.text-input id="recamaras" type="number" wire:model="recamaras" class="w-full font-medium" />
+        <x-shared::form.number-input 
+            id="recamaras" 
+            wire:model="recamaras" 
+            placeholder="0"
+            :messages="$errors->get('recamaras')" 
+        />
     </div>
     <x-shared::form.input-error :messages="$errors->get('recamaras')" class="mt-2" />
 </div>
@@ -80,6 +90,6 @@
 <div class="md:col-span-3">
     <x-shared::form.input-label for="direccion" :value="__('Dirección Completa (Calle, Número, Interno)')" required/>
     <div class="mt-1.5">
-        <x-shared::form.textarea-input id="direccion" wire:model="direccion" placeholder="Ingresa la calle, número exterior y número de lote exacto..." :messages="$errors->get('direccion')" class="w-full text-sm font-medium h-24 rounded-none" />
+        <x-shared::form.textarea-input id="direccion" wire:model="direccion" placeholder="Ingresa la calle, número exterior y número de lote exacto..." :messages="$errors->get('direccion')"  />
     </div>
 </div>

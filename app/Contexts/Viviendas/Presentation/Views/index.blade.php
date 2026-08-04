@@ -268,17 +268,30 @@
                                 </td>
 
                                 {{-- Acciones --}}
-                                <td class="px-6 py-2 text-center whitespace-nowrap z-30">
-                                    <div class="flex items-center justify-center gap-1">
-                                        <a href="{{ route('viviendas.edit', $vivienda->id) }}" class="p-2 rounded-xl text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-all shadow-xs" title="Editar Propiedad">
-                                            <i class="fa-solid fa-pen-to-square text-base"></i>
-                                        </a>
-                                        
-                                        <button type="button" wire:click="confirmDelete({{ $vivienda->id }})" class="p-2 rounded-xl text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all shadow-xs" title="Dar de Baja">
-                                            <i class="fa-solid fa-trash-can text-base"></i>
-                                        </button>
-                                    </div>
-                                </td>
+                                <x-shared::form.dropdown-actions title="Opciones">
+                                    
+                                    {{-- Opción Editar Propiedad --}}
+                                    <x-shared::form.dropdown-item 
+                                        :href="route('viviendas.edit', $vivienda->id)" 
+                                        icon="fa-solid fa-pen-to-square"
+                                    >
+                                        Editar Propiedad
+                                    </x-shared::form.dropdown-item>
+
+                                    {{-- Opción Dar de Baja / Eliminar --}}
+                                    @if(checkPermiso('viviendas.is_update'))
+                                        <div class="my-1 border-t border-gray-100 dark:border-gray-800"></div>
+
+                                        <x-shared::form.dropdown-item 
+                                            wire:click="confirmDelete({{ $vivienda->id }})" 
+                                            icon="fa-solid fa-trash-can" 
+                                            variant="danger"
+                                        >
+                                            Dar de Baja Propiedad
+                                        </x-shared::form.dropdown-item>
+                                    @endif
+
+                                </x-shared::form.dropdown-actions>
                             </tr>
                         @empty
                             <tr>
