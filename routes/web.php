@@ -48,8 +48,8 @@ use App\Contexts\Shared\Presentation\Livewire\Amenidades\EditAmenidad;
 use App\Contexts\Viviendas\Presentation\Livewire\IndexViviendas;
 use App\Contexts\Viviendas\Presentation\Livewire\CreateVivienda;
 use App\Contexts\Viviendas\Presentation\Livewire\EditVivienda;
-use App\Contexts\Viviendas\Presentation\Controllers\ViviendaDocumentoController;
-use App\Contexts\Viviendas\Presentation\Controllers\ViviendaFotoController;
+use App\Contexts\Viviendas\Presentation\Http\Controllers\ViviendaDocumentoController;
+use App\Contexts\Viviendas\Presentation\Http\Controllers\ViviendaFotoController;
 
 // --- IMPORTACIONES MÓDULO 6: CLIENTES ---
 use App\Contexts\Clientes\Presentation\Livewire\IndexClientes;

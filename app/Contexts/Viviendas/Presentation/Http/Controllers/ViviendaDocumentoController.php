@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Contexts\Viviendas\Presentation\Controllers;
+namespace App\Contexts\Viviendas\Presentation\Http\Controllers;
 
 use App\Contexts\Shared\Infrastructure\Controllers\Controller;
 use App\Contexts\Viviendas\Infrastructure\LaravelModels\ViviendaDocumentoEloquentModel;

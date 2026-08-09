@@ -22,6 +22,9 @@ use App\Contexts\Shared\Application\UseCases\TiposVivienda\GetTiposViviendaForSe
 use App\Contexts\Shared\Application\UseCases\TiposCredito\GetTiposCreditoForSelectUseCase;
 use App\Contexts\Shared\Application\UseCases\Amenidades\GetAmenidadesForSelectUseCase;
 
+// IMPORTACIÓN DEL REQUEST DE EDICIÓN
+use App\Contexts\Viviendas\Presentation\Http\Requests\EditViviendaRequest;
+
 class EditVivienda extends Component
 {
     use WithFileUploads;
@@ -47,19 +50,6 @@ class EditVivienda extends Component
     public array $contactos = [];
     public array $documentos = [];
     public array $fotos = [];
-
-    protected array $rules = [
-        'fraccionamiento'  => 'nullable|string|max:255',
-        'asentamiento_id'  => 'required|exists:asentamientos,id',
-        'tipo_vivienda_id' => 'required|exists:tipos_vivienda,id',
-        'precio_lista'     => 'required|numeric|min:0',
-        'recamaras'        => 'required|integer|min:0',
-        'direccion'        => 'required|string',
-        'llaves'           => 'required|boolean',
-        'estatus_vivienda' => 'required|in:Disponible,Apartada,Vendida,Rentada,Mantenimiento,Suspendida',
-        'creditos_ids'     => 'nullable|array',
-        'amenidades_ids'   => 'nullable|array',
-    ];
 
     #[Computed]
     public function estados()
@@ -202,7 +192,13 @@ class EditVivienda extends Component
         SaveViviendaDocumentosUseCase $documentosUseCase,
         SaveViviendaFotosUseCase $fotosUseCase
     ) {
-        $this->validate();
+        $req = new EditViviendaRequest($this->viviendaId);
+
+        $validatedData = $this->validate(
+            $req->rules(),
+            $req->messages(),
+            $req->attributes()
+        );
 
         try {
             DB::beginTransaction();
