@@ -39,11 +39,10 @@
         <div class="space-y-2.5 max-h-60 overflow-y-auto pr-1">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 @foreach($this->amenidadesDisponibles as $am) 
-                    @php $amData = $am->toArray(); @endphp
                     <x-shared::form.checkbox-input
-                        value="{{ $amData['id'] }}" 
+                        value="{{ $am['id'] }}" 
                         wire:model="amenidades_ids"
-                        :label="$amData['nombre']"
+                        :label="$am['nombre']"
                     />
                 @endforeach
             </div>
