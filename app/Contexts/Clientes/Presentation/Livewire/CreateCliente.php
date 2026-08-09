@@ -19,6 +19,8 @@ use App\Contexts\Shared\Application\UseCases\Asentamientos\GetUniqueCiudadesUseC
 use App\Contexts\Shared\Application\UseCases\TiposCredito\GetTiposCreditoForSelectUseCase;
 use App\Contexts\Shared\Application\UseCases\Asentamientos\GetAllAsentamientosUseCase; 
 
+use App\Contexts\Clientes\Presentation\Http\Requests\SaveClienteRequest;
+
 class CreateCliente extends Component
 {
     public string $searchAsentamiento = '';
@@ -167,49 +169,22 @@ class CreateCliente extends Component
         $this->referencias = array_values($this->referencias);
     }
 
-    protected function rules(): array
-    {
-        return [
-            'nombre' => 'required|string|max:255',
-            'apellido_paterno' => 'required|string|max:255',
-            'apellido_materno' => 'required|string|max:255',
-            'fecha_nacimiento' => 'nullable|date',
-            'rfc' => 'nullable|string|max:13|unique:clientes,rfc',
-            'curp' => 'nullable|string|max:18|unique:clientes,curp',
-            'asentamiento_id' => 'nullable|integer|exists:asentamientos,id',
-            'calle_numero' => 'nullable|string|max:255',
-            'nss' => 'nullable|string|max:15',
-            'correo_infonavit' => 'nullable|email|max:255',
-            'contrasena_infonavit' => 'nullable|string|max:255',
-            'tipo_credito_id' => 'nullable|integer',
-            'precalificacion' => 'nullable|numeric|min:0',
-            'avaluo_solicitado' => 'required|in:Sí,No',
-            'estado_civil' => 'nullable|in:Soltero,Casado,Divorciado,Viudo,Union_Libre',
-            'regimen_casamiento' => 'nullable|string|max:100',
-            'zonas_ids' => 'nullable|array',
-            'zonas_ids.*' => 'integer|exists:asentamientos,id',
 
-            // Validaciones de Relaciones (1:N)
-            'telefonos'                 => 'required|array|min:1',
-            'telefonos.*.id'            => 'nullable|integer',
-            'telefonos.*.telefono'      => 'required|string|min:8|max:20',
-            'telefonos.*.tipo_telefono' => 'required|string|max:50',
-            'referencias'               => 'nullable|array',
-            'referencias.*.id'          => 'nullable|integer',
-            'referencias.*.nombre'      => 'required|string|max:255',
-            'referencias.*.celular'     => 'nullable|string|max:20',
-            'referencias.*.parentesco'   => 'nullable|string|max:100',
-        ];
-    }
-
+    
     public function store(
         SaveClienteUseCase $saveClienteUseCase,
         SaveClienteTelefonosUseCase $telefonosUseCase,
         SaveClienteReferenciasUseCase $referenciasUseCase,
         SaveClienteDocumentosUseCase $documentosUseCase
     ) {
-        $validatedData = $this->validate();
+        $request = new SaveClienteRequest();
 
+        $validatedData = $this->validate(
+            $request->rules(),
+            $request->messages(),
+            $request->attributes()
+        );
+        
         try {
             // 1. Guardar cliente base
             $clienteId = $saveClienteUseCase->execute([
