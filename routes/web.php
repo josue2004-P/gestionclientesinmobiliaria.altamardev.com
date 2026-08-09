@@ -7,6 +7,7 @@ use App\Contexts\Dashboard\Presentation\Livewire\DashboardPage;
 
 use App\Contexts\Public\Presentation\Livewire\WelcomePage;
 use App\Contexts\Public\Presentation\Livewire\ContactPage;
+use App\Contexts\Public\Presentation\Livewire\CatalogoPage;
 
 use App\Contexts\Security\Presentation\Livewire\Permisos\IndexPermisos;
 use App\Contexts\Security\Presentation\Livewire\Permisos\CreatePermiso;
@@ -58,6 +59,7 @@ use App\Contexts\Clientes\Presentation\Http\Controllers\VerClienteDocumentoContr
 
 Route::get('/', WelcomePage::class)->name('home');
 Route::get('/contacto', ContactPage::class)->name('contactar');
+Route::get('/catalogo', CatalogoPage::class)->name('public.catalogo');
 
 Route::middleware(['auth'])->group(function () {
 
