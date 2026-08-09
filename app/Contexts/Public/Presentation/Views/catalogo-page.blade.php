@@ -61,69 +61,74 @@
                     </select>
                 </div>
 
-                <!-- Municipio -->
+                <!-- ESTADO -->
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Ubicación / Municipio</label>
-                    <select wire:model.live="municipio" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-xs font-semibold text-gray-700 dark:text-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-600">
-                        <option value="">Todas las zonas</option>
-                        @foreach($municipios as $m)
-                            <option value="{{ $m }}">{{ $m }}</option>
+                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Estado</label>
+                    <select wire:model.live="selectedEstado" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-600">
+                        <option value="">Todos los Estados</option>
+                        @foreach($this->estados as $est)
+                            <option value="{{ $est }}">{{ $est }}</option>
                         @endforeach
                     </select>
                 </div>
 
-                <!-- Tipos de Inmueble -->
+                <!-- MUNICIPIO (Se habilita según el Estado seleccionado) -->
+                @if(!empty($selectedEstado))
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Tipo de Inmueble</label>
-                    <div class="space-y-2 text-xs font-medium text-gray-700 dark:text-gray-300">
-                        @foreach($tiposVivienda as $tipo)
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" wire:model.live="tipo_vivienda_id" value="{{ $tipo->id }}" class="rounded text-indigo-600 border-gray-300 dark:border-gray-600 dark:bg-gray-900 focus:ring-indigo-500" />
-                                <span>{{ $tipo->nombre }}</span>
-                            </label>
+                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Municipio</label>
+                    <select wire:model.live="selectedMunicipio" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-600">
+                        <option value="">Todos los Municipios</option>
+                        @foreach($this->municipios as $mun)
+                            <option value="{{ $mun }}">{{ $mun }}</option>
                         @endforeach
-                    </div>
-                </div>
-
-                <!-- Recámaras -->
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Recámaras Mínimas</label>
-                    <div class="flex gap-1">
-                        @foreach([0 => 'Todas', 1 => '1+', 2 => '2+', 3 => '3+', 4 => '4+'] as $val => $label)
-                            <button type="button" wire:click="$set('recamaras', {{ $val }})" 
-                                    class="flex-1 py-1 rounded-lg text-xs font-bold border transition {{ $recamaras == $val ? 'bg-white dark:bg-gray-800 border-2 border-indigo-600 text-indigo-600 dark:text-indigo-400' : 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-indigo-600' }}">
-                                {{ $label }}
-                            </button>
-                        @endforeach
-                    </div>
-                </div>
-
-                <!-- Presupuesto Máximo -->
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Presupuesto Máximo</label>
-                    <select wire:model.live="precio_max" class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-xs font-semibold text-gray-700 dark:text-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-600">
-                        <option value="">Sin límite</option>
-                        <option value="1500000">$1,500,000 MXN</option>
-                        <option value="3000000">$3,000,000 MXN</option>
-                        <option value="5000000">$5,000,000 MXN</option>
-                        <option value="10000000">$10,000,000 MXN</option>
                     </select>
-                </div>
-
-                <!-- Amenidades -->
-                @if($amenidadesList->count() > 0)
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Amenidades</label>
-                    <div class="space-y-2 text-xs font-medium text-gray-700 dark:text-gray-300">
-                        @foreach($amenidadesList as $amenidad)
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" wire:model.live="amenidades" value="{{ $amenidad->id }}" class="rounded text-indigo-600 border-gray-300 dark:border-gray-600 dark:bg-gray-900 focus:ring-indigo-500" />
-                                <span>{{ $amenidad->nombre }}</span>
-                            </label>
-                        @endforeach
-                    </div>
                 </div>
                 @endif
+
+                <!-- CIUDAD (Se habilita según el Municipio seleccionado) -->
+                @if(!empty($selectedMunicipio))
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Ciudad / Localidad</label>
+                    <select wire:model.live="selectedCiudad" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:border-indigo-600">
+                        <option value="">Todas las Ciudades</option>
+                        @foreach($this->ciudades as $ciu)
+                            <option value="{{ $ciu }}">{{ $ciu }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                @endif
+
+                <!-- TIPO DE VIVIENDA (Usando $this->tiposVivienda) -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Tipo de Inmueble</label>
+                    <div class="space-y-2 text-xs font-medium text-slate-700 dark:text-slate-300">
+                        @foreach($this->tiposVivienda as $tipo)
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" 
+                                    wire:model.live="tipo_vivienda_id" 
+                                    value="{{ $tipo['id'] }}" 
+                                    class="rounded text-indigo-600 border-slate-300 dark:border-slate-600 dark:bg-slate-900 focus:ring-indigo-500" />
+                                <span>{{ $tipo['nombre'] }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
+
+                <!-- AMENIDADES (Usando $this->amenidadesDisponibles) -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Amenidades</label>
+                    <div class="space-y-2 text-xs font-medium text-slate-700 dark:text-slate-300">
+                        @foreach($this->amenidadesDisponibles as $amenidad)
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" 
+                                    wire:model.live="amenidades" 
+                                    value="{{ $amenidad['id'] }}" 
+                                    class="rounded text-indigo-600 border-slate-300 dark:border-slate-600 dark:bg-slate-900 focus:ring-indigo-500" />
+                                <span>{{ $amenidad['nombre'] }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
             </div>
         </aside>
 
@@ -132,73 +137,119 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 @forelse($viviendas as $vivienda)
                     @php
-                        $fotoPrincipal = $vivienda->fotos->firstWhere('es_principal', true)?->url 
-                                         ?? $vivienda->fotos->first()?->url 
-                                         ?? 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80';
-                        $msjWa = rawurlencode("Hola, me interesa obtener más información de la propiedad: {$vivienda->fraccionamiento} (ID: {$vivienda->id}) con precio de $" . number_format($vivienda->precio_lista, 2) . " MXN");
+                        $fotoEntity = $vivienda->fotos->firstWhere('es_principal', true) ?? $vivienda->fotos->first();
+
+                        if ($fotoEntity) {
+                            $fotoUrl = route('viviendas.fotos.show', ['id' => $fotoEntity->id]);
+                        } else {
+                            $fotoUrl = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80';
+                        }
+
+                        $tituloPropiedad = $vivienda->fraccionamiento ?? 'Inmueble ID-' . $vivienda->id;
+                        
+                        $msjWa = rawurlencode("Hola, me interesa solicitar la ficha técnica y precio de la propiedad: {$tituloPropiedad} (ID: {$vivienda->id}) ubicada en {$vivienda->asentamiento?->municipio}.");
                     @endphp
 
-                    <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200/80 dark:border-gray-700/80 overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 group flex flex-col justify-between">
+                    <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 overflow-hidden shadow-sm hover:shadow-md transition-all group flex flex-col justify-between">
                         <div>
-                            <!-- IMAGEN -->
-                            <div class="relative overflow-hidden h-48 bg-gray-200 dark:bg-gray-700">
-                                <img src="{{ $fotoPrincipal }}" alt="{{ $vivienda->fraccionamiento }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                            <!-- CONTENEDOR DE LA IMAGEN Y BADGES -->
+                            <div class="relative overflow-hidden h-56 bg-slate-200 dark:bg-slate-700">
+                                <img src="{{ $fotoUrl }}" 
+                                    alt="{{ $tituloPropiedad }}" 
+                                    class="w-full h-full object-cover group-hover:scale-105 transition duration-500" 
+                                    loading="lazy" />
                                 
+                                <!-- BADGES DE ESTATUS Y CARACTERÍSTICAS CLAVE -->
                                 <div class="absolute top-3 left-3 flex flex-wrap gap-1.5 items-center">
-                                    <span class="bg-gray-900/90 dark:bg-gray-900/90 backdrop-blur text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full">
+                                    <span class="bg-slate-900/90 dark:bg-slate-950/90 backdrop-blur text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">
                                         {{ $vivienda->estatus_vivienda }}
                                     </span>
+                                    
                                     @if($vivienda->llaves)
-                                        <span class="bg-emerald-600/90 backdrop-blur text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full flex items-center gap-1">
-                                            <i class="fa-solid fa-key text-[9px]"></i> Llaves
+                                        <span class="bg-emerald-600/90 backdrop-blur text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm">
+                                            <i class="fa-solid fa-key text-[9px]"></i> Llaves listas
                                         </span>
                                     @endif
                                 </div>
+
+                                <!-- BADGE DE ID TIPO FICHA -->
+                                <div class="absolute bottom-3 right-3 bg-slate-900/80 backdrop-blur text-white text-[10px] font-mono px-2.5 py-0.5 rounded-lg border border-white/20">
+                                    ID: #{{ $vivienda->id }}
+                                </div>
                             </div>
 
-                            <!-- INFORMACIÓN -->
-                            <div class="p-4">
-                                <p class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-1 line-clamp-1">
-                                    <i class="fa-solid fa-location-dot"></i> {{ $vivienda->asentamiento?->nombre_asentamiento ?? 'Ubicación' }}, {{ $vivienda->asentamiento?->municipio }}
-                                </p>
-                                <h3 class="text-sm font-bold text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition line-clamp-1">
-                                    {{ $vivienda->fraccionamiento ?? 'Inmueble ID-' . $vivienda->id }}
-                                </h3>
-                                <p class="text-lg font-black text-gray-900 dark:text-white mt-1">
-                                    ${{ number_format($vivienda->precio_lista, 2) }} <span class="text-[10px] font-semibold text-gray-400">MXN</span>
-                                </p>
+                            <!-- CONTENIDO INFORMATIVO EXPANDIDO -->
+                            <div class="p-5 space-y-3">
+                                <!-- UBICACIÓN Y MUNICIPIO -->
+                                <div>
+                                    <p class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-1 flex items-center gap-1 line-clamp-1">
+                                        <i class="fa-solid fa-location-dot"></i> 
+                                        {{ $vivienda->asentamiento?->nombre_asentamiento ?? 'Zona residencial' }}, {{ $vivienda->asentamiento?->municipio }}
+                                    </p>
 
-                                <div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700/50 grid grid-cols-3 gap-1 text-center text-gray-600 dark:text-gray-400 text-[11px] font-medium">
-                                    <div class="bg-gray-50 dark:bg-gray-900 p-1.5 rounded-lg border border-gray-100 dark:border-gray-700/40">
-                                        <i class="fa-solid fa-bed text-indigo-600 dark:text-indigo-400 block mb-0.5"></i> {{ $vivienda->recamaras }} Rec.
+                                    <h3 class="text-base font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition line-clamp-1 uppercase">
+                                        {{ $tituloPropiedad }}
+                                    </h3>
+                                </div>
+
+                                <!-- DIRECCIÓN O REFERENCIA CERCANA -->
+                                @if($vivienda->direccion)
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed uppercase">
+                                        <i class="fa-solid fa-map-pin text-slate-400 dark:text-slate-500 mr-1 text-[11px]"></i>
+                                        {{ $vivienda->direccion }}
+                                    </p>
+                                @endif
+
+                                <!-- ESPECIFICACIONES TÉCNICAS (GRID DE 3 COLUMNAS) -->
+                                <div class="pt-2 border-t border-slate-100 dark:border-slate-700/60 grid grid-cols-3 gap-1.5 text-center text-slate-600 dark:text-slate-300 text-[11px] font-medium">
+                                    <div class="bg-slate-50 dark:bg-slate-900/60 p-2 rounded-xl border border-slate-100 dark:border-slate-700/50">
+                                        <i class="fa-solid fa-bed text-indigo-600 dark:text-indigo-400 block mb-1 text-xs"></i> 
+                                        <span>{{ $vivienda->recamaras }} Recámaras</span>
                                     </div>
-                                    <div class="bg-gray-50 dark:bg-gray-900 p-1.5 rounded-lg border border-gray-100 dark:border-gray-700/40">
-                                        <i class="fa-solid fa-house text-indigo-600 dark:text-indigo-400 block mb-0.5"></i> {{ $vivienda->tipoVivienda?->nombre ?? 'Inmueble' }}
+                                    <div class="bg-slate-50 dark:bg-slate-900/60 p-2 rounded-xl border border-slate-100 dark:border-slate-700/50">
+                                        <i class="fa-solid fa-house text-indigo-600 dark:text-indigo-400 block mb-1 text-xs"></i> 
+                                        <span class="truncate block">{{ $vivienda->tipoVivienda?->nombre ?? 'Inmueble' }}</span>
                                     </div>
-                                    <div class="bg-gray-50 dark:bg-gray-900 p-1.5 rounded-lg border border-gray-100 dark:border-gray-700/40">
-                                        <i class="fa-solid fa-hashtag text-indigo-600 dark:text-indigo-400 block mb-0.5"></i> ID: {{ $vivienda->id }}
+                                    <div class="bg-slate-50 dark:bg-slate-900/60 p-2 rounded-xl border border-slate-100 dark:border-slate-700/50">
+                                        <i class="fa-solid fa-map-location-dot text-indigo-600 dark:text-indigo-400 block mb-1 text-xs"></i> 
+                                        <span class="truncate block">{{ $vivienda->asentamiento?->tipo_asentamiento ?? 'Colonia' }}</span>
                                     </div>
                                 </div>
+
+                                <!-- LISTA DE AMENIDADES DESTACADAS (SI EXISTEN EN LA RELACIÓN) -->
+                                @if($vivienda->amenidades && $vivienda->amenidades->count() > 0)
+                                    <div class="pt-1 flex flex-wrap gap-1">
+                                        @foreach($vivienda->amenidades->take(3) as $amenidad)
+                                            <span class="inline-flex items-center gap-1 text-[10px] font-semibold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded-md border border-indigo-100 dark:border-indigo-900/50">
+                                                <i class="fa-solid fa-circle-check text-[8px] text-indigo-500"></i>
+                                                {{ $amenidad->nombre }}
+                                            </span>
+                                        @endforeach
+                                        @if($vivienda->amenidades->count() > 3)
+                                            <span class="text-[10px] font-bold text-slate-400 self-center pl-1">
+                                                +{{ $vivienda->amenidades->count() - 3 }} más
+                                            </span>
+                                        @endif
+                                    </div>
+                                @endif
                             </div>
                         </div>
 
-                        <!-- CTA WHATSAPP -->
-                        <div class="px-4 pb-4">
-                            <a href="https://wa.me/521223456789?text={{ $msjWa }}" target="_blank" 
-                               class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-2 transition shadow-sm">
-                                <i class="fa-brands fa-whatsapp text-sm"></i>
-                                <span>Pedir Informes</span>
+                        <!-- CTA PRINCIPAL SOLICITAR PRECIO / INFORMES POR WHATSAPP -->
+                        <div class="px-5 pb-5 pt-2">
+                            <a href="https://wa.me/522292433841?text={{ $msjWa }}" 
+                            target="_blank" 
+                            class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition shadow-sm hover:shadow">
+                                <i class="fa-brands fa-whatsapp text-base"></i>
+                                <span>Solicitar Precio / Informes</span>
                             </a>
                         </div>
                     </div>
                 @empty
-                    <div class="col-span-full bg-white dark:bg-gray-800 p-12 rounded-2xl border border-gray-200 dark:border-gray-700 text-center">
-                        <i class="fa-solid fa-house-circle-xmark text-4xl text-gray-400 mb-3 block"></i>
-                        <h3 class="text-base font-bold text-gray-900 dark:text-white">No se encontraron propiedades</h3>
-                        <p class="text-xs text-gray-500 mt-1">Intenta modificar los criterios de búsqueda o limpia los filtros aplicados.</p>
-                        <button wire:click="limpiarFiltros" class="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition">
-                            Limpiar Filtros
-                        </button>
+                    <div class="col-span-full bg-white dark:bg-slate-800 p-12 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 text-center space-y-3">
+                        <i class="fa-solid fa-house-circle-xmark text-4xl text-slate-400"></i>
+                        <h3 class="text-base font-bold text-slate-900 dark:text-white">No se encontraron propiedades</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Intenta modificar los filtros aplicados para obtener resultados.</p>
                     </div>
                 @endforelse
             </div>

@@ -3,6 +3,7 @@
 namespace App\Contexts\Shared\Application\UseCases\Amenidades;
 
 use App\Contexts\Shared\Domain\Repositories\AmenidadRepositoryInterface;
+use App\Contexts\Shared\Application\DTOs\Amenidad\AmenidadDTO;
 
 class GetAmenidadesForSelectUseCase
 {
@@ -12,6 +13,11 @@ class GetAmenidadesForSelectUseCase
 
     public function execute(): array
     {
-        return $this->repository->all();
+        $entities = $this->repository->all();
+
+        return array_map(
+            fn($amenidad) => AmenidadDTO::fromEntity($amenidad)->toArray(),
+            $entities
+        );
     }
 }

@@ -20,12 +20,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- FontAwesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-
-    <!-- Alpine JS Core -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
     </style>
@@ -123,7 +117,7 @@
                 </a>
 
                 <!-- CTA Principal WhatsApp -->
-                <a href="https://wa.me/521234567890?text=Hola,%20quisiera%20pedir%20informes%20sobre%20las%20propiedades%20del%20catálogo" 
+                <a href="https://wa.me/522292433841?text=Hola,%20quisiera%20pedir%20informes%20sobre%20las%20propiedades%20del%20catálogo" 
                    target="_blank" 
                    class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-4 sm:px-5 py-2.5 rounded-xl text-xs uppercase tracking-wider transition shadow-sm flex items-center gap-2">
                     <i class="fa-brands fa-whatsapp text-sm"></i>
@@ -159,7 +153,7 @@
 
             <!-- CONTACTO RÁPIDO / AVISO -->
             <div class="flex items-center space-x-6 text-slate-400">
-                <a href="https://wa.me/521234567890" target="_blank" class="hover:text-emerald-400 transition flex items-center gap-1.5 font-medium">
+                <a href="https://wa.me/522292433841" target="_blank" class="hover:text-emerald-400 transition flex items-center gap-1.5 font-medium">
                     <i class="fa-brands fa-whatsapp text-sm text-emerald-500"></i>
                     <span>Soporte / Asesoría</span>
                 </a>

@@ -4,39 +4,114 @@ namespace App\Contexts\Public\Presentation\Livewire;
 
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\Computed;
+use Livewire\Attributes\Url;
+
 use App\Contexts\Viviendas\Infrastructure\LaravelModels\ViviendaEloquentModel;
-use App\Contexts\Shared\Infrastructure\LaravelModels\TipoViviendaEloquentModel;
-use App\Contexts\Shared\Infrastructure\LaravelModels\AmenidadEloquentModel;
-use App\Contexts\Shared\Infrastructure\LaravelModels\AsentamientoEloquentModel;
+
+// CASOS DE USO REUTILIZADOS DEL BOUNDED CONTEXT SHARED
+use App\Contexts\Shared\Application\UseCases\Asentamientos\GetUniqueEstadosUseCase;
+use App\Contexts\Shared\Application\UseCases\Asentamientos\GetUniqueMunicipiosUseCase;
+use App\Contexts\Shared\Application\UseCases\Asentamientos\GetUniqueCiudadesUseCase;
+use App\Contexts\Shared\Application\UseCases\TiposVivienda\GetTiposViviendaForSelectUseCase;
+use App\Contexts\Shared\Application\UseCases\Amenidades\GetAmenidadesForSelectUseCase;
+
 
 class CatalogoPage extends Component
 {
     use WithPagination;
 
-    // Propiedades de Filtros
+    // Buscador general
+    #[Url(history: true, keep: true)]
     public $search = '';
+
+    // Filtros de Ubicación en Cadena
+    #[Url(keep: true)]
+    public $selectedEstado = '';
+
+    #[Url(keep: true)]
+    public $selectedMunicipio = '';
+
+    #[Url(keep: true)]
+    public $selectedCiudad = '';
+
+    // Filtros Técnicos y de Inmueble
+    #[Url(keep: true)]
     public $estatus = '';
-    public $municipio = '';
+
+    #[Url(keep: true)]
     public $tipo_vivienda_id = [];
+
+    #[Url(keep: true)]
     public $recamaras = 0;
+
+    #[Url(keep: true)]
     public $precio_max = '';
+
+    #[Url(keep: true)]
     public $amenidades = [];
+
+    #[Url(keep: true)]
     public $sort = 'recent';
 
-    protected $queryString = [
-        'search'           => ['except' => ''],
-        'estatus'          => ['except' => ''],
-        'municipio'        => ['except' => ''],
-        'tipo_vivienda_id' => ['except' => []],
-        'recamaras'        => ['except' => 0],
-        'precio_max'       => ['except' => ''],
-        'amenidades'       => ['except' => []],
-        'sort'             => ['except' => 'recent'],
-    ];
+    // ==========================================
+    // PROPIEDADES COMPUTADAS (CASOS DE USO)
+    // ==========================================
+
+    #[Computed]
+    public function estados()
+    {
+        return app(GetUniqueEstadosUseCase::class)->execute();
+    }
+
+    #[Computed]
+    public function municipios()
+    {
+        return app(GetUniqueMunicipiosUseCase::class)->execute($this->selectedEstado);
+    }
+
+    #[Computed]
+    public function ciudades()
+    {
+        return app(GetUniqueCiudadesUseCase::class)->execute($this->selectedEstado, $this->selectedMunicipio);
+    }
+
+    #[Computed]
+    public function tiposVivienda()
+    {
+        return app(GetTiposViviendaForSelectUseCase::class)->execute();
+    }
+
+    #[Computed]
+    public function amenidadesDisponibles()
+    {
+        return app(GetAmenidadesForSelectUseCase::class)->execute();
+    }
+
+    // ==========================================
+    // LISTENERS Y CASCADA DE FILTROS DE UBICACIÓN
+    // ==========================================
+
+    public function updatedSelectedEstado()
+    {
+        $this->selectedMunicipio = '';
+        $this->selectedCiudad = '';
+        $this->resetPage();
+    }
+
+    public function updatedSelectedMunicipio()
+    {
+        $this->selectedCiudad = '';
+        $this->resetPage();
+    }
+
+    public function updatedSelectedCiudad()
+    {
+        $this->resetPage();
+    }
 
     public function updatingSearch() { $this->resetPage(); }
     public function updatingEstatus() { $this->resetPage(); }
-    public function updatingMunicipio() { $this->resetPage(); }
     public function updatingTipoViviendaId() { $this->resetPage(); }
     public function updatingRecamaras() { $this->resetPage(); }
     public function updatingPrecioMax() { $this->resetPage(); }
@@ -45,16 +120,31 @@ class CatalogoPage extends Component
 
     public function limpiarFiltros()
     {
-        $this->reset(['search', 'estatus', 'municipio', 'tipo_vivienda_id', 'recamaras', 'precio_max', 'amenidades', 'sort']);
+        $this->reset([
+            'search', 
+            'selectedEstado', 
+            'selectedMunicipio', 
+            'selectedCiudad', 
+            'estatus', 
+            'tipo_vivienda_id', 
+            'recamaras', 
+            'precio_max', 
+            'amenidades', 
+            'sort'
+        ]);
         $this->resetPage();
     }
+
+    // ==========================================
+    // RENDERIZADO DEL CATÁLOGO
+    // ==========================================
 
     public function render()
     {
         $query = ViviendaEloquentModel::query()
             ->with(['asentamiento', 'tipoVivienda', 'fotos', 'amenidades']);
 
-        // Buscador
+        // Buscador ID / Fraccionamiento / Dirección
         if (!empty($this->search)) {
             $search = $this->search;
             $query->where(function ($q) use ($search) {
@@ -69,10 +159,18 @@ class CatalogoPage extends Component
             $query->where('estatus_vivienda', $this->estatus);
         }
 
-        // Filtro Municipio
-        if (!empty($this->municipio)) {
+        // Cadena de Ubicación en Cascada mediante relación Asentamiento
+        if (!empty($this->selectedEstado)) {
             $query->whereHas('asentamiento', function ($q) {
-                $q->where('municipio', $this->municipio);
+                $q->where('estado', $this->selectedEstado);
+
+                if (!empty($this->selectedMunicipio)) {
+                    $q->where('municipio', $this->selectedMunicipio);
+                }
+
+                if (!empty($this->selectedCiudad)) {
+                    $q->where('ciudad', $this->selectedCiudad);
+                }
             });
         }
 
@@ -81,7 +179,7 @@ class CatalogoPage extends Component
             $query->whereIn('tipo_vivienda_id', (array) $this->tipo_vivienda_id);
         }
 
-        // Filtro Recámaras
+        // Filtro Recámaras Mínimas
         if ($this->recamaras > 0) {
             $query->where('recamaras', '>=', (int) $this->recamaras);
         }
@@ -106,18 +204,10 @@ class CatalogoPage extends Component
             default      => $query->orderBy('created_at', 'desc'),
         };
 
-        $viviendas = $query->paginate(9);
-
-        // Catálogos auxiliares para los filtros
-        $municipios = AsentamientoEloquentModel::distinct()->pluck('municipio')->filter()->values();
-        $tiposVivienda = TipoViviendaEloquentModel::all();
-        $amenidadesList = AmenidadEloquentModel::all();
-
         return view('public::catalogo-page', [
-            'viviendas'     => $viviendas,
-            'municipios'    => $municipios,
-            'tiposVivienda' => $tiposVivienda,
-            'amenidadesList' => $amenidadesList,
-        ])->layout('shared::layouts.public-catalogo');
+            'viviendas' => $query->paginate(9)
+        ])
+        ->layout('shared::layouts.public-catalogo')
+        ->title('Catálogo de Inmuebles');
     }
 }

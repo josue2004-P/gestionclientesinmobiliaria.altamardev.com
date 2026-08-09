@@ -81,6 +81,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('usuarios/assets/{directory}/{filename}', DownloadUsuarioDigitalAssetController::class)
         ->name('security.usuarios.asset');
 
+    Route::get('/profile', EditProfilePage::class)->name('profile.edit');
+
     // --- MÓDULO 4: CATÁLOGO DE ASENTAMIENTOS ---
     Route::get('asentamientos', IndexAsentamientos::class)->name('asentamientos.index');
     Route::get('asentamientos/crear', CreateAsentamiento::class)->name('asentamientos.create');
@@ -109,9 +111,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/viviendas/documentos/{id}/descargar', [ViviendaDocumentoController::class, 'download'])
         ->name('viviendas.documentos.download');
 
-    Route::get('/viviendas/fotos/{id}/ver', [ViviendaFotoController::class, 'show'])
-        ->name('viviendas.fotos.show');
-
     // --- MÓDULO 6: COMERCIAL DE COMPRADORES (CLIENTES) ---
     Route::get('clientes', IndexClientes::class)->name('clientes.index');
     Route::get('clientes/crear', CreateCliente::class)->name('clientes.create');
@@ -125,7 +124,12 @@ Route::get('/dashboard', DashboardPage::class)
     ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', EditProfilePage::class)->name('profile.edit');
 });
+
+// MODULO VIVIENDAS 
+
+Route::get('/viviendas/fotos/{id}/ver', [ViviendaFotoController::class, 'show'])
+    ->name('viviendas.fotos.show');
+
 
 require __DIR__.'/auth.php';
