@@ -13,23 +13,8 @@
         pattern="[0-9]*"
         @disabled($disabled)
         placeholder="{{ $placeholder }}"
-        @keydown="
-            // Permitir teclas de control: Backspace, Tab, Delete, Esc, Enter, Flechas
-            if (['Backspace', 'Tab', 'Delete', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'Home', 'End'].includes($event.key)) {
-                return;
-            }
-            // Bloquear cualquier tecla que no sea un número del 0 al 9
-            if (!/^[0-9]$/.test($event.key)) {
-                $event.preventDefault();
-            }
-        "
-        @paste="
-            // Validar que el texto pegado sea estrictamente numérico
-            let paste = ($event.clipboardData || window.clipboardData).getData('text');
-            if (!/^\d+$/.test(paste)) {
-                $event.preventDefault();
-            }
-        "
+        @keydown="['Backspace', 'Tab', 'Delete', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'Home', 'End'].includes($event.key) || /^[0-9]$/.test($event.key) || $event.preventDefault()"
+        @paste="/^\d+$/.test(($event.clipboardData || window.clipboardData).getData('text')) || $event.preventDefault()"
         {{ $attributes->merge([
             'class' => "
                 dark:bg-dark-900 shadow-theme-xs
