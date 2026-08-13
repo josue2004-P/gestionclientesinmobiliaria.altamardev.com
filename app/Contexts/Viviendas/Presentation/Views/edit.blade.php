@@ -9,24 +9,127 @@
         ]"
     />
 
-    <div class="max-w-5xl text-left">
+    {{-- Envolvente Alpine con persistencia local --}}
+    <div 
+        class="max-w-5xl text-left" 
+        wire:ignore.self
+        x-data="{ 
+            tab: localStorage.getItem('vivienda_active_tab_edit') || 'general',
+            setTab(val) {
+                this.tab = val;
+                localStorage.setItem('vivienda_active_tab_edit', val);
+            }
+        }"
+    >
         <form wire:submit="save">
+
+            {{-- Navegación de Tabs Responsiva (Móvil Scroll + Desktop) --}}
+            <div class="border-b border-gray-200 dark:border-gray-800 mb-6">
+                <nav class="-mb-px flex space-x-2 sm:space-x-4 overflow-x-auto no-scrollbar py-1" aria-label="Tabs">
+                    
+                    {{-- Tab 1: Ficha del Inmueble --}}
+                    <button
+                        type="button"
+                        @click="setTab('general')"
+                        :class="tab === 'general' 
+                            ? 'border-indigo-600 dark:border-indigo-500 text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/70 dark:bg-indigo-950/40' 
+                            : 'border-transparent text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100/60 dark:hover:bg-gray-900/50 font-medium'"
+                        class="whitespace-nowrap pb-2.5 pt-2 px-3.5 border-b-2 rounded-t-lg text-xs sm:text-sm flex items-center gap-2 transition-all cursor-pointer shrink-0"
+                    >
+                        <i class="fa-solid fa-house text-xs sm:text-sm"></i>
+                        <span>Ficha del Inmueble</span>
+                    </button>
+
+                    {{-- Tab 2: Contactos --}}
+                    <button
+                        type="button"
+                        @click="setTab('contactos')"
+                        :class="tab === 'contactos' 
+                            ? 'border-indigo-600 dark:border-indigo-500 text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/70 dark:bg-indigo-950/40' 
+                            : 'border-transparent text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100/60 dark:hover:bg-gray-900/50 font-medium'"
+                        class="whitespace-nowrap pb-2.5 pt-2 px-3.5 border-b-2 rounded-t-lg text-xs sm:text-sm flex items-center gap-2 transition-all cursor-pointer shrink-0"
+                    >
+                        <i class="fa-solid fa-address-book text-xs sm:text-sm"></i>
+                        <span>Contactos Relacionados</span>
+                        <span 
+                            class="px-2 py-0.5 text-[10px] font-semibold rounded-full border transition-colors"
+                            :class="tab === 'contactos'
+                                ? 'bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800'
+                                : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700'"
+                        >
+                            {{ count($contactos) }}
+                        </span>
+                    </button>
+
+                    {{-- Tab 3: Expediente Digital y Galería --}}
+                    <button
+                        type="button"
+                        @click="setTab('expediente_fotos')"
+                        :class="tab === 'expediente_fotos' 
+                            ? 'border-indigo-600 dark:border-indigo-500 text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-50/70 dark:bg-indigo-950/40' 
+                            : 'border-transparent text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100/60 dark:hover:bg-gray-900/50 font-medium'"
+                        class="whitespace-nowrap pb-2.5 pt-2 px-3.5 border-b-2 rounded-t-lg text-xs sm:text-sm flex items-center gap-2 transition-all cursor-pointer shrink-0"
+                    >
+                        <i class="fa-solid fa-folder-open text-xs sm:text-sm"></i>
+                        <span>Expediente Digital y Fotos</span>
+                        <span 
+                            class="px-2 py-0.5 text-[10px] font-semibold rounded-full border transition-colors"
+                            :class="tab === 'expediente_fotos'
+                                ? 'bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800'
+                                : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700'"
+                        >
+                            {{ count($documentos) + count($fotos) }}
+                        </span>
+                    </button>
+
+                </nav>
+            </div>
+
+            {{-- Tarjeta Principal con el Contenido Reactivo --}}
             <x-shared::common.component-card 
                 title="Actualizar Características del Inmueble" 
                 desc="Los cambios realizados afectarán las simulaciones de crédito activas y la disponibilidad en el CRM corporativo." 
                 class="shadow-sm border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 transition-colors duration-200"
             >
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    @include('viviendas::partials.datos-generales')
-                    @include('viviendas::partials.ubicacion-geografica')
-                    @include('viviendas::partials.amenidades-creditos')
-                    @include('viviendas::partials.contactos')
-                    @include('viviendas::partials.expediente-archivos')
+                <div class="mt-2">
+                    
+                    {{-- TAB 1: INFORMACIÓN GENERAL --}}
+                    <div x-show="tab === 'general'" x-cloak class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            @include('viviendas::partials.datos-generales')
+                            @include('viviendas::partials.ubicacion-geografica')
+                        </div>
+
+                        {{-- Créditos y Amenidades --}}
+                        @include('viviendas::partials.amenidades-creditos')
+                    </div>
+
+                    {{-- TAB 2: CONTACTOS RELACIONADOS --}}
+                    <div x-show="tab === 'contactos'" x-cloak>
+                        @include('viviendas::partials.contactos')
+                    </div>
+
+                    {{-- TAB 3: EXPEDIENTE Y FOTOS --}}
+                    <div x-show="tab === 'expediente_fotos'" x-cloak class="space-y-8">
+                        {{-- Componente Expediente / Documentos --}}
+                        <div>
+                            @livewire('viviendas::vivienda-documentos-section', ['documentos' => $documentos], key('docs-sec-'.$viviendaId))
+                        </div>
+
+                        {{-- Separador Visual --}}
+                        <div class="border-t border-gray-200 dark:border-gray-800"></div>
+
+                        {{-- Componente Fotos / Galería Comercial --}}
+                        <div>
+                            @livewire('viviendas::vivienda-fotos-section', ['fotos' => $fotos], key('fotos-sec-'.$viviendaId))
+                        </div>
+                    </div>
+
                 </div>
-                
+
+                {{-- Footer Único de la Card para Guardar / Cancelar --}}
                 <x-slot:footer>
-                    <div class="flex items-center justify-between">
-                        {{-- Botón Cancelar  --}}
+                    <div class="flex items-center justify-between w-full">
                         <x-shared::form.link 
                             :href="route('viviendas.index')" 
                             danger
@@ -34,7 +137,6 @@
                             <i class="fa-solid fa-xmark mr-2 text-sm"></i> Cancelar
                         </x-shared::form.link>
 
-                        {{-- Botón Guardar / Acción con soporte Livewire --}}
                         <x-shared::form.button-form 
                             type="submit" 
                             variant="primary" 
@@ -44,12 +146,13 @@
                         >
                             <i class="fa-solid fa-floppy-disk text-sm" wire:loading.remove wire:target="save"></i>
                             <i class="fa-solid fa-circle-notch animate-spin text-sm" wire:loading wire:target="save"></i>
-                            <span class="" wire:loading.remove wire:target="save">Guardar Cambios</span>
-                            <span class="" wire:loading wire:target="save">Procesando...</span>
+                            <span wire:loading.remove wire:target="save">Guardar Cambios</span>
+                            <span wire:loading wire:target="save">Procesando...</span>
                         </x-shared::form.button-form>
                     </div>
                 </x-slot:footer>
             </x-shared::common.component-card>
+
         </form>
     </div>
 </div>

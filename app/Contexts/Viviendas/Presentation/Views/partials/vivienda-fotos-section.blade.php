@@ -1,4 +1,4 @@
-<div class="pt-6 mt-6 border-t-2 border-dashed border-gray-200 dark:border-gray-800">
+<div class="">
     <div class="mb-5">
         <span class="block text-sm font-extrabold uppercase tracking-tight text-gray-900 dark:text-white">
             Galería Fotográfica Comercial

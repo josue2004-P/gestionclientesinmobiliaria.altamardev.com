@@ -1,4 +1,4 @@
-<div class="md:col-span-3 pt-6 mt-4 border-t-2 border-dashed border-gray-200 dark:border-gray-800">
+<div class="md:col-span-3 ">
     {{-- Encabezado de la Sección --}}
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
         <div>
